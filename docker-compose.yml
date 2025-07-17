@@ -6,7 +6,7 @@ services:
       dockerfile: dockerfile
     environment:
       DB_HOST: mariadb
-      DB_NAME_2: authshare
+      DB_NAME: authshare
       DB_USER: authshare
       DB_PASSWORD: 5ES2#7PhHZplRm
       DENO_ENV: development
@@ -14,7 +14,7 @@ services:
       - ./service/src:/app
     ports:
       - "8000:8000"
-    command: ["deno", "run", "--watch", "--allow-net", "main.ts"]
+    command: ["deno", "run", "--watch", "--allow-net", "--allow-env", "main.ts"]
 
   mariadb:
     container_name: database
