@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     pwdhash TEXT NOT NULL,
@@ -7,38 +7,38 @@ CREATE TABLE users (
 );
 
 CREATE TABLE groups (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     groupname VARCHAR(255) UNIQUE,
-    owner INTEGER UNIQUE,
-    Foreign Key (owner) REFERENCES users (id)
+    owner INTEGER UNSIGNED UNIQUE,
+    FOREIGN KEY (owner) REFERENCES users (id)
 );
 
 CREATE TABLE service (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     servicename TEXT NOT NULL,
     loginname TEXT NOT NULL,
     loginpassword TEXT NOT NULL,
-    twoFAref TEXT,
-    owner INTEGER not NULL,
+    two_fa_ref TEXT,
+    owner INTEGER UNSIGNED not NULL,
     FOREIGN KEY (owner) REFERENCES users (id)
 );
 
 CREATE TABLE service_permission (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    user_id INTEGER,
-    group_id INTEGER,
-    service_id INTEGER NOT NULL,
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER UNSIGNED,
+    group_id INTEGER UNSIGNED,
+    service_id INTEGER UNSIGNED NOT NULL,
     UNIQUE (user_id, service_id),
     UNIQUE (group_id, service_id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (group_id) REFERENCES groups (id),
     FOREIGN KEY (service_id) REFERENCES service (id),
-    Check (
+    CHECK (
         (
             user_id IS NOT NULL
             AND group_id IS null
         )
-        or (
+        OR (
             user_id IS NULL
             AND group_id IS NOT NULL
         )
@@ -46,33 +46,20 @@ CREATE TABLE service_permission (
 );
 
 CREATE TABLE user_groups (
-    user_id INTEGER,
-    group_id INTEGER,
+    user_id INTEGER UNSIGNED,
+    group_id INTEGER UNSIGNED,
     PRIMARY KEY (user_id, group_id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (group_id) REFERENCES groups (id)
 );
 
 CREATE TABLE group_invitation (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    group_id INTEGER NOT NULL,
-    user_id INTEGER,
-    expire_after TIMESTAMP,
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    group_id INTEGER UNSIGNED NOT NULL,
+    user_id INTEGER UNSIGNED,
+    expire_after TIMESTAMP NOT NULL,
     remaining_uses SMALLINT DEFAULT -1,
-    Foreign Key (user_id) REFERENCES users (id),
-    Foreign Key (group_id) REFERENCES groups (id)
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (group_id) REFERENCES groups (id)
 );
 
-DELIMITER //
-
-CREATE TRIGGER set_expirydate
-BEFORE INSERT ON group_invitation 
-FOR EACH ROW
-BEGIN
-    IF NEW.expire_after is NULL THEN
-        SET NEW.expire_after = NOW() + INTERVAL 5 MINUTE;
-    END IF;
-END;
-//
-
-DELIMITER ;
