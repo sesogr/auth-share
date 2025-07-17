@@ -1,6 +1,9 @@
 services:
   service-dev:
-    build: .
+    container_name: dev-service
+    build:
+      context: .
+      dockerfile: dockerfile
     environment:
       DB_HOST: mariadb
       DB_NAME_2: authshare
@@ -14,6 +17,7 @@ services:
     command: ["deno", "run", "--watch", "--allow-net", "main.ts"]
 
   mariadb:
+    container_name: database
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: xy9#wAX*MFQ1#Q
