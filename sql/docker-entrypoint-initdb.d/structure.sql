@@ -3,7 +3,7 @@ CREATE TABLE users (
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     pwdhash TEXT NOT NULL,
-    two_fa_ref TEXT,
+    two_fa_ref TEXT
 );
 
 CREATE TABLE groups (
@@ -36,11 +36,11 @@ CREATE TABLE service_permission (
     Check (
         (
             user_id IS NOT NULL
-            AND group_is IS null
+            AND group_id IS null
         )
         or (
             user_id IS NULL
-            AND group_is IS NOT NULL
+            AND group_id IS NOT NULL
         )
     )
 );
@@ -54,25 +54,25 @@ CREATE TABLE user_groups (
 );
 
 CREATE TABLE group_invitation (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     group_id INTEGER NOT NULL,
     user_id INTEGER,
     expire_after TIMESTAMP,
     remaining_uses SMALLINT DEFAULT -1,
-    Foreign Key (user_id) REFERENCES user (id),
+    Foreign Key (user_id) REFERENCES users (id),
     Foreign Key (group_id) REFERENCES groups (id)
-)
+);
 
-DELIMITER /
+DELIMITER //
 
 CREATE TRIGGER set_expirydate
 BEFORE INSERT ON group_invitation 
 FOR EACH ROW
 BEGIN
-    IF NEW.expire_at is NULL THEN
-        SET NEW.expire_at = NOW() + INTERVAL 5 MINUTE;
+    IF NEW.expire_after is NULL THEN
+        SET NEW.expire_after = NOW() + INTERVAL 5 MINUTE;
     END IF;
 END;
-/
+//
 
-DELIMITER;
+DELIMITER ;
