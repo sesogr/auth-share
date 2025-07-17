@@ -1,4 +1,17 @@
 services:
+  service-dev:
+    build: .
+    environment:
+      DB_HOST: mariadb
+      DB_NAME_2: authshare
+      DB_USER: authshare
+      DB_PASSWORD: 5ES2#7PhHZplRm
+      DENO_ENV: development
+    volumes:
+      - ./service/src:/app
+    ports:
+      - "8000:8000"
+    command: ["deno", "run", "--watch", "--allow-net", "main.ts"]
 
   mariadb:
     image: mariadb:latest
