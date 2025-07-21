@@ -1,3 +1,1 @@
-export interface Database{
-    test:number
-}
+export interface Database {}
