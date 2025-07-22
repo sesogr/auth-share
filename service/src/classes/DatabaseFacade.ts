@@ -4,19 +4,19 @@ import {
   ClientConfig,
   Connection,
 } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
-export default class DBManager implements Database {
-  private credentials!: ClientConfig;
+export default class DatabaseFacade implements Database {
+  private credentials: ClientConfig;
   private static requireEnv(key: string): string {
     const value = Deno.env.get(key);
     if (!value) throw new Error(`Missing environment variable: ${key}`);
     return value;
   }
-  DBManager() {
+  constructor() {
     this.credentials = {
-      hostname: DBManager.requireEnv("DB_HOST"),
-      username: DBManager.requireEnv("DB_USER"),
-      db: DBManager.requireEnv("DB_NAME"),
-      password: DBManager.requireEnv("DB_PASSWORD"),
+      hostname: DatabaseFacade.requireEnv("DB_HOST"),
+      username: DatabaseFacade.requireEnv("DB_USER"),
+      db: DatabaseFacade.requireEnv("DB_NAME"),
+      password: DatabaseFacade.requireEnv("DB_PASSWORD"),
     };
   }
 }
