@@ -1,25 +1,29 @@
-import "../ports/Database.ts";
-import { Database, Userinfo } from "../ports/Database.ts";
+import "../ports/Repository.ts";
+import { Repository } from "../ports/Repository.ts";
+import { User } from "../ports/User.ts";
+import { UserFacade } from "../src/classes/UserFacade.ts";
 
-export class MemoryDatabase implements Database {
-  private generateUsers(): Userinfo[] {
-    const Userlist: Userinfo[] = [];
+export class MemoryDatabase implements Repository {
+  private users: User[] = [];
+  private generateUsers(): boolean {
+    const userlist: User[] = [];
     for (let i: number = 1; i < 10; i++) {
-      Userlist.push({
-        email: `${i}@${i}.de}`,
-        name: `name${i}`,
-        passwort: `pass1234`,
-        twofaref: ``,
-      });
+      this.users.push(
+        new UserFacade(`${i}@${i}.de}`, `name${i}`, `pass1234`, ``)
+      );
     }
-    return Userlist;
+    return true;
   }
-  getUserinfoList(): Userinfo[] {
-    return this.generateUsers();
+  addNewUser(user: User) {
+    this.users.push(user);
+    return true;
   }
-  getUserinfoByName(name: string): Userinfo {
-    const user: Userinfo | undefined = this.generateUsers().find(
-      (e) => e.name === name
+  getUserList(): User[] {
+    return this.users;
+  }
+  findUserByName(name: string): User {
+    const user: User | undefined = this.users.find(
+      (e: User) => e.getName() === name
     );
     if (user === undefined) {
       throw new Error("user not found");

@@ -1,10 +1,10 @@
-import { Database } from "../../ports/Database.ts";
+import { Repository } from "../../ports/Repository.ts";
 import {
   Client,
   ClientConfig,
   Connection,
 } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
-export default class DatabaseFacade implements Database {
+export default class DatabaseFacade implements Repository {
   private credentials: ClientConfig;
   private static requireEnv(key: string): string {
     const value = Deno.env.get(key);
