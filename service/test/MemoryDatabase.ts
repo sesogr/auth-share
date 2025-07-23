@@ -5,14 +5,17 @@ import { UserFacade } from "../src/classes/UserFacade.ts";
 
 export class MemoryDatabase implements Repository {
   private users: User[] = [];
-  private generateUsers(): boolean {
+  private static generateUsers(): User[] {
     const userlist: User[] = [];
     for (let i: number = 1; i < 10; i++) {
-      this.users.push(
+      userlist.push(
         new UserFacade(`${i}@${i}.de}`, `name${i}`, `pass1234`, ``)
       );
     }
-    return true;
+    return userlist;
+  }
+  constructor() {
+    this.users = MemoryDatabase.generateUsers();
   }
   addNewUser(user: User) {
     this.users.push(user);
