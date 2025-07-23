@@ -5,9 +5,8 @@ WORKDIR /app
 
 # Copy source
 COPY ./service/src .
-
 # Compile the main app
 RUN deno cache main.ts
 
 # Run the app
-CMD ["deno", "run", "--allow-net --allow-env", "main.ts"]
+CMD ["deno", "run", "--allow-net", "--allow-read=/deno-dir/npm", "--allow-env", "main.ts"]

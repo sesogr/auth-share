@@ -13,8 +13,8 @@ services:
     volumes:
       - ./service/src:/app
     ports:
-      - "8000:8000"
-    command: ["deno", "run", "--watch", "--allow-net", "--allow-env", "main.ts"]
+      - "8000:3000"
+    command: ["deno", "run", "--watch", "--allow-net","--allow-read=/deno-dir/npm", "--allow-env", "main.ts"]
 
   mariadb:
     container_name: database
