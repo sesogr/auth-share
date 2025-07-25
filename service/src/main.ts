@@ -1,16 +1,33 @@
-// @ts-types="npm:@types/express@4.17.15"
-import express from "npm:express";
-import cookie_parser from "npm:cookie-parser";
+import { Application, Router } from "https://deno.land/x/oak/mod.ts";
+import process from "node:process";
 
-const app = express();
-const port = process.env.PORT || 3000;
-app.use(cookie_parser());
-app.get("/", async (req, res) => {
+const app = new Application();
+const port: number = Number(process.env.PORT) || 3000;
+const router = new Router();
+const decoder = new TextDecoder("utf-8");
+const certfile = await Deno.readFile("./certs/mycert.crt");
+const keyfile = await Deno.readFile("./certs/mykey.key");
+const key = decoder.decode(keyfile);
+const cert = decoder.decode(certfile);
+
+router.get("/", async (context) => {
   console.log("ich bin hier");
-  res.cookie("testcookie", "yes", {
-    domain: "wekan.sedna-soft.de",
+  context.cookies.set("testcookie", "yes", {
+    domain: "localhost",
+    sameSite: "none",
     expires: new Date(Date.now() + 500000),
   });
+  const fetcher = await fetch("", {
+    credentials: "include",
+  });
+
+  if (!fetcher.ok) {
+    return;
+  }
+  console.log(fetcher);
+  let body = fetcher.body;
+  let head = fetcher.headers;
+
   const embeddedWebsite = `
     <!DOCTYPE html>
     <html lang="en">
@@ -20,14 +37,22 @@ app.get("/", async (req, res) => {
       <title>Embedded Website</title>
     </head>
     <body>
-      <h1>Embedded Website Example</h1>
-      <iframe src="https://wekan.sedna-soft.de/" width="100%" height="600px" style="border:none;"></iframe>
-    </body>
+    <h1>Embedded Website Example</h1>
+      <iframe id="1" src="" width="100%" height="600px" style="border:none;"></iframe>
+      <script>
+      </script>
+      </body>
     </html>
   `;
-  res.send(embeddedWebsite);
+  //context.response.headers = head;
+  context.response.body = embeddedWebsite;
 });
+app.use(router.routes());
+app.use(router.allowedMethods());
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+await app.listen({
+  port: port,
+  secure: true,
+  cert: cert,
+  key: key,
 });
