@@ -11,10 +11,18 @@ services:
       DB_PASSWORD: 5ES2#7PhHZplRm
       DENO_ENV: development
     volumes:
-      - ./service/src:/app
+      - ./service:/app
     ports:
       - "8000:3000"
-    command: ["deno", "run", "--watch", "--allow-net","--allow-read=/deno-dir/npm", "--allow-env", "main.ts"]
+    command:
+      [
+        "deno",
+        "run",
+        "--watch",
+        "--allow-all",
+        "--unsafely-ignore-certificate-errors",
+        "src/main.ts",
+      ]
 
   mariadb:
     container_name: database
