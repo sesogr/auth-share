@@ -29,6 +29,7 @@ router.get("/liveconfig/login", async (context) => {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
+    Credentials: "omit",
     body: `a=2&l=${logindetails.l}&p=${logindetails.p}&lang=`,
   }
   const request = new Request("https://lc.commodea.com/liveconfig/login", data)
@@ -36,8 +37,14 @@ router.get("/liveconfig/login", async (context) => {
   if (!fetchresponse.ok) {
     return;
   }
-  console.log(bodyData)
-  console.log(fetchresponse)
+  const cookie = fetchresponse.headers.getSetCookie()
+  if (!cookie){
+    throw Error("no cookie found")
+  }
+  console.log(fetchresponse.headers)
+  console.log(cookie)
+  const actualCookie = cookie[0]
+  context.response.headers.set("set-cookie", actualCookie)
   context.response.body = "<html><head><title>hallo</title></head><body>hallo</body></html>"
 });
 app.use(router.routes());
