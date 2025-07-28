@@ -17,20 +17,14 @@ router.get("/liveconfig/login", async (context) => {
     sameSite: "none",
     expires: new Date(Date.now() + 500000),
   });
-  const bodyData = {
-    a: "2",
-    l: logindetails.l,
-    p: logindetails.p,
-    lang: "",
-  };
 
-  const data = {
+  const data:RequestInit = {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    Credentials: "include",
-    body: `a=2&l=${logindetails.l}&p=${logindetails.p}&lang=`,
+    credentials: 'include',
+    body: `a=2&l=${logindetails.l}&p=${logindetails.p}&lang=&c=1`,
   }
   const request = new Request("https://lc.commodea.com/liveconfig/login", data)
   const fetchresponse = await fetch(request);
@@ -42,12 +36,12 @@ router.get("/liveconfig/login", async (context) => {
     if (!cookie.length){
       throw Error("no cookie found")
     }
-    context.response.headers.set("set-cookie", cookie[0])
+    context.response.headers.set("set-cookie", cookie[0] + "; SameSite = none")
     }catch (e){
       console.log(e.message)
     }
     console.log(fetchresponse.headers)
-  context.response.body = "<html><head><title>hallo</title></head><body>hallo</body></html>"
+  context.response.body = "<!DOCTYPE html><html><head><title>hallo</title></head><body>hallo</body></html>"
 });
 app.use(router.routes());
 app.use(router.allowedMethods());
