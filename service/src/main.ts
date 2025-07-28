@@ -1,4 +1,5 @@
-import { Application, Router } from "https://deno.land/x/oak/mod.ts";
+import { Application, Router } from "https://deno.land/x/oak@v17.1.5/mod.ts";
+import logindetails from "../certs/logindetails.json" with { type: "json" };
 import process from "node:process";
 
 const app = new Application();
@@ -10,46 +11,37 @@ const keyfile = await Deno.readFile("./certs/mykey.key");
 const key = decoder.decode(keyfile);
 const cert = decoder.decode(certfile);
 
-router.get("/", async (context) => {
-  console.log("ich bin hier");
+router.get("/liveconfig/login", async (context) => {
   context.cookies.set("testcookie", "yes", {
     domain: "localhost",
     sameSite: "none",
     expires: new Date(Date.now() + 500000),
   });
-  const fetcher = await fetch("", {
-    credentials: "include",
-  });
+  const bodyData = {
+    a: "2",
+    l: logindetails.l,
+    p: logindetails.p,
+    lang: "",
+  };
 
-  if (!fetcher.ok) {
+  const data = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `a=2&l=${logindetails.l}&p=${logindetails.p}&lang=`,
+  }
+  const request = new Request("https://lc.commodea.com/liveconfig/login", data)
+  const fetchresponse = await fetch(request);
+  if (!fetchresponse.ok) {
     return;
   }
-  console.log(fetcher);
-  let body = fetcher.body;
-  let head = fetcher.headers;
-
-  const embeddedWebsite = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Embedded Website</title>
-    </head>
-    <body>
-    <h1>Embedded Website Example</h1>
-      <iframe id="1" src="" width="100%" height="600px" style="border:none;"></iframe>
-      <script>
-      </script>
-      </body>
-    </html>
-  `;
-  //context.response.headers = head;
-  context.response.body = embeddedWebsite;
+  console.log(bodyData)
+  console.log(fetchresponse)
+  context.response.body = "<html><head><title>hallo</title></head><body>hallo</body></html>"
 });
 app.use(router.routes());
 app.use(router.allowedMethods());
-
 await app.listen({
   port: port,
   secure: true,
