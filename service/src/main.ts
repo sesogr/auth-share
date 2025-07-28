@@ -42,10 +42,9 @@ router.get("/liveconfig/login", async (context) => {
     if (!cookie.length){
       throw Error("no cookie found")
     }}catch (e){
-      console.log(e)
-    }finally{
-      console.log(fetchresponse.headers)
+      console.log(e.message)
     }
+    console.log(fetchresponse.headers)
   context.response.body = "<html><head><title>hallo</title></head><body>hallo</body></html>"
   const actualCookie = cookie[0]
   context.response.headers.set("set-cookie", actualCookie)
