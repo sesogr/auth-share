@@ -38,7 +38,9 @@ router.get("/liveconfig/login", async (context) => {
     }
     context.response.headers.set("set-cookie", cookie[0] + "; SameSite = none")
     }catch (e){
-      console.log(e.message)
+      if (e instanceof Error){
+        console.log(e.message)
+      }
     }
     console.log(fetchresponse.headers)
   context.response.body = "<!DOCTYPE html><html><head><title>hallo</title></head><body>hallo</body></html>"
