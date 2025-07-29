@@ -1,13 +1,39 @@
 import { Application, Router } from "https://deno.land/x/oak@v17.1.5/mod.ts";
 import logindetails from "../certs/logindetails.json" with { type: "json" };
 import process from "node:process";
+
 type Forminformation = {
   [key: string]: string
 }
-type logins = {
+
+type Logins = {
+  liveconfig: Liveconfig;
+  wekan:      Wekan;
+  github:     Github;
   [key: string]: Forminformation
 }
-const logininformation:logins = logindetails
+
+type Github = {
+  login:    string;
+  password: string;
+}
+
+type Liveconfig = {
+  a: string;
+  c: string;
+  l: string;
+  p: string;
+}
+
+type Wekan = {
+  "at-field-username_and_email": string;
+  "at-field-password":           string;
+}
+
+
+
+
+const logininformation:Logins = logindetails as Logins
 const github:string = `<div class="position-relative">
 <input type="hidden" name="webauthn-conditional" value="undefined">
 <input type="hidden" class="js-support" name="javascript-support" value="true">
@@ -24,9 +50,6 @@ const github:string = `<div class="position-relative">
 
   </div>`
 
-const wekan:Forminformation = logininformation.wekan
-const liveconfig:Forminformation = logininformation.liveconfig
-const githubc:Forminformation = logininformation.github
 function returnhtml(credential:string,forminfo:Forminformation){
   let html:string = "";
   if (credential=="liveconfig"){
