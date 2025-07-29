@@ -19,8 +19,8 @@ type Github = {
 }
 
 type Liveconfig = {
-  a: string;
-  c: string;
+  a:"2",  //not sure what it does
+  c:"1",  //overwrite still existing sessions
   l: string;
   p: string;
 }
