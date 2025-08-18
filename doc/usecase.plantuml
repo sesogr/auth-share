@@ -1,0 +1,26 @@
+@startuml
+
+left to right direction
+
+actor User
+actor Service_Inhaber
+actor Group_Admin
+
+User <|-- Service_Inhaber
+User <|---- Group_Admin
+
+package Usecases{
+
+User -> (Authentifizierung)
+User -> (Service erstellen)
+User -> (Service Liste anzeigen)
+User -> (Service aufrufen)
+User -> (PW ändern)
+User -> (Gruppen auflisten)
+
+
+}
+
+
+
+@enduml
