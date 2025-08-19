@@ -6,8 +6,8 @@ actor User
 actor Service_Owner
 actor Group_Admin
 
-User <|-- Service_Owner
-User <|-- Group_Admin
+User <|- Service_Owner
+User <|- Group_Admin
 
 package "Use Cases for User" {
     (perform authentication) as PA
@@ -20,14 +20,14 @@ package "Use Cases for User" {
     (List user groups invitations) as LUGI
 }
 
-User -> PA
-User -> CNS
-User -> LS
-User -> CS
-User -> CP
-User -> LMUG
-User -> CNUG
-User -> LUGI
+User --> PA
+User --> CNS
+User --> LS
+User --> CS
+User --> CP
+User --> LMUG
+User --> CNUG
+User --> LUGI
 
 package "Use Cases for Service Owner" as SO{
     (edit service username) as ESU
@@ -49,19 +49,19 @@ package "Use Cases for Service Owner" as SO{
 (request authorization) as AUTH
 
 DS ..|> MS : <<include>>
-Service_Owner -> ESU
-Service_Owner -> ESP
-Service_Owner -> EASI
-Service_Owner -> DS
+Service_Owner --> ESU
+Service_Owner --> ESP
+Service_Owner --> EASI
+Service_Owner --> DS
 SO ..|> AUTH : <<include>>
-Service_Owner -> G_AUTH
-Service_Owner -> R_AUTH
-Service_Owner -> AUTS
-Service_Owner -> IUFS
-Service_Owner -> RGFS
-Service_Owner -> RUFS
-Service_Owner -> LAU
-Service_Owner -> LAG
+Service_Owner --> G_AUTH
+Service_Owner --> R_AUTH
+Service_Owner --> AUTS
+Service_Owner --> IUFS
+Service_Owner --> RGFS
+Service_Owner --> RUFS
+Service_Owner --> LAU
+Service_Owner --> LAG
 
 package "Use Cases for Group Admin" {
     (invite to usergroup) as ITG
@@ -80,13 +80,13 @@ package "Use Cases for Group Admin" {
     (list group specific services) as LGSS
 }
 
-Group_Admin -> ITG
-Group_Admin -> DG
-Group_Admin -> RUFG
-Group_Admin -> LSI
-Group_Admin -> ASI
-Group_Admin -> DSI
-Group_Admin -> RS
-Group_Admin -> LGSS
+Group_Admin --> ITG
+Group_Admin --> DG
+Group_Admin --> RUFG
+Group_Admin --> LSI
+Group_Admin --> ASI
+Group_Admin --> DSI
+Group_Admin --> RS
+Group_Admin --> LGSS
 
 @enduml
