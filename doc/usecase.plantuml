@@ -3,24 +3,63 @@
 left to right direction
 
 actor User
-actor Service_Inhaber
+actor Service_Owner
 actor Group_Admin
 
-User <|-- Service_Inhaber
-User <|---- Group_Admin
+User <|-- Service_Owner
+User <|-- Group_Admin
 
-package Usecases{
-
-User -> (Authentifizierung)
-User -> (Service erstellen)
-User -> (Service Liste anzeigen)
-User -> (Service aufrufen)
-User -> (PW ändern)
-User -> (Gruppen auflisten)
-
-
+package "Use Cases for User" {
+    (perform authentication)
+    (create/add new service)
+    (output servicelist)
+    (call service)
+    (change password)
+    (list groups)
+    usecase "invitationList" as UC1
 }
 
+User -> (perform authentication)
+User -> (create/add new service)
+User -> (output servicelist)
+User -> (call service)
+User -> (change password)
+User -> (list groups)
+(list groups) <|.. UC1 : <<extend>>
 
+package "Use Cases for Service Owner" {
+    (change service)
+    (delete service)
+    usecase "authorization" as UC2
+    (manage permissions)
+    (output userlist)
+    (output grouplist)
+}
+
+Service_Owner -> (change service)
+Service_Owner -> (delete service)
+(change service) ..|> UC2 : <<include>>
+(delete service) ..|> UC2 : <<include>>
+Service_Owner -> (manage permissions)
+Service_Owner -> (output userlist)
+Service_Owner -> (output grouplist)
+
+package "Use Cases for Group Admin" {
+    (change group)
+    (delete group)
+    (delete from group)
+    (show service invitation)
+    (add service "to group?")
+    (delete service)
+    (change service)
+}
+
+Group_Admin -> (change group)
+Group_Admin -> (delete group)
+Group_Admin -> (delete from group)
+Group_Admin -> (show service invitation)
+Group_Admin -> (add service "to group?")
+Group_Admin -> (delete service)
+Group_Admin -> (change service)
 
 @enduml
