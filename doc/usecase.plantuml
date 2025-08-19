@@ -43,10 +43,12 @@ package "Use Cases for Service Owner" as SO{
     (remove user from service) as RUFS
     (list added users) as LAU
     (list added usergroup) as LAG
+    (making sure) as MS
 }
 
 (request authorization) as AUTH
 
+DS ..|> MS : <<include>>
 Service_Owner -> ESU
 Service_Owner -> ESP
 Service_Owner -> EASI
