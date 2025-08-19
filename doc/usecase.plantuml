@@ -67,9 +67,15 @@ package "Use Cases for Group Admin" {
     (invite to usergroup) as ITG
     (delete usergroup) as DG
     (remove user from usergroup) as RUFG
+    package "Invitations" as Invitations{
     (list service invitations) as LSI
     (accept service invitations) as ASI
     (decline service invitation) as DSI
+    }
+    note right of Invitations
+    Group Admin can Filter through malicious use
+    before other users have access to them
+    end note
     (remove service) as RS
     (list group specific services) as LGSS
 }
