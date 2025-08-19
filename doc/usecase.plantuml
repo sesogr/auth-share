@@ -12,22 +12,22 @@ User <|-- Group_Admin
 package "Use Cases for User" {
     (perform authentication) as PA
     (create new service) as CNS
-    (add new service) as ANS
     (list services) as LS
     (call service) as CS
     (change password) as CP
-    (list joined user groups) as LJUG
-    usecase "List usergroups invitations" as UC1
+    (list my user groups) as LMUG
+    (create new user group) as CNUG
+    (List user groups invitations) as LUGI
 }
 
 User -> PA
 User -> CNS
-User -> ANS
 User -> LS
 User -> CS
 User -> CP
-User -> LJUG
-LJUG <|.. UC1 : <<extend>>
+User -> LMUG
+User -> CNUG
+User -> LUGI
 
 package "Use Cases for Service Owner" as SO{
     (edit service username) as ESU
