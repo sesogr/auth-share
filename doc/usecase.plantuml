@@ -66,8 +66,8 @@ package "Use Cases for Group Admin" {
     (delete usergroup) as DG
     (remove user from usergroup) as RUFG
     (list service invitations) as LSI
-    (approve service invitations) as ASI
-    (except service invitation) as ESI
+    (accept service invitations) as ASI
+    (decline service invitation) as DSI
     (remove service) as RS
     (list group specific services) as LGSS
 }
@@ -77,7 +77,7 @@ Group_Admin -> DG
 Group_Admin -> RUFG
 Group_Admin -> LSI
 Group_Admin -> ASI
-Group_Admin -> ESI
+Group_Admin -> DSI
 Group_Admin -> RS
 Group_Admin -> LGSS
 
