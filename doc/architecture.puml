@@ -1,25 +1,74 @@
 @startuml
-'https://plantuml.com/class-diagram
 
-interface Repository<T extends Entity> {
-    load(id: UUID): T
-    save(obj: T): void
-}
-interface UserRepository extends Repository<User> {
-    findByLastName(:string) User[]
+class User{
 
-}
-
-class UserRepositoryImpl implements Repository<User> {
-}
-
-abstract class Entity {
-    getId(): UUID
-    equals(other: any): boolean
-}
-
-class Service extends Entity {
     username: string
+    credentials: UserCredentials
+    -owned: List<Service>
+    callable: List<Service>
+    ownedGroups: List<Groups>
+    
+    +listOwnedServices(): List<Service>
+    {static}authenticate(Param1..or Credential_obj): User
+    
+    listServices(): List<Service>
+    changeUserCredentials(:UserCredentials)
+
+    listUsergroups(): List<Group>
+    listUsergroupInvitation(): List<Invitation>
+
+    requestAuthorization(:Service)
+}
+
+class Invitation{
+
+    sendername: string
+    usergroupname: string
+
+}
+
+class Service{
+
+    servicename: string
+    credentials: ServiceCredentials
+    
+    {static}createService(:string, :User, :ServiceCredentials): Service
+    authorized: List<User>
+    users: List<User>
+    groups: List<Group>
+
+    giveAuthorizationToUser(:User)
+    sendInvitation(:Group)
+    
+    deleteService()
+    callService()
+
+    
+}
+
+class UserCredentials{
+
+    username: string
+    password: string
+    
+}
+
+class ServiceCredentials{
+    
+    
+
+}
+
+class Group{
+    groupname: string
+    users: List<User>
+    listServiceInvitation(): List<Invitation>
+
+    {static}createUsergroup(:groupname, ): Group
+    sendInvitation(:User)
 }
 
 @enduml
+
+requestAuthorization()? giveAuthorization()? 
+which class is the better one? Service_Owner or Service?
