@@ -1,0 +1,15 @@
+@startuml
+
+ --> aGroup: sendInvitation(aUser)
+
+aGroup --> anInvitation: <<create>>(aGroup, aUser)
+aGroup <-- anInvitation: anInvitation
+aGroup --> aUser: listUserGroupInvitation()
+aGroup <-- aUser: anInvitationList
+aGroup --> anInvitationList: add(anInvitation) :void
+ <-- aGroup: successful :boolean
+
+
+
+
+@enduml
