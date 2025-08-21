@@ -6,11 +6,12 @@ class User{
     credentials: UserCredentials
     -owned: List<Service>
     callable: List<Service>
-    ownedGroups: List<Groups>
+    InvitedGroups: List<Invitation>
+    ownedGroups: List<Group>
     
     +listOwnedServices(): List<Service>
     {static}authenticate(Param1..or Credential_obj): User
-    
+    addInvitation(:Invitation)
     listServices(): List<Service>
     changeUserCredentials(:UserCredentials)
 
@@ -36,7 +37,7 @@ class Service{
     authorized: List<User>
     users: List<User>
     groups: List<Group>
-    invitations: List<Invitations>
+    invitations: List<Invitation>
 
     giveAuthorizationToUser(:User)
     sendInvitation(:Group)
@@ -63,6 +64,7 @@ class ServiceCredentials{
 class Group{
     groupname: string
     users: List<User>
+    sentUserInvitations: List<Invitation>
     listServiceInvitation(): List<Invitation>
 
     {static}createUsergroup(:groupname, ): Group
