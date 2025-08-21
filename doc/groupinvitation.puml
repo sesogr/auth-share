@@ -1,0 +1,32 @@
+@startuml
+
+-> aGroup: sendInvitation(aGroup)
+activate aGroup #5a7447ff
+aGroup -> anInvitation: Constructor<<create>>(aGroup, aUser)
+activate anInvitation #5a7447ff
+aGroup <-- anInvitation: anInvitation
+deactivate anInvitation
+aGroup -> aGroup: put Invitation in List
+note right of aGroup
+List Object is shown in a simplified manner
+end note
+activate aGroup #4e5e91ff
+deactivate aGroup
+aGroup -> aUser: addServiceInvitation(anInvitation)
+activate aUser #5a7447ff
+aUser -> aUser:  put Invitation in List
+activate aUser #4e5e91ff
+deactivate aUser
+aGroup <-- aUser
+deactivate aUser
+<-- aGroup: successful :boolean
+deactivate aGroup
+
+
+
+
+@enduml
+
+createInvitation(:Group, :User) in class Invitation as a method?
+return an object Invitation to aGroup in List<Invitation> or should be the
+createInvitation() methode inside the class Group

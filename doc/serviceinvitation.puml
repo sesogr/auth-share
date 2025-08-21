@@ -1,0 +1,37 @@
+@startuml
+
+-> aService: sendInvitation(aGroup)
+activate aService #5a7447ff
+aService -> anInvitation: Constructor<<create>>(aService, aGroup)
+activate anInvitation #5a7447ff
+aService <-- anInvitation: anInvitation
+deactivate anInvitation
+aService -> aService: put Invitation in List
+note right of aService
+List Object is shown in a simplified manner
+end note
+activate aService #4e5e91ff
+deactivate aService
+aService -> aGroup: addServiceInvitation(anInvitation)
+activate aGroup #5a7447ff
+aGroup -> aGroup:  put Invitation in List
+activate aGroup #4e5e91ff
+deactivate aGroup
+aService <-- aGroup
+deactivate aGroup
+<-- aService: successful :boolean
+    
+
+@enduml
+
+
+
+
+just some thoughts, there are two typs of invitations "Service and Groups" --> Generics?
+should there be a class only for Service_Invitation and one for Group_Invitation
+as subclasses from class invitation? Or createInvitation() as a Methode in class Service and Group?
+both classes get the method createInvitation which create an Invitation Object which
+then goes into each lists "List<Group>, List<Service>"
+
+Is "anInvitation" the return value of the <<create>>, if yes, is it an Object of Invitation
+and will be 

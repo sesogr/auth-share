@@ -1,0 +1,39 @@
+@startuml
+->aService : deleteService()
+activate aService #ff0000
+aService->userList :iterateOver(removeService)
+activate userList #ff0000
+loop removeService(next aUser) 
+userList -> aUser :removeService(aService)
+activate aUser #ff0000
+aUser -> aUser :take aService out of List
+userList <-- aUser
+deactivate aUser
+deactivate userList
+end loop
+aService <-- userList
+aService -> groupList :iterateOver(removeService)
+loop removeService(next aUser)
+activate groupList #ff0000
+groupList -> aGroup :removeService(aService)
+activate aGroup #ff0000
+aGroup -> aGroup :take aService out of List
+groupList <-- aGroup
+deactivate aGroup
+end loop
+aService <-- groupList
+deactivate groupList
+aService -> sentInvitationList :iterateOver(revokeInvitation)
+activate sentInvitationList #ff0000
+loop revokeInvitation(next aGroup)
+sentInvitationList -> aGroup :revokeInvitation(aInvitation)
+activate aGroup #ff0000
+aGroup -> aGroup: take aInvitation out of List
+sentInvitationList <-- aGroup
+deactivate aGroup
+end loop
+sentInvitationList --> aService
+deactivate sentInvitationList
+<-- aService :deleted
+deactivate aService
+@enduml
