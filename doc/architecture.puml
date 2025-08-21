@@ -1,8 +1,8 @@
 @startuml
 
-class User{
+entity User{
 
-    username: string
+    displayName: string
     credentials: UserCredentials
     -owned: List<Service>
     callable: List<Service>
@@ -21,14 +21,14 @@ class User{
     requestAuthorization(:Service)
 }
 
-class Invitation{
+struct Invitation <<ValueObject>>{
 
-    sendername: string
-    usergroupname: string
+    +sendername: string
+    +usergroupname: string
 
 }
 
-class Service{
+entity Service{
 
     servicename: string
     credentials: ServiceCredentials
@@ -48,20 +48,22 @@ class Service{
     
 }
 
-class UserCredentials{
+struct UserCredentials <<ValueObject>>{
 
-    username: string
-    password: string
+    +username: string
+    +password: string
     
 }
 
-class ServiceCredentials{
+struct ServiceCredentials <<ValueObject>>{
     
-    
+    -username?: string
+    -password?: string
+    -token?: string
 
 }
 
-class Group{
+entity Group{
     groupname: string
     users: List<User>
     sentUserInvitations: List<Invitation>
