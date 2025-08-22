@@ -1,4 +1,4 @@
-export class UserCredential {
+export class ServiceCredential {
   constructor(
     private readonly username?: string,
     private readonly password?: string
