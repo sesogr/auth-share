@@ -1,4 +1,4 @@
-export class UserCredentials {
+export class UserCredential {
   constructor(
     private readonly username: string,
     private readonly password: string
