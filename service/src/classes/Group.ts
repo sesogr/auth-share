@@ -10,10 +10,10 @@ export class Group {
     private serviceInvitations: Invitation[] = []
   ) {}
   listServiceInvitation(): Invitation[] {
-    return this.serviceInvitations;
+    return [...this.serviceInvitations];
   }
   listSentUserInvitation(): Invitation[] {
-    return this.sentUserInvitations;
+    return [...this.sentUserInvitations];
   }
   static createUserGroup(groupname: string, owner: User): Group {
     return new Group(groupname, owner);

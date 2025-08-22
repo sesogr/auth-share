@@ -20,7 +20,7 @@ export class User {
   }
 
   listOwnedServices(): Service[] {
-    return this.owned;
+    return [...this.owned];
   }
   static createUser(credentials: UserCredential, displayName: string) {
     return new User(credentials, displayName);
@@ -34,20 +34,20 @@ export class User {
   }
 
   listServices(): Service[] {
-    return this.callable;
+    return [...this.callable];
   }
   changeUserCredentials(newCredentials: UserCredential) {}
 
   listOwnedGroups(): Group[] {
-    return this.ownedGroups;
+    return [...this.ownedGroups];
   }
 
   listUserGroups(): Group[] {
-    return this.groups;
+    return [...this.groups];
   }
 
   listUserGroupInvitation(): Invitation[] {
-    return this.invitedGroups;
+    return [...this.invitedGroups];
   }
   requestAuthorization(newService: Service) {}
 }
