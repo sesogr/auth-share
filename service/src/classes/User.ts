@@ -15,6 +15,10 @@ export class User {
     private ownedGroups: Group[] = []
   ) {}
 
+  getDisplayName(): string {
+    return this.displayName;
+  }
+
   listOwnedServices(): Service[] {
     return this.owned;
   }
