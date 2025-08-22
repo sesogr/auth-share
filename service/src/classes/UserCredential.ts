@@ -4,6 +4,6 @@ export class UserCredential {
     private readonly password: string
   ) {}
   toString() {
-    return this.username + "&" + this.password;
+    return `${this.username}:${this.password}`;
   }
 }

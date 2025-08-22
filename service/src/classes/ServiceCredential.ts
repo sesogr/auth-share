@@ -5,6 +5,6 @@ export class ServiceCredential {
   ) {}
 
   toString() {
-    return this.username + "&" + this.password;
+    return `${this.username}:${this.password}`;
   }
 }

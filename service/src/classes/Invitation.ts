@@ -4,6 +4,6 @@ export class Invitation {
     private readonly reference: string
   ) {}
   toString() {
-    return this.sendername + "&" + this.reference;
+    return `${this.sendername}:${this.reference}`;
   }
 }
