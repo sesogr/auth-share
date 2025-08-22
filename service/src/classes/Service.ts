@@ -1,18 +1,31 @@
 import { Group } from "./Group.ts";
+import { Invitation } from "./Invitation.ts";
+import { ServiceCredential } from "./ServiceCredential.ts";
 import { User } from "./User.ts";
 
-export class Service{
-    servicename: string;
-    credentials: ServiceCredential;
+export class Service {
+  private constructor(
+    private credentials: ServiceCredential,
 
-    authorized: User[];
-    users: User[];
-    groups: Group[];
-    invitation: Invitation[];
+    private serviceName: string = "",
+    private authorized: User[] = [],
+    private users: User[] = [],
+    private groups: Group[] = [],
+    private invitation: Invitation[] = []
+  ) {}
 
-    static createService(:string, :User, :ServiceCredentials): Service;
-    giveAuthorizationToUser(userFromList: User);
-    sendInvitation(:Group?);
-    deleteService();
-    callService();
+  static createService(
+    credentials: ServiceCredential,
+    serviceName: string,
+    serviceOwner: User
+  ): Service {
+    const service = new Service(credentials, serviceName);
+    service.authorized.push(serviceOwner);
+    serviceOwner.addOwnedService(service);
+    return service;
+  }
+  giveAuthorizationToUser(userFromList: User) {}
+  sendInvitation() {}
+  deleteService() {}
+  callService() {}
 }
