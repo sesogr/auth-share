@@ -49,5 +49,8 @@ export class User {
   listUserGroupInvitation(): Invitation[] {
     return [...this.invitedGroups];
   }
+  addOwnedService(newService: Service) {
+    this.owned.push(newService);
+  }
   requestAuthorization(newService: Service) {}
 }
