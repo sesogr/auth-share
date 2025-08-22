@@ -8,7 +8,7 @@ export class Service {
     private credentials: ServiceCredential,
 
     private serviceName: string = "",
-    private authorized: User[] = [],
+    private owners: User[] = [],
     private users: User[] = [],
     private groups: Group[] = [],
     private invitation: Invitation[] = []
@@ -20,7 +20,7 @@ export class Service {
     serviceOwner: User
   ): Service {
     const service = new Service(credentials, serviceName);
-    service.authorized.push(serviceOwner);
+    service.owners.push(serviceOwner);
     serviceOwner.addOwnedService(service);
     return service;
   }
