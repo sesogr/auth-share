@@ -1,4 +1,6 @@
-class Group{
+import { User } from "./User.ts";
+
+export class Group{
     groupname: string;
 
     users: User[];

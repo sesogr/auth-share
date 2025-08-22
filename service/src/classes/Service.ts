@@ -1,4 +1,7 @@
-class Service{
+import { Group } from "./Group.ts";
+import { User } from "./User.ts";
+
+export class Service{
     servicename: string;
     credentials: ServiceCredential;
 

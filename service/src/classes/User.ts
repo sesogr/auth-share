@@ -1,4 +1,7 @@
-class User {
+import { Group } from "./Group.ts";
+import { Service } from "./Service.ts";
+
+export class User {
   displayName: string;
   //I guess UserCredentials are an Object
   credentials: UserCredentials;
@@ -7,7 +10,7 @@ class User {
   invitedGroups: Invitation[];
   ownedGroups: Group[];
 
-  listOwendServices(): Service[] {
+  listOwnedServices(): Service[] {
     return this.owned;
   }
   static authenticate(UserCredentials): User;
