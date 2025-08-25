@@ -12,10 +12,10 @@ export class Invitation<
   ) {
     super();
   }
-  toString() {
+  override toString() {
     return `${this.senderReference.getDisplayName()}:${this.objReference.getDisplayName()}:${this.receiverRefence.getDisplayName()}`;
   }
-  equals(that: Invitation<T, U>) {
+  override equals(that: Invitation<T, U>) {
     return this.toString() === that.toString();
   }
   getObjReference(): T {
