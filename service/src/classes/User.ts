@@ -52,5 +52,14 @@ export class User {
   addOwnedService(newService: Service) {
     this.owned.push(newService);
   }
+  removeOwnedService(service: Service) {
+    this.owned = this.owned.filter((e) => e != service);
+  }
+  removeService(service: Service) {
+    this.callable = this.callable.filter((e) => e != service);
+  }
+  addService(newService: Service) {
+    this.callable.push(newService);
+  }
   requestAuthorization(newService: Service) {}
 }
