@@ -1,10 +1,17 @@
-export class ServiceCredential {
+import { ValueClass } from "./ValueClass.ts";
+
+export class ServiceCredential extends ValueClass {
   constructor(
     private readonly username?: string,
     private readonly password?: string
-  ) {}
+  ) {
+    super();
+  }
 
-  toString() {
+  override toString() {
     return `${this.username}:${this.password}`;
+  }
+  override equals(that: ServiceCredential) {
+    return this.toString() === that.toString();
   }
 }
