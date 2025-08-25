@@ -20,12 +20,17 @@ export class Group {
   }
   sendInvitation(receiver: User) {
     const invite: Invitation = new Invitation(
-      this.groupname,
-      this.owner.getDisplayName()
+      this.owner.getDisplayName(),
+      this.groupname
     );
     receiver.addInvitation(invite);
   }
   addServiceInvitation(newServiceInvite: Invitation) {
     this.serviceInvitations.push(newServiceInvite);
+  }
+  removeServiceInvitation(serviceInvite: Invitation) {
+    this.serviceInvitations = this.serviceInvitations.filter((e) => {
+      return !e.equals(serviceInvite);
+    });
   }
 }
