@@ -3,7 +3,7 @@ import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
-
+import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 export class User implements Displayable {
   private constructor(
     private credentials: UserCredential,
@@ -12,7 +12,7 @@ export class User implements Displayable {
     private owned: Service[] = [],
     private callable: Service[] = [],
     private groups: Group[] = [],
-    private invitedGroups: Invitation<Group>[] = [],
+    private invitedGroups: Invitation<Group, User>[] = [],
     private ownedGroups: Group[] = []
   ) {}
 
@@ -30,10 +30,21 @@ export class User implements Displayable {
     return new User(credentials);
   }
 
-  addInvitation(newInvite: Invitation<Group>) {
+  addInvitation(newInvite: Invitation<Group, User>) {
+    const receiver = newInvite.getReceiverReference();
+    if (receiver != this) {
+      throw new WrongReceiverError(
+        `This isn't User ${receiver.getDisplayName()}`
+      );
+    }
     this.invitedGroups.push(newInvite);
   }
-
+  removeInvitation(invite: Invitation<Group, User>){
+    this.invitedGroups = this.invitedGroups.filter((currInvitation) =>{
+      return currInvitation.equals(invite)
+    }
+    
+  }
   listServices(): Service[] {
     return [...this.callable];
   }
@@ -47,7 +58,7 @@ export class User implements Displayable {
     return [...this.groups];
   }
 
-  listUserGroupInvitation(): Invitation<Group>[] {
+  listUserGroupInvitation(): Invitation<Group, User>[] {
     return [...this.invitedGroups];
   }
   addOwnedService(newService: Service) {

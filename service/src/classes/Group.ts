@@ -1,3 +1,4 @@
+import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 import { Displayable } from "../interfaces/Displayable.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
@@ -9,35 +10,42 @@ export class Group implements Displayable {
     private owner: User,
     private users: User[] = [],
     private serviceList: Service[] = [],
-    private sentUserInvitations: User[] = [],
-    private serviceInvitations: Invitation<Service>[] = []
+    private sentInvitations: Invitation<Group, User>[] = [],
+    private serviceInvitations: Invitation<Service, Group>[] = []
   ) {}
   getDisplayName(): string {
     return this.groupname;
   }
-  listServiceInvitation(): Invitation<Service>[] {
+  listServiceInvitation(): Invitation<Service, Group>[] {
     return [...this.serviceInvitations];
   }
-  listSentUserInvitation(): User[] {
-    return [...this.sentUserInvitations];
+  listSentInvitation(): Invitation<Group, User>[] {
+    return [...this.sentInvitations];
   }
   static createUserGroup(groupname: string, owner: User): Group {
     return new Group(groupname, owner);
   }
   sendInvitation(receiver: User) {
-    const invite: Invitation<Group> = new Invitation(
-      this.owner.getDisplayName(),
-      this
+    const invite: Invitation<Group, User> = new Invitation(
+      this.owner,
+      this,
+      receiver
     );
-    this.sentUserInvitations.push(receiver);
+    this.sentInvitations.push(invite);
     receiver.addInvitation(invite);
   }
-  addServiceInvitation(newServiceInvite: Invitation<Service>) {
+  addServiceInvitation(newServiceInvite: Invitation<Service, Group>) {
+    const receiver = newServiceInvite.getReceiverReference();
+    if (receiver != this) {
+      throw new WrongReceiverError(
+        `This is not Group: ${receiver.getDisplayName()}`
+      );
+    }
     this.serviceInvitations.push(newServiceInvite);
   }
-  removeServiceInvitation(serviceInvite: Service) {
-    this.serviceInvitations = this.serviceInvitations.filter((e) => {
-      return e.getReference() != serviceInvite;
+  removeServiceInvitation(invitation: Invitation<Service, Group) {
+    this.serviceInvitations = this.serviceInvitations.filter((currInvitation) => {
+      return currInvitation != invitation;
     });
   }
   removeService(service: Service) {
