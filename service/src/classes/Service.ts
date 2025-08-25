@@ -25,7 +25,14 @@ export class Service {
     return service;
   }
   giveAuthorizationToUser(userFromList: User) {}
-  sendInvitation() {}
+
+  sendInvitation(receiver: Group, sender: User = this.owners[0]) {
+    const invitation = new Invitation(
+      sender.getDisplayName(),
+      this.serviceName
+    );
+    receiver.addServiceInvitation(invitation);
+  }
   deleteService() {}
   callService() {}
 }
