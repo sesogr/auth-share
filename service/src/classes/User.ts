@@ -1,9 +1,10 @@
+import { Displayable } from "../interfaces/Displayable.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 
-export class User {
+export class User implements Displayable {
   private constructor(
     private credentials: UserCredential,
 
@@ -11,7 +12,7 @@ export class User {
     private owned: Service[] = [],
     private callable: Service[] = [],
     private groups: Group[] = [],
-    private invitedGroups: Invitation[] = [],
+    private invitedGroups: Invitation<Group>[] = [],
     private ownedGroups: Group[] = []
   ) {}
 
@@ -29,7 +30,7 @@ export class User {
     return new User(credentials);
   }
 
-  addInvitation(newInvite: Invitation) {
+  addInvitation(newInvite: Invitation<Group>) {
     this.invitedGroups.push(newInvite);
   }
 
@@ -46,7 +47,7 @@ export class User {
     return [...this.groups];
   }
 
-  listUserGroupInvitation(): Invitation[] {
+  listUserGroupInvitation(): Invitation<Group>[] {
     return [...this.invitedGroups];
   }
   addOwnedService(newService: Service) {
