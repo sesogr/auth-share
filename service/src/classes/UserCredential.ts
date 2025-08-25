@@ -6,4 +6,7 @@ export class UserCredential {
   toString() {
     return `${this.username}:${this.password}`;
   }
+  equals(that: UserCredential) {
+    return this.toString() === that.toString();
+  }
 }

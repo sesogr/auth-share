@@ -6,4 +6,7 @@ export class Invitation {
   toString() {
     return `${this.sendername}:${this.reference}`;
   }
+  equals(that: Invitation) {
+    return this.toString() === that.toString();
+  }
 }
