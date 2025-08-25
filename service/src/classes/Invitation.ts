@@ -1,16 +1,19 @@
 import { ValueClass } from "./ValueClass.ts";
-
-export class Invitation extends ValueClass {
+import { Displayable } from "../interfaces/Displayable.ts";
+export class Invitation<T extends Displayable> extends ValueClass {
   constructor(
     private readonly sendername: string,
-    private readonly reference: string
+    private readonly reference: T
   ) {
     super();
   }
   toString() {
-    return `${this.sendername}:${this.reference}`;
+    return `${this.sendername}:${this.reference.getDisplayName()}`;
   }
-  equals(that: Invitation) {
+  equals(that: Invitation<T>) {
     return this.toString() === that.toString();
+  }
+  getReference(): T {
+    return this.reference;
   }
 }
