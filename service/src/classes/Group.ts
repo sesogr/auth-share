@@ -43,10 +43,12 @@ export class Group implements Displayable {
     }
     this.serviceInvitations.push(newServiceInvite);
   }
-  removeServiceInvitation(invitation: Invitation<Service, Group) {
-    this.serviceInvitations = this.serviceInvitations.filter((currInvitation) => {
-      return currInvitation != invitation;
-    });
+  removeServiceInvitation(invitation: Invitation<Service, Group>) {
+    this.serviceInvitations = this.serviceInvitations.filter(
+      (currInvitation) => {
+        return currInvitation != invitation;
+      }
+    );
   }
   removeService(service: Service) {
     this.serviceList = this.serviceList.filter(

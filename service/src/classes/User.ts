@@ -39,11 +39,10 @@ export class User implements Displayable {
     }
     this.invitedGroups.push(newInvite);
   }
-  removeInvitation(invite: Invitation<Group, User>){
-    this.invitedGroups = this.invitedGroups.filter((currInvitation) =>{
-      return currInvitation.equals(invite)
-    }
-    
+  removeInvitation(invite: Invitation<Group, User>) {
+    this.invitedGroups = this.invitedGroups.filter((currInvitation) => {
+      return currInvitation.equals(invite);
+    });
   }
   listServices(): Service[] {
     return [...this.callable];
