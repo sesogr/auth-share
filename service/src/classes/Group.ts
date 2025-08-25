@@ -1,4 +1,5 @@
 import { Invitation } from "./Invitation.ts";
+import { Service } from "./Service.ts";
 import { User } from "./User.ts";
 
 export class Group {
@@ -6,6 +7,7 @@ export class Group {
     private groupname: string,
     private owner: User,
     private users: User[] = [],
+    private serviceList: Service[] = [],
     private sentUserInvitations: Invitation[] = [],
     private serviceInvitations: Invitation[] = []
   ) {}
@@ -32,5 +34,10 @@ export class Group {
     this.serviceInvitations = this.serviceInvitations.filter((e) => {
       return !e.equals(serviceInvite);
     });
+  }
+  removeService(service: Service) {
+    this.serviceList = this.serviceList.filter(
+      (currService) => service != currService
+    );
   }
 }
