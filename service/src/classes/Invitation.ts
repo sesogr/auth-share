@@ -2,29 +2,29 @@ import { ValueClass } from "./ValueClass.ts";
 import { Displayable } from "../interfaces/Displayable.ts";
 import { User } from "./User.ts";
 export class Invitation<
-  T extends Displayable,
-  U extends Displayable
+  ObjType extends Displayable,
+  ReceiverType extends Displayable
 > extends ValueClass {
   constructor(
     private readonly senderReference: User,
-    private readonly objReference: T,
-    private readonly receiverRefence: U
+    private readonly objReference: ObjType,
+    private readonly receiverRefence: ReceiverType
   ) {
     super();
   }
   override toString() {
     return `${this.senderReference.getDisplayName()}:${this.objReference.getDisplayName()}:${this.receiverRefence.getDisplayName()}`;
   }
-  override equals(that: Invitation<T, U>) {
+  override equals(that: Invitation<ObjType, ReceiverType>) {
     return this.toString() === that.toString();
   }
-  getObjReference(): T {
+  getObjReference(): ObjType {
     return this.objReference;
   }
   getSenderReference(): User {
     return this.senderReference;
   }
-  getReceiverReference(): U {
+  getReceiverReference(): ReceiverType {
     return this.receiverRefence;
   }
 }
