@@ -24,7 +24,13 @@ export class Group implements Displayable {
     return [...this.sentInvitations];
   }
   static createUserGroup(groupname: string, owner: User): Group {
-    // if(this.groupAlreadyExists(groupname))
+    /* if(this.groupAlreadyExist(groupname)){
+      throw new Error(
+        `The group called ${groupname} is already found in the list of groups.`
+      )
+    }
+      this.?
+    */
     return new Group(groupname, owner);
   }
   sendInvitation(receiver: User) {
@@ -57,4 +63,7 @@ export class Group implements Displayable {
       (currService) => service != currService
     );
   }
+  /*groupAlreadyExist(groupname: string): boolean{
+  return this.groupList.includes(groupname);
+  */
 }

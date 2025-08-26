@@ -25,8 +25,17 @@ export class User implements Displayable {
   }
   // exception! Unique Username(rules like lenght, what kind of special characters, ..)
   static createUser(credentials: UserCredential, displayName: string) {
+    if (User.stringToLong(displayName)) {
+      throw new Error(
+        "Your Username is too long, please use a Name with max 20 characters."
+      );
+    }
     return new User(credentials, displayName);
   }
+  private static stringToLong(displayName: string) {
+    return displayName.length > 20;
+  }
+
   static authenticate(credentials: UserCredential): User {
     return new User(credentials);
   }

@@ -12,7 +12,7 @@ export class Service implements Displayable {
     private owners: User[] = [],
     private users: User[] = [],
     private groups: Group[] = [],
-    private invitation: Invitation<Service, Group>[] = []
+    private invitation: Invitation<Service, Group>[] = [] //private services or callable: Service[] = []
   ) {}
   getDisplayName(): string {
     return this.serviceName;
@@ -23,9 +23,16 @@ export class Service implements Displayable {
     serviceName: string,
     serviceOwner: User
   ): Service {
+    /*if(this.serviceIsInList(serviceName)) {
+      throw new Error(
+        `The service called ${serviceName} is already found in the callable list.`
+      )
+    }
+    */
     const service = new Service(credentials, serviceName);
     service.owners.push(serviceOwner);
     serviceOwner.addOwnedService(service);
+    //service.services or callable.push(service);
     return service;
   }
   giveAuthorizationToUser(userFromList: User) {}
@@ -57,4 +64,7 @@ export class Service implements Displayable {
   receiverIsInGroups(receiver: Group): boolean {
     return this.groups.includes(receiver);
   }
+  /*serviceIsInList(serviceName: string): boolean{
+  return this.services.includes(serviceName);
+}*/
 }
