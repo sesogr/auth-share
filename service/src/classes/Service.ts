@@ -1,9 +1,10 @@
+import { Displayable } from "../interfaces/Displayable.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
 import { User } from "./User.ts";
 
-export class Service {
+export class Service implements Displayable {
   private constructor(
     private credentials: ServiceCredential,
 
@@ -11,9 +12,12 @@ export class Service {
     private owners: User[] = [],
     private users: User[] = [],
     private groups: Group[] = [],
-    private invitation: Invitation[] = []
+    private invitation: Invitation<Service, Group>[] = []
   ) {}
-
+  getDisplayName(): string {
+    return this.serviceName;
+  }
+  // createService should also have an exception
   static createService(
     credentials: ServiceCredential,
     serviceName: string,
@@ -27,12 +31,30 @@ export class Service {
   giveAuthorizationToUser(userFromList: User) {}
 
   sendInvitation(receiver: Group, sender: User = this.owners[0]) {
-    const invitation = new Invitation(
-      sender.getDisplayName(),
-      this.serviceName
-    );
+    if (this.receiverIsInGroups(receiver)) {
+      throw new Error(
+        `The group ${receiver.getDisplayName()} is already using the service ${this.getDisplayName()}!`
+      );
+    }
+    const invitation = new Invitation<Service, Group>(sender, this, receiver);
     receiver.addServiceInvitation(invitation);
+    this.invitation.push(invitation);
   }
-  deleteService() {}
+  deleteService() {
+    this.users.forEach((currUser) => {
+      currUser.removeService(this);
+    });
+    this.groups.forEach((currGroup) => {
+      currGroup.removeService(this);
+    });
+    /*this.invitation.forEach((currInvitation)=> {
+    currInvitation.
+  })*/
+  }
+
   callService() {}
+
+  receiverIsInGroups(receiver: Group): boolean {
+    return this.groups.includes(receiver);
+  }
 }
