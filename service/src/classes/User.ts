@@ -23,6 +23,7 @@ export class User implements Displayable {
   listOwnedServices(): Service[] {
     return [...this.owned];
   }
+  // exception! Unique Username(rules like lenght, what kind of special characters, ..)
   static createUser(credentials: UserCredential, displayName: string) {
     return new User(credentials, displayName);
   }

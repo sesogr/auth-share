@@ -7,6 +7,7 @@ import { User } from "./User.ts";
 export class Group implements Displayable {
   private constructor(
     private groupname: string,
+    // private groupList: Group[] = []
     private owner: User,
     private users: User[] = [],
     private serviceList: Service[] = [],
@@ -23,6 +24,7 @@ export class Group implements Displayable {
     return [...this.sentInvitations];
   }
   static createUserGroup(groupname: string, owner: User): Group {
+    // if(this.groupAlreadyExists(groupname))
     return new Group(groupname, owner);
   }
   sendInvitation(receiver: User) {

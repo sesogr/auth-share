@@ -6,7 +6,7 @@ aService -> anInvitation: Constructor<<create>>(aService, aGroup)
 activate anInvitation #5a7447ff
 aService <-- anInvitation: anInvitation
 deactivate anInvitation
-aService -> aService: put Invitation in List
+aService -> aService: put aGroup in aInvitationList
 note right of aService
 List Object is shown in a simplified manner
 end note
