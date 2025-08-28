@@ -12,7 +12,7 @@ export class User implements Displayable {
     private owned: Service[] = [],
     private callable: Service[] = [],
     private groups: Group[] = [],
-    private invitedGroups: Invitation<Group, User>[] = [],
+    private userGroupInvitations: Invitation<Group, User>[] = [],
     private ownedGroups: Group[] = []
   ) {}
 
@@ -47,12 +47,14 @@ export class User implements Displayable {
         `This isn't User ${receiver.getDisplayName()}`
       );
     }
-    this.invitedGroups.push(newInvite);
+    this.userGroupInvitations.push(newInvite);
   }
   removeInvitation(invite: Invitation<Group, User>) {
-    this.invitedGroups = this.invitedGroups.filter((currInvitation) => {
-      return currInvitation.equals(invite);
-    });
+    this.userGroupInvitations = this.userGroupInvitations.filter(
+      (currInvitation) => {
+        return currInvitation.equals(invite);
+      }
+    );
   }
   listServices(): Service[] {
     return [...this.callable];
@@ -68,7 +70,7 @@ export class User implements Displayable {
   }
 
   listUserGroupInvitation(): Invitation<Group, User>[] {
-    return [...this.invitedGroups];
+    return [...this.userGroupInvitations];
   }
   addOwnedService(newService: Service) {
     this.owned.push(newService);
