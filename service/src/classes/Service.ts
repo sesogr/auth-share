@@ -17,6 +17,15 @@ export class Service implements Displayable {
   getDisplayName(): string {
     return this.serviceName;
   }
+  listUsers(): User[] {
+    return [...this.users];
+  }
+  listGroups(): Group[] {
+    return [...this.groups];
+  }
+  listOwners(): User[] {
+    return [...this.owners];
+  }
   // createService should also have an exception
   static createService(
     credentials: ServiceCredential,
@@ -35,7 +44,9 @@ export class Service implements Displayable {
     //service.services or callable.push(service);
     return service;
   }
-  giveAuthorizationToUser(userFromList: User) {}
+  giveAuthorizationToUser(userFromList: User) {
+    this.owners.push(userFromList);
+  }
 
   sendInvitation(receiver: Group, sender: User = this.owners[0]) {
     if (this.receiverIsInGroups(receiver)) {
