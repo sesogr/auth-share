@@ -1,21 +1,46 @@
-import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
+import {
+  assertArrayIncludes,
+  assertEquals,
+} from "https://deno.land/std@0.224.0/assert/mod.ts";
 import { Service } from "../src/classes/Service.ts";
 import { ServiceCredential } from "../src/classes/ServiceCredential.ts";
 import { User } from "../src/classes/User.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
-
-//Auslagerung der Service-Einstellungen in der Function createTestService
-function createTestService(): Service {
+function newUser(displayName: string): {
+  credentials: { userCred: UserCredential; serviceCred: ServiceCredential };
+  user: User;
+} {
   const serviceCredential = new ServiceCredential("", "");
   const userCredential = new UserCredential("", "");
-  const user = User.createUser(userCredential, "");
-  return Service.createService(serviceCredential, "Google", user);
+  const user = User.createUser(userCredential, displayName);
+  return {
+    credentials: {
+      userCred: userCredential,
+      serviceCred: serviceCredential,
+    },
+    user: user,
+  };
 }
+const user = newUser("Uwe");
+const user2 = newUser("Swe");
+const service: Service = Service.createService(
+  user.credentials.serviceCred,
+  "Google",
+  user.user
+);
+Deno.test("Service Creates with correct Owner", () => {
+  const owners: User[] = service.listOwners();
+  assertArrayIncludes(owners, [user.user]);
+});
+
+Deno.test("lists that should be empty are empty", () => {
+  assertEquals(service.listGroups().length + service.listUsers().length, 0);
+});
 
 Deno.test(
-  "Service should return correct display name when created with valid credentials",
+  "Service Authorize new User successfully puts User into owners",
   () => {
-    const service = createTestService();
-    assertEquals(service.getDisplayName(), "Google");
+    service.giveAuthorizationToUser(user2.user);
+    assertArrayIncludes(service.listOwners(), [user2.user]);
   }
 );
