@@ -1,9 +1,15 @@
 import { ValueClass } from "./ValueClass.ts";
 
 export class UserCredential extends ValueClass {
+  public get password(): string {
+    return this._password;
+  }
+  public get username(): string {
+    return this._username;
+  }
   constructor(
-    private readonly username: string,
-    private readonly password: string
+    private readonly _username: string,
+    private readonly _password: string
   ) {
     super();
   }
