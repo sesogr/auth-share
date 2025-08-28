@@ -43,7 +43,7 @@ export class Group implements Displayable {
     receiver.addInvitation(invite);
   }
   addServiceInvitation(newServiceInvite: Invitation<Service, Group>) {
-    const receiver = newServiceInvite.getReceiverReference();
+    const receiver = newServiceInvite.receiverReference;
     if (receiver != this) {
       throw new WrongReceiverError(
         `This is not Group: ${receiver.getDisplayName()}`
@@ -66,4 +66,7 @@ export class Group implements Displayable {
   /*groupAlreadyExist(groupname: string): boolean{
   return this.groupList.includes(groupname);
   */
+  getOwner(): User {
+    return this.owner;
+  }
 }

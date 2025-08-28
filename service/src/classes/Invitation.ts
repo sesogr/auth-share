@@ -5,8 +5,8 @@ export class Invitation<
   ObjType extends Displayable,
   ReceiverType extends Displayable
 > extends ValueClass {
-  public get receiverRefence(): ReceiverType {
-    return this._receiverRefence;
+  public get receiverReference(): ReceiverType {
+    return this._receiverReference;
   }
   public get objReference(): ObjType {
     return this._objReference;
@@ -17,12 +17,12 @@ export class Invitation<
   constructor(
     private readonly _senderReference: User,
     private readonly _objReference: ObjType,
-    private readonly _receiverRefence: ReceiverType
+    private readonly _receiverReference: ReceiverType
   ) {
     super();
   }
   override toString() {
-    return `${this.senderReference.getDisplayName()}:${this.objReference.getDisplayName()}:${this.receiverRefence.getDisplayName()}`;
+    return `${this.senderReference.getDisplayName()}:${this.objReference.getDisplayName()}:${this.receiverReference.getDisplayName()}`;
   }
   override equals(that: Invitation<ObjType, ReceiverType>) {
     return this.toString() === that.toString();
