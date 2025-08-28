@@ -41,7 +41,7 @@ export class User implements Displayable {
   }
 
   addInvitation(newInvite: Invitation<Group, User>) {
-    const receiver = newInvite.getReceiverReference();
+    const receiver = newInvite.receiverReference;
     if (receiver != this) {
       throw new WrongReceiverError(
         `This isn't User ${receiver.getDisplayName()}`
