@@ -12,7 +12,7 @@ export class Service implements Displayable {
     private owners: User[] = [],
     private users: User[] = [],
     private groups: Group[] = [],
-    private invitation: Invitation<Service, Group>[] = [] //private services or callable: Service[] = []
+    private sentInvitations: Invitation<Service, Group>[] = [] //private services or callable: Service[] = []
   ) {}
   getDisplayName(): string {
     return this.serviceName;
@@ -55,8 +55,8 @@ export class Service implements Displayable {
       );
     }
     const invitation = new Invitation<Service, Group>(sender, this, receiver);
+    this.sentInvitations.push(invitation);
     receiver.addServiceInvitation(invitation);
-    this.invitation.push(invitation);
   }
   deleteService() {
     this.users.forEach((currUser) => {
