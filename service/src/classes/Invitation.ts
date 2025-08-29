@@ -24,7 +24,4 @@ export class Invitation<
   override toString() {
     return `${this.senderReference.getDisplayName()}:${this.objReference.getDisplayName()}:${this.receiverReference.getDisplayName()}`;
   }
-  override equals(that: Invitation<ObjType, ReceiverType>) {
-    return this.toString() === that.toString();
-  }
 }

@@ -16,7 +16,4 @@ export class UserCredential extends ValueClass {
   override toString() {
     return `${this.username}:${this.password}`;
   }
-  override equals(that: UserCredential) {
-    return this.toString() === that.toString();
-  }
 }
