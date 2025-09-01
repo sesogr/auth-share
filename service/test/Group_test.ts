@@ -16,6 +16,7 @@ Deno.test("test the method createUserGroup", () => {
   const group = createTestGroup();
   const owner = group.getOwner();
   assertEquals(owner, user);
+  assertArrayIncludes(owner.listOwnedGroups(), [group]);
 });
 
 Deno.test("test the method getDisplayName on groupname", () => {
