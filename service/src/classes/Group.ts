@@ -24,14 +24,9 @@ export class Group implements Displayable {
     return [...this.sentInvitations];
   }
   static createUserGroup(groupname: string, owner: User): Group {
-    /* if(this.groupAlreadyExist(groupname)){
-      throw new Error(
-        `The group called ${groupname} is already found in the list of groups.`
-      )
-    }
-      this.?
-    */
-    return new Group(groupname, owner);
+    const newGroup = new Group(groupname, owner);
+    owner.addOwnedGroup(newGroup);
+    return newGroup;
   }
   sendInvitation(receiver: User) {
     const invite: Invitation<Group, User> = new Invitation(

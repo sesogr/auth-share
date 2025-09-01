@@ -19,7 +19,9 @@ export class User implements Displayable {
   getDisplayName(): string {
     return this.displayName;
   }
-
+  addOwnedGroup(newGroup: Group) {
+    this.ownedGroups.push(newGroup);
+  }
   listOwnedServices(): Service[] {
     return [...this.owned];
   }
