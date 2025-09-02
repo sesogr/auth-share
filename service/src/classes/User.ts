@@ -4,6 +4,7 @@ import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
+import { ConvertedUser } from "../types/ConvertedUser.ts";
 export class User implements Displayable {
   private constructor(
     private credentials: UserCredential,
@@ -89,7 +90,10 @@ export class User implements Displayable {
   requestAuthorization(newService: Service) {}
 
   toJsonString(): string {
-    return JSON.stringify({
+    return JSON.stringify(this.toConvertedUser());
+  }
+  private toConvertedUser(): ConvertedUser {
+    return {
       credentials: this.credentials,
       displayname: this.displayName,
       owned: this.owned.map((e) => e.getDisplayName()),
@@ -97,9 +101,10 @@ export class User implements Displayable {
       groups: this.groups.map((e) => e.getDisplayName()),
       userGroupInvitations: this.userGroupInvitations.map((e) => e.toString()),
       ownedGroups: this.ownedGroups.map((e) => e.getDisplayName()),
-    });
+    };
   }
-  toJson() {
-    return JSON.parse(this.toJsonString());
+
+  toJson(): ConvertedUser {
+    return this.toConvertedUser();
   }
 }

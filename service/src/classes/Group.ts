@@ -1,5 +1,6 @@
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 import { Displayable } from "../interfaces/Displayable.ts";
+import { ConvertedGroup } from "../types/ConvertedGroup.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { User } from "./User.ts";
@@ -65,18 +66,20 @@ export class Group implements Displayable {
     return this.owner;
   }
   toJsonString(): string {
-    return JSON.stringify({
+    return JSON.stringify(this.convertToSerializeableObj());
+  }
+  private convertToSerializeableObj(): ConvertedGroup {
+    return {
       groupname: this.groupname,
       owner: this.owner.getDisplayName(),
       users: this.users.map((e) => e.getDisplayName()),
-      serviceList: this.serviceList.map((e) => {
-        e.getDisplayName();
-      }),
+      serviceList: this.serviceList.map((e) => e.getDisplayName()),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
-    });
+    };
   }
+
   toJson() {
-    return JSON.parse(this.toJsonString());
+    return this.convertToSerializeableObj();
   }
 }

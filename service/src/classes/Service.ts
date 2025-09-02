@@ -1,4 +1,5 @@
 import { Displayable } from "../interfaces/Displayable.ts";
+import { ConvertedService } from "../types/ConvertedService.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
@@ -76,19 +77,21 @@ export class Service implements Displayable {
     return this.groups.includes(receiver);
   }
   toJsonString(): string {
-    return JSON.stringify({
+    return JSON.stringify(this.convertToSerializeableObj());
+  }
+  private convertToSerializeableObj(): ConvertedService {
+    return {
       serviceName: this.serviceName,
       credentials: this.credentials,
       users: this.users.map((e) => e.getDisplayName()),
       owners: this.owners.map((e) => e.getDisplayName()),
-      groups: this.groups.map((e) => {
-        e.getDisplayName();
-      }),
+      groups: this.groups.map((e) => e.getDisplayName()),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
-    });
+    };
   }
+
   toJson() {
-    return JSON.parse(this.toJsonString());
+    return this.convertToSerializeableObj();
   }
   /*serviceIsInList(serviceName: string): boolean{
   return this.services.includes(serviceName);
