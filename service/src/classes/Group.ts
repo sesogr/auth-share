@@ -64,4 +64,19 @@ export class Group implements Displayable {
   getOwner(): User {
     return this.owner;
   }
+  toJsonString(): string {
+    return JSON.stringify({
+      groupname: this.groupname,
+      owner: this.owner.getDisplayName(),
+      users: this.users.map((e) => e.getDisplayName()),
+      serviceList: this.serviceList.map((e) => {
+        e.getDisplayName();
+      }),
+      sentInvitations: this.sentInvitations.map((e) => e.toString()),
+      serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
+    });
+  }
+  toJson() {
+    return JSON.parse(this.toJsonString());
+  }
 }

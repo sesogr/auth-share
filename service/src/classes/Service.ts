@@ -75,6 +75,21 @@ export class Service implements Displayable {
   receiverIsInGroups(receiver: Group): boolean {
     return this.groups.includes(receiver);
   }
+  toJsonString(): string {
+    return JSON.stringify({
+      serviceName: this.serviceName,
+      credentials: this.credentials,
+      users: this.users.map((e) => e.getDisplayName()),
+      owners: this.owners.map((e) => e.getDisplayName()),
+      groups: this.groups.map((e) => {
+        e.getDisplayName();
+      }),
+      sentInvitations: this.sentInvitations.map((e) => e.toString()),
+    });
+  }
+  toJson() {
+    return JSON.parse(this.toJsonString());
+  }
   /*serviceIsInList(serviceName: string): boolean{
   return this.services.includes(serviceName);
 }*/

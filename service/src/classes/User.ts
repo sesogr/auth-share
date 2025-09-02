@@ -87,4 +87,21 @@ export class User implements Displayable {
     this.callable.push(newService);
   }
   requestAuthorization(newService: Service) {}
+
+  toJsonString(): string {
+    return JSON.stringify({
+      credentials: this.credentials,
+      displayname: this.displayName,
+      owned: this.owned.map((e) => e.getDisplayName()),
+      callable: this.callable.map((e) => e.getDisplayName()),
+      groups: this.groups.map((e) => {
+        e.getDisplayName();
+      }),
+      userGroupInvitations: this.userGroupInvitations.map((e) => e.toString()),
+      ownedGroups: this.ownedGroups.map((e) => e.getDisplayName()),
+    });
+  }
+  toJson() {
+    return JSON.parse(this.toJsonString());
+  }
 }
