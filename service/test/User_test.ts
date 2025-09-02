@@ -6,7 +6,7 @@ Deno.test("name to long error", () => {
   assertThrows(() => {
     User.createUser(
       new UserCredential("", ""),
-      "i'mtoolongandhave$pecialcharacters"
+      "i'mwayyyyytoolongandhave$pecialcharactersasmyname"
     );
   });
 });

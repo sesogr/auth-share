@@ -29,13 +29,13 @@ export class User implements Displayable {
   static createUser(credentials: UserCredential, displayName: string) {
     if (User.stringToLong(displayName)) {
       throw new Error(
-        "Your Username is too long, please use a Name with max 20 characters."
+        "Your Username is too long, please use a Name with max 40 characters."
       );
     }
     return new User(credentials, displayName);
   }
   private static stringToLong(displayName: string) {
-    return displayName.length > 20;
+    return displayName.length > 40;
   }
 
   static authenticate(credentials: UserCredential): User {
@@ -94,9 +94,7 @@ export class User implements Displayable {
       displayname: this.displayName,
       owned: this.owned.map((e) => e.getDisplayName()),
       callable: this.callable.map((e) => e.getDisplayName()),
-      groups: this.groups.map((e) => {
-        e.getDisplayName();
-      }),
+      groups: this.groups.map((e) => e.getDisplayName()),
       userGroupInvitations: this.userGroupInvitations.map((e) => e.toString()),
       ownedGroups: this.ownedGroups.map((e) => e.getDisplayName()),
     });
