@@ -1,5 +1,5 @@
 import { Displayable } from "../interfaces/Displayable.ts";
-import { ConvertedService } from "../types/ConvertedService.ts";
+import { ConvertedService } from "../types/types.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";

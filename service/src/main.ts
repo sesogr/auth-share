@@ -2,6 +2,11 @@ import { Hono } from "@hono/hono";
 import { FakeObjectGen } from "./FakeObjectGen.ts";
 import { User } from "./classes/User.ts";
 import { Group } from "./classes/Group.ts";
+import {
+  ConvertedUser,
+  ConvertedGroup,
+  ConvertedService,
+} from "./types/types.ts";
 
 const app = new Hono();
 /* old
@@ -53,12 +58,12 @@ app.get("/data", async (c) => {
 });*/
 
 app.get("/user", (c) => {
-  const convertedList = userList.map((e) => e.toJson());
+  const convertedList: ConvertedUser[] = userList.map((e) => e.toJson());
   return c.json(convertedList);
 });
 
 app.get("/group", (c) => {
-  const convertedGroupList = testGroup.map((e) => e.toJson());
+  const convertedGroupList: ConvertedGroup[] = testGroup.map((e) => e.toJson());
   return c.json(convertedGroupList);
 });
 

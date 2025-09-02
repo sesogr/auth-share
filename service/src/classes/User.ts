@@ -4,7 +4,7 @@ import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
-import { ConvertedUser } from "../types/ConvertedUser.ts";
+import { ConvertedUser } from "../types/types.ts";
 export class User implements Displayable {
   private constructor(
     private credentials: UserCredential,
