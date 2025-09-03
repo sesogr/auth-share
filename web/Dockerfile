@@ -12,3 +12,4 @@ RUN deno cache src/main.ts
 
 # Run the app
 
+CMD ["deno"]
