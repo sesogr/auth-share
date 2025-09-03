@@ -1,4 +1,5 @@
 import { Hono } from "@hono/hono";
+import { cors } from "@hono/hono/cors";
 import { FakeObjectGen } from "./FakeObjectGen.ts";
 import { User } from "./classes/User.ts";
 import { Group } from "./classes/Group.ts";
@@ -9,11 +10,13 @@ import {
 } from "./types/types.ts";
 
 const app = new Hono();
-/* old
-const userList = [1, 2, 3, 4].map((c) => FakeObjectGen.createFakeUser());
-const testGroup = FakeObjectGen.createFakeGroup(undefined, userList[0]);
- */
-
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 //new
 const userList: User[] = [];
 
