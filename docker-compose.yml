@@ -2,8 +2,8 @@ services:
   service-dev:
     container_name: dev-service
     build:
-      context: .
-      dockerfile: ./service/dockerfile
+      context: ./service
+      dockerfile: ./Dockerfile
     environment:
       DB_HOST: mariadb
       DB_NAME: authshare
@@ -14,20 +14,20 @@ services:
       - ./service:/app
     ports:
       - "8000:8000"
-    command: ["deno", "run", "dev"]
+    entrypoint: ["deno", "run", "dev"]
 
   web-dev:
     container_name: dev-web
     build:
-      context: .
-      dockerfile: ./web/dockerfile
+      context: ./web
+      dockerfile: ./Dockerfile
     environment:
       DENO_ENV: development
     volumes:
       - ./web:/app
     ports:
       - "3000:5173"
-    command: ["deno", "run", "dev"]
+    entrypoint: ["deno", "run","--allow-all", "dev"]
 
   mariadb:
     container_name: database

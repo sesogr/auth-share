@@ -11,4 +11,4 @@ RUN deno install
 RUN deno cache src/main.ts
 
 # Run the app
-CMD ["deno", "run", "--allow-net --allow-env", "src/main.ts"]
+ENTRYPOINT ["deno", "run", "--allow-net --allow-env", "src/main.ts"]

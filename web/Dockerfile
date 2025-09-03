@@ -8,8 +8,7 @@ COPY . .
 
 # Compile the main app
 RUN deno install
-RUN deno cache src/main.ts
 
 # Run the app
 
-CMD ["deno"]
+ENTRYPOINT ["deno", "run", "dev"]
