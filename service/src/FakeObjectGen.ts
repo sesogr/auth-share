@@ -18,14 +18,14 @@ export class FakeObjectGen {
   ) {
     return Group.createUserGroup(groupDisplayName, user);
   }
-  static createFakeService() {
+  static createFakeService(futureOwner: User = FakeObjectGen.createFakeUser()) {
     return Service.createService(
       new ServiceCredential(
         faker.internet.userName(),
         faker.internet.password(7, true, /.*/, "")
       ),
       faker.internet.domainName(),
-      FakeObjectGen.createFakeUser()
+      futureOwner
     );
   }
 }
