@@ -1,30 +1,17 @@
-import React, { useState, type JSX } from "react";
-import type { ConvertedUser } from "./types/types.ts";
+import { type JSX } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./Home.tsx";
+import Service from "./Service.tsx";
 
 function App(): JSX.Element {
-  const [users, setUsers] = useState<ConvertedUser[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  fetch("http://localhost:8000/user") // Port/Host anpassen
-    .then((res): Promise<ConvertedUser[]> => {
-      if (!res.ok) throw new Error("Netzwerkfehler");
-      return res.json();
-    })
-    .then((data: ConvertedUser[]) => setUsers(data))
-    .catch((err) => setError(err.message));
-
-  if (error) return <div>Fehler: {error}</div>;
-  if (!users) return <div>Lade...</div>;
-
   return (
-    <div>
-      <h1>User List</h1>
-      <ul>
-        {users.map((u) => (
-          <li>{u.displayname}</li>
-        ))}
-      </ul>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<div>Missing Page!!</div>} />
+        <Route path="/owned" element={<Service />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 export default App;
