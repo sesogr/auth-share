@@ -8,6 +8,7 @@ import {
   ConvertedGroup,
   ConvertedService,
 } from "./types/types.ts";
+import { Service } from "./classes/Service.ts";
 
 const app = new Hono();
 app.use(
@@ -23,6 +24,12 @@ const userList: User[] = [];
 for (let i = 0; i < 10; i++) {
   const fakeUser = FakeObjectGen.createFakeUser();
   userList.push(fakeUser);
+}
+
+const firstUser = userList[0];
+
+for (let i = 0; i < 3; i++) {
+  const service = FakeObjectGen.createFakeService(firstUser);
 }
 
 const testGroup: Group[] = [];
@@ -62,6 +69,15 @@ app.get("/data", async (c) => {
 
 app.get("/user", (c) => {
   const convertedList: ConvertedUser[] = userList.map((e) => e.toJson());
+  return c.json(convertedList);
+});
+
+app.get("/user/owned", (c) => {
+  const firstUser: User = userList[0];
+  if (!firstUser) return c.json({ error: "No users" }, 404);
+
+  const serviceList: Service[] = firstUser.listOwnedServices();
+  const convertedList: ConvertedService[] = serviceList.map((e) => e.toJson());
   return c.json(convertedList);
 });
 
