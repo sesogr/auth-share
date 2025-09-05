@@ -8,6 +8,7 @@ function App(): JSX.Element {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/:serviceName" element={<Home />} />
         <Route path="*" element={<div>Missing Page!!</div>} />
         <Route path="/owned" element={<Service />} />
       </Routes>
