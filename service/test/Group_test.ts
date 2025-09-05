@@ -95,7 +95,7 @@ Deno.test(
   }
 );
 
-export const groupTestDefinition = async (t: Deno.TestContext) => {
+export const groupTestContext = async (t: Deno.TestContext) => {
   await t.step("test the method createUserGroup", () => {
     const group = createTestGroup();
     const owner = group.getOwner();

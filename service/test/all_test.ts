@@ -1,5 +1,5 @@
-import { groupTestDefinition } from "./Group_test.ts";
+import { groupTestContext } from "./Group_test.ts";
 
 Deno.test("All", async (t) => {
-  await t.step("Group", groupTestDefinition);
+  await t.step("Group", groupTestContext);
 });
