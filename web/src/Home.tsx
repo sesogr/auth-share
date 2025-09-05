@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import type { ConvertedService } from "./types/ConvertedService.ts";
 import { Link, useParams } from "react-router-dom";
+import Service from "./Service.tsx";
 
 const Home = () => {
   const [serviceList, setServiceList] = useState<ConvertedService[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { serviceName } = useParams();
   //Deconstruction
   //const parameter = useParams();
   //const { serviceName } = parameter
+  const { serviceName } = useParams();
+
   useEffect(() => {
     fetch("http://localhost:8000/user/owned") // Port/Host anpassen
       .then((res): Promise<ConvertedService[]> => {
@@ -35,48 +37,7 @@ const Home = () => {
           </li>
         ))}
       </ul>
-      <div>
-        <h2>{serviceName}</h2>
-        <ul>
-          <li>
-            {service?.credentials.username +
-              ":" +
-              service?.credentials.password}
-          </li>
-          <li>
-            Groups:{" "}
-            <ul>
-              {service?.groups.map((e) => (
-                <li>{e}</li>
-              ))}
-            </ul>
-          </li>
-          <li>
-            Owner:{" "}
-            <ul>
-              {service?.owners.map((e) => (
-                <li>{e}</li>
-              ))}
-            </ul>
-          </li>
-          <li>
-            Sent Invitations:{" "}
-            <ul>
-              {service?.sentInvitations.map((e) => (
-                <li>{e}</li>
-              ))}
-            </ul>
-          </li>
-          <li>
-            Users:{" "}
-            <ul>
-              {service?.users.map((e) => (
-                <li>{e}</li>
-              ))}
-            </ul>
-          </li>
-        </ul>
-      </div>
+      {service && <Service {service} />}
     </div>
   );
 };
