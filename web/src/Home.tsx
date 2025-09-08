@@ -38,7 +38,7 @@ const Home = () => {
           const urlPath = "/" + e.serviceName;
           return (
             <li>
-              <Link to={urlPath}>{e.serviceName}</Link>
+              {e.serviceName}
               <button
                 type="button"
                 onClick={() => navigate(urlPath)}
