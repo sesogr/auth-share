@@ -24,10 +24,10 @@ services:
     environment:
       DENO_ENV: development
     volumes:
-      - ./web:/app
+      - ./web/src:/app/src
     ports:
       - "3000:5173"
-    entrypoint: ["deno", "run","--allow-all", "dev"]
+    entrypoint: ["deno", "run", "--allow-all", "dev"]
 
   mariadb:
     container_name: database
