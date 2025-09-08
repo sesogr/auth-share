@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import type { ConvertedService } from "./types/ConvertedService.ts";
 import { Link, useParams } from "react-router-dom";
 import Service from "./Service.tsx";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [serviceList, setServiceList] = useState<ConvertedService[]>([]);
@@ -26,16 +27,35 @@ const Home = () => {
   const service = serviceList.find(
     (currService) => serviceName == currService.serviceName
   );
+  const navigate = useNavigate();
 
   return (
     <div>
       <h1>Service List</h1>
       <ul>
-        {serviceList.map((e) => (
-          <li>
-            <Link to={"/" + e.serviceName}>{e.serviceName}</Link>
-          </li>
-        ))}
+        {serviceList.map((e) => {
+          //should be the final path like "/serviceName/details or /serviceName/settings"??
+          const urlPath = "/" + e.serviceName;
+          return (
+            <li>
+              <Link to={urlPath}>{e.serviceName}</Link>
+              <button
+                type="button"
+                onClick={() => navigate(urlPath)}
+                aria-label={`Details for ${e.serviceName}`}
+              >
+                Details
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(urlPath)}
+                aria-label={`Settings for ${e.serviceName}`}
+              >
+                Settings
+              </button>
+            </li>
+          );
+        })}
       </ul>
       {service && <Service service={service} />}
     </div>
