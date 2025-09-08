@@ -2,7 +2,6 @@ import React from "react";
 import type { ConvertedService } from "./types/types.ts";
 
 const Service = ({ service }: { service: ConvertedService }) => {
-  console.log(service);
   return (
     <div>
       <h2>{service.serviceName}</h2>
