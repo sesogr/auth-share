@@ -37,7 +37,7 @@ const Home = () => {
           </li>
         ))}
       </ul>
-      {service && <Service {service} />}
+      {service && <Service service={service} />}
     </div>
   );
 };

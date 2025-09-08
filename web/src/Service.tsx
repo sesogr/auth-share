@@ -1,8 +1,7 @@
 import React from "react";
 import type { ConvertedService } from "./types/types.ts";
 
-const Service = (children: { service: any }) => {
-  const service: ConvertedService = children.service;
+const Service = ({ service }: { service: ConvertedService }) => {
   console.log(service);
   return (
     <div>
