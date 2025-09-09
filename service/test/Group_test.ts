@@ -29,7 +29,7 @@ Deno.test("test the method getDisplayName on groupname", () => {
 });
 
 Deno.test("test the method getDisplayName on owner", () => {
-  const group = createTestGroup();
+  const _group = createTestGroup();
 
   const owner = userCredential.username;
   console.log(

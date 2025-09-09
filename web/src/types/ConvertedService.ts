@@ -1,9 +1,7 @@
-import { ServiceCredential } from "../classes/ServiceCredential.ts";
-
 export type ConvertedService =
   & {
     serviceName: string;
-    credentials: ServiceCredential;
+    credentials: string;
   }
   & {
     [K in ServiceListProperties]: string[];

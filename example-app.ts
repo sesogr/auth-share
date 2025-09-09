@@ -28,7 +28,7 @@ class InMemoryUserRepository implements Repository<User>, UserFinder {
   }
 }
 const userRepository: InMemoryUserRepository = new InMemoryUserRepository();
-let firstUserId = crypto.randomUUID();
+const firstUserId = crypto.randomUUID();
 userRepository.save({ firstName: "John", lastName: "Doe", id: firstUserId });
 userRepository.save({
   firstName: "Jenny",

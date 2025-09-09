@@ -61,7 +61,7 @@ export class User implements Displayable {
   listServices(): Service[] {
     return [...this.callable];
   }
-  changeUserCredentials(newCredentials: UserCredential) {}
+  changeUserCredentials(_newCredentials: UserCredential) {}
 
   listOwnedGroups(): Group[] {
     return [...this.ownedGroups];
@@ -86,14 +86,14 @@ export class User implements Displayable {
   addService(newService: Service) {
     this.callable.push(newService);
   }
-  requestAuthorization(newService: Service) {}
+  requestAuthorization(_newService: Service) {}
 
   toJsonString(): string {
     return JSON.stringify(this.toConvertedUser());
   }
   private toConvertedUser(): ConvertedUser {
     return {
-      credentials: this.credentials,
+      credentials: this.credentials.toString(),
       displayname: this.displayName,
       owned: this.owned.map((e) => e.getDisplayName()),
       callable: this.callable.map((e) => e.getDisplayName()),

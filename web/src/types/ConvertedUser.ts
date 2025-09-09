@@ -1,8 +1,6 @@
-import { UserCredential } from "../classes/UserCredential.ts";
-
 export type ConvertedUser =
   & {
-    credentials: UserCredential;
+    credentials: string;
     displayname: string;
   }
   & {

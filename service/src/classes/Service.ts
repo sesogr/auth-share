@@ -81,7 +81,7 @@ export class Service implements Displayable {
   private convertToSerializeableObj(): ConvertedService {
     return {
       serviceName: this.serviceName,
-      credentials: this.credentials,
+      credentials: this.credentials.toString(),
       users: this.users.map((e) => e.getDisplayName()),
       owners: this.owners.map((e) => e.getDisplayName()),
       groups: this.groups.map((e) => e.getDisplayName()),

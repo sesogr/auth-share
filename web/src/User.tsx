@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ConvertedUser } from "./types/types.ts";
 import { useParams } from "react-router-dom";
 
@@ -32,35 +32,35 @@ const User = () => {
           <li>
             Your Credentials:
             <ul>
-              {user?.credentials.username + ":" + user?.credentials.password}
+              {user?.credentials}
             </ul>
           </li>
           <li>
             Owned:{" "}
             <ul>
-              {user?.owned.map((e) => <li>{e}</li>)}
+              {user?.owned.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
           </li>
           <li>
             Callable:{" "}
             <ul>
-              {user?.callable.map((e) => <li>{e}</li>)}
+              {user?.callable.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
           </li>
           <li>
             Groups:{" "}
             <ul>
-              {user?.groups.map((e) => <li>{e}</li>)}
+              {user?.groups.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
             <li>
               Group Invitations:
               <ul>
-                {user?.userGroupInvitations.map((e) => <li>{e}</li>)}
+                {user?.userGroupInvitations.map((e, i) => <li key={i}>{e}</li>)}
               </ul>
               <li>
                 Owned Groups:
                 <ul>
-                  {user?.ownedGroups.map((e) => <li>{e}</li>)}
+                  {user?.ownedGroups.map((e, i) => <li key={i}>{e}</li>)}
                 </ul>
               </li>
             </li>

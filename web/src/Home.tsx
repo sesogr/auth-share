@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ConvertedService } from "./types/ConvertedService.ts";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Service from "./Service.tsx";
 import { useNavigate } from "react-router-dom";
 
