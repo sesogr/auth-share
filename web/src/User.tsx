@@ -38,39 +38,29 @@ const User = () => {
           <li>
             Owned:{" "}
             <ul>
-              {user?.owned.map((e) => (
-                <li>{e}</li>
-              ))}
+              {user?.owned.map((e) => <li>{e}</li>)}
             </ul>
           </li>
           <li>
             Callable:{" "}
             <ul>
-              {user?.callable.map((e) => (
-                <li>{e}</li>
-              ))}
+              {user?.callable.map((e) => <li>{e}</li>)}
             </ul>
           </li>
           <li>
             Groups:{" "}
             <ul>
-              {user?.groups.map((e) => (
-                <li>{e}</li>
-              ))}
+              {user?.groups.map((e) => <li>{e}</li>)}
             </ul>
             <li>
               Group Invitations:
               <ul>
-                {user?.userGroupInvitations.map((e) => (
-                  <li>{e}</li>
-                ))}
+                {user?.userGroupInvitations.map((e) => <li>{e}</li>)}
               </ul>
               <li>
                 Owned Groups:
                 <ul>
-                  {user?.ownedGroups.map((e) => (
-                    <li>{e}</li>
-                  ))}
+                  {user?.ownedGroups.map((e) => <li>{e}</li>)}
                 </ul>
               </li>
             </li>

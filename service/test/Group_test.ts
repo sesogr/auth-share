@@ -24,7 +24,7 @@ Deno.test("test the method getDisplayName on groupname", () => {
   const groupname = group.getDisplayName();
   assertEquals(groupname, "Schachverein");
   console.log(
-    "The groupname is " + groupname + " and should be hopefully Schachverein!?"
+    "The groupname is " + groupname + " and should be hopefully Schachverein!?",
   );
 });
 
@@ -33,7 +33,7 @@ Deno.test("test the method getDisplayName on owner", () => {
 
   const owner = userCredential.username;
   console.log(
-    "The owner is " + owner + " and should be hopefully Hans Meiser!?"
+    "The owner is " + owner + " and should be hopefully Hans Meiser!?",
   );
   assertEquals(owner, "Hans Meiser");
 });
@@ -64,7 +64,7 @@ Deno.test(
 
     const listSentInvitation = group.listSentInvitation();
     assertEquals(listSentInvitation, testUser.listUserGroupInvitation());
-  }
+  },
 );
 
 Deno.test(
@@ -73,16 +73,16 @@ Deno.test(
     const group: Group = createTestGroup();
     const testUserCredentials: UserCredential = new UserCredential(
       "Don Receiver",
-      "qwertz"
+      "qwertz",
     );
     const testReceiver: User = User.createUser(
       testUserCredentials,
-      "Don Receiver"
+      "Don Receiver",
     );
     const testInvitation: Invitation<Group, User> = new Invitation(
       user,
       group,
-      testReceiver
+      testReceiver,
     );
     //const sender = group.getOwner();
     group.sendInvitation(testReceiver);
@@ -92,5 +92,5 @@ Deno.test(
 
     assertArrayIncludes(listSentInvitation, [testInvitation]);
     assertArrayIncludes(listUserGroupInvitation, [testInvitation]);
-  }
+  },
 );

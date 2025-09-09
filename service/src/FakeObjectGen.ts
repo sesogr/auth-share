@@ -8,13 +8,13 @@ export class FakeObjectGen {
   static createFakeUser(
     userName = faker.internet.userName(),
     password = faker.internet.password(7, true, /.* /, ""),
-    displayname = faker.name.findName()
+    displayname = faker.name.findName(),
   ) {
     return User.createUser(new UserCredential(userName, password), displayname);
   }
   static createFakeGroup(
     groupDisplayName = faker.internet.domainName(),
-    user: User = FakeObjectGen.createFakeUser()
+    user: User = FakeObjectGen.createFakeUser(),
   ) {
     return Group.createUserGroup(groupDisplayName, user);
   }
@@ -22,10 +22,10 @@ export class FakeObjectGen {
     return Service.createService(
       new ServiceCredential(
         faker.internet.userName(),
-        faker.internet.password(7, true, /.*/, "")
+        faker.internet.password(7, true, /.*/, ""),
       ),
       faker.internet.domainName(),
-      futureOwner
+      futureOwner,
     );
   }
 }

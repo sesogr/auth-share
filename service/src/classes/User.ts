@@ -8,13 +8,12 @@ import { ConvertedUser } from "../types/types.ts";
 export class User implements Displayable {
   private constructor(
     private credentials: UserCredential,
-
     private displayName: string = "",
     private owned: Service[] = [],
     private callable: Service[] = [],
     private groups: Group[] = [],
     private userGroupInvitations: Invitation<Group, User>[] = [],
-    private ownedGroups: Group[] = []
+    private ownedGroups: Group[] = [],
   ) {}
 
   getDisplayName(): string {
@@ -30,7 +29,7 @@ export class User implements Displayable {
   static createUser(credentials: UserCredential, displayName: string) {
     if (User.stringToLong(displayName)) {
       throw new Error(
-        "Your Username is too long, please use a Name with max 40 characters."
+        "Your Username is too long, please use a Name with max 40 characters.",
       );
     }
     return new User(credentials, displayName);
@@ -47,7 +46,7 @@ export class User implements Displayable {
     const receiver = newInvite.receiverReference;
     if (receiver != this) {
       throw new WrongReceiverError(
-        `This isn't User ${receiver.getDisplayName()}`
+        `This isn't User ${receiver.getDisplayName()}`,
       );
     }
     this.userGroupInvitations.push(newInvite);
@@ -56,7 +55,7 @@ export class User implements Displayable {
     this.userGroupInvitations = this.userGroupInvitations.filter(
       (currInvitation) => {
         return currInvitation.equals(invite);
-      }
+      },
     );
   }
   listServices(): Service[] {

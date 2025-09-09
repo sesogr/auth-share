@@ -3,7 +3,7 @@ import { Displayable } from "../interfaces/Displayable.ts";
 import { User } from "./User.ts";
 export class Invitation<
   ObjType extends Displayable,
-  ReceiverType extends Displayable
+  ReceiverType extends Displayable,
 > extends ValueClass {
   public get receiverReference(): ReceiverType {
     return this._receiverReference;
@@ -17,7 +17,7 @@ export class Invitation<
   constructor(
     private readonly _senderReference: User,
     private readonly _objReference: ObjType,
-    private readonly _receiverReference: ReceiverType
+    private readonly _receiverReference: ReceiverType,
   ) {
     super();
   }

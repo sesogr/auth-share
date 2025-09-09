@@ -9,33 +9,25 @@ const Service = ({ service }: { service: ConvertedService }) => {
         <li>
           Groups:{" "}
           <ul>
-            {service.groups.map((e) => (
-              <li>{e}</li>
-            ))}
+            {service.groups.map((e) => <li>{e}</li>)}
           </ul>
         </li>
         <li>
           Owner:{" "}
           <ul>
-            {service.owners.map((e) => (
-              <li>{e}</li>
-            ))}
+            {service.owners.map((e) => <li>{e}</li>)}
           </ul>
         </li>
         <li>
           Sent Invitations:{" "}
           <ul>
-            {service.sentInvitations.map((e) => (
-              <li>{e}</li>
-            ))}
+            {service.sentInvitations.map((e) => <li>{e}</li>)}
           </ul>
         </li>
         <li>
           Users:{" "}
           <ul>
-            {service.users.map((e) => (
-              <li>{e}</li>
-            ))}
+            {service.users.map((e) => <li>{e}</li>)}
           </ul>
         </li>
       </ul>

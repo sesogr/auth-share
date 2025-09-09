@@ -9,7 +9,7 @@ export class UserCredential extends ValueClass {
   }
   constructor(
     private readonly _username: string,
-    private readonly _password: string
+    private readonly _password: string,
   ) {
     super();
   }

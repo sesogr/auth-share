@@ -25,7 +25,7 @@ const Home = () => {
   if (!serviceList) return <div>Lade...</div>;
 
   const service = serviceList.find(
-    (currService) => serviceName == currService.serviceName
+    (currService) => serviceName == currService.serviceName,
   );
   const navigate = useNavigate();
 

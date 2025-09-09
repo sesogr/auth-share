@@ -4,9 +4,9 @@ import { FakeObjectGen } from "./FakeObjectGen.ts";
 import { User } from "./classes/User.ts";
 import { Group } from "./classes/Group.ts";
 import {
-  ConvertedUser,
   ConvertedGroup,
   ConvertedService,
+  ConvertedUser,
 } from "./types/types.ts";
 import { Service } from "./classes/Service.ts";
 
@@ -16,7 +16,7 @@ app.use(
   cors({
     origin: "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE"],
-  })
+  }),
 );
 //new
 const userList: User[] = [];
@@ -29,7 +29,7 @@ for (let i = 0; i < 10; i++) {
 const firstUser = userList[0];
 
 for (let i = 0; i < 3; i++) {
-  const service = FakeObjectGen.createFakeService(firstUser);
+  const _service = FakeObjectGen.createFakeService(firstUser);
 }
 
 const testGroup: Group[] = [];

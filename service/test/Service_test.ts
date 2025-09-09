@@ -26,7 +26,7 @@ const user2 = newUser("Swe");
 const service: Service = Service.createService(
   user.credentials.serviceCred,
   "Google",
-  user.user
+  user.user,
 );
 Deno.test("Service Creates with correct Owner", () => {
   const owners: User[] = service.listOwners();
@@ -42,5 +42,5 @@ Deno.test(
   () => {
     service.giveAuthorizationToUser(user2.user);
     assertArrayIncludes(service.listOwners(), [user2.user]);
-  }
+  },
 );

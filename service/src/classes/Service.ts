@@ -8,12 +8,11 @@ import { User } from "./User.ts";
 export class Service implements Displayable {
   private constructor(
     private credentials: ServiceCredential,
-
     private serviceName: string = "",
     private owners: User[] = [],
     private users: User[] = [],
     private groups: Group[] = [],
-    private sentInvitations: Invitation<Service, Group>[] = [] //private services or callable: Service[] = []
+    private sentInvitations: Invitation<Service, Group>[] = [], //private services or callable: Service[] = []
   ) {}
   getDisplayName(): string {
     return this.serviceName;
@@ -31,7 +30,7 @@ export class Service implements Displayable {
   static createService(
     credentials: ServiceCredential,
     serviceName: string,
-    serviceOwner: User
+    serviceOwner: User,
   ): Service {
     /*if(this.serviceIsInList(serviceName)) {
       throw new Error(
@@ -52,7 +51,7 @@ export class Service implements Displayable {
   sendInvitation(receiver: Group, sender: User = this.owners[0]) {
     if (this.receiverIsInGroups(receiver)) {
       throw new Error(
-        `The group ${receiver.getDisplayName()} is already using the service ${this.getDisplayName()}!`
+        `The group ${receiver.getDisplayName()} is already using the service ${this.getDisplayName()}!`,
       );
     }
     const invitation = new Invitation<Service, Group>(sender, this, receiver);

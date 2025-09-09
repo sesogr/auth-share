@@ -13,7 +13,7 @@ export class Group implements Displayable {
     private users: User[] = [],
     private serviceList: Service[] = [],
     private sentInvitations: Invitation<Group, User>[] = [],
-    private serviceInvitations: Invitation<Service, Group>[] = []
+    private serviceInvitations: Invitation<Service, Group>[] = [],
   ) {}
   getDisplayName(): string {
     return this.groupname;
@@ -33,7 +33,7 @@ export class Group implements Displayable {
     const invite: Invitation<Group, User> = new Invitation(
       this.owner,
       this,
-      receiver
+      receiver,
     );
     this.sentInvitations.push(invite);
     receiver.addInvitation(invite);
@@ -42,7 +42,7 @@ export class Group implements Displayable {
     const receiver = newServiceInvite.receiverReference;
     if (receiver != this) {
       throw new WrongReceiverError(
-        `This is not Group: ${receiver.getDisplayName()}`
+        `This is not Group: ${receiver.getDisplayName()}`,
       );
     }
     this.serviceInvitations.push(newServiceInvite);
@@ -51,12 +51,12 @@ export class Group implements Displayable {
     this.serviceInvitations = this.serviceInvitations.filter(
       (currInvitation) => {
         return currInvitation != invitation;
-      }
+      },
     );
   }
   removeService(service: Service) {
     this.serviceList = this.serviceList.filter(
-      (currService) => service != currService
+      (currService) => service != currService,
     );
   }
   /*groupAlreadyExist(groupname: string): boolean{
