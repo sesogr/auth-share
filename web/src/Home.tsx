@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ConvertedService } from "./types/ConvertedService.ts";
 import { useParams } from "react-router-dom";
 import Service from "./Service.tsx";
 import { useNavigate } from "react-router-dom";
 
-const Home = () => {
+const Home: React.FC = () => {
   const [serviceList, setServiceList] = useState<ConvertedService[]>([]);
   const [error, setError] = useState<string | null>(null);
   //Deconstruction
