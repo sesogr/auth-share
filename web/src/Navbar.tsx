@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-function Navbar() {
+const Navbar: React.FC = () => {
   const linkStyle = ({ isActive }: { isActive: boolean }) => ({
     marginRight: 12,
     textDecoration: "none",
@@ -18,6 +18,6 @@ function Navbar() {
       </NavLink>
     </nav>
   );
-}
+};
 
 export default Navbar;
