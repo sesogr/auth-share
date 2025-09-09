@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "check": "deno fmt && deno lint --fix && deno test",
+    "hooks:install": "deno run --allow-read=deno.json,.git/hooks/ --allow-write=.git/hooks/ jsr:@hongminhee/deno-task-hooks",
+    "hooks:pre-commit": "deno task check",
+    "install": "cd "
+  }
+}
