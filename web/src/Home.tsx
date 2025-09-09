@@ -42,9 +42,9 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => navigate(urlPath)}
-                aria-label={`Details for ${e.serviceName}`}
+                aria-label={`Launch the ${e.serviceName}`}
               >
-                Details
+                Launch
               </button>
               <button
                 type="button"
