@@ -1,6 +1,7 @@
+import React from "react";
 import type { ConvertedService } from "./types/types.ts";
 
-const Service = ({ service }: { service: ConvertedService }) => {
+const Service: React.FC<{ service: ConvertedService }> = ({ service }) => {
   return (
     <div>
       <h2>{service.serviceName}</h2>

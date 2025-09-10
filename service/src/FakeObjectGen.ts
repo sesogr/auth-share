@@ -1,4 +1,4 @@
-import { faker } from "jsr:@jackfiszr/faker@1.1.6";
+import { faker } from "@jackfiszr/faker";
 import { User } from "./classes/User.ts";
 import { UserCredential } from "./classes/UserCredential.ts";
 import { Group } from "./classes/Group.ts";

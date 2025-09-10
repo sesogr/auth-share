@@ -3,7 +3,6 @@ import type { ConvertedService } from "./types/ConvertedService.ts";
 import { useParams } from "react-router-dom";
 import Service from "./Service.tsx";
 import { useNavigate } from "react-router-dom";
-
 const Home: React.FC = () => {
   const [serviceList, setServiceList] = useState<ConvertedService[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +24,7 @@ const Home: React.FC = () => {
   if (!serviceList) return <div>Lade...</div>;
 
   const service = serviceList.find(
-    (currService) => serviceName == currService.serviceName,
+    (currService: ConvertedService) => serviceName == currService.serviceName,
   );
   const navigate = useNavigate();
 
@@ -33,7 +32,7 @@ const Home: React.FC = () => {
     <div>
       <h1>Service List</h1>
       <ul>
-        {serviceList.map((e) => {
+        {serviceList.map((e: ConvertedService) => {
           //should be the final path like "/serviceName/details or /serviceName/settings"??
           const urlPath = "/" + e.serviceName;
           return (

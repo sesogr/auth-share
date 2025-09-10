@@ -1,8 +1,22 @@
 {
   "tasks": {
-    "check": "deno fmt && deno lint --fix && deno test",
+    "check": "deno fmt && deno lint --fix && (deno task check-web) && (deno task check-service) && deno test",
+    "check-web": "cd web && deno check",
+    "check-service": "cd service && deno check",
     "hooks:install": "deno run --allow-read=deno.json,.git/hooks/ --allow-write=.git/hooks/ jsr:@hongminhee/deno-task-hooks",
     "hooks:pre-commit": "deno task check",
-    "install": "cd "
+    "deno-check": "deno task check-web && deno task check-service"
+  },
+  "imports": {
+    "react-router-dom": "npm:react-router-dom",
+    "react-dom/client": "npm:react-dom/client",
+    "react": "npm:react",
+    "vite/client": "npm:vite/client",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react",
+    "vite": "npm:vite",
+    "@hono/hono": "jsr:@hono/hono@^4.9.5",
+    "@hono/hono/cors": "jsr:@hono/hono@^4.9.5/cors",
+    "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
+    "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6"
   }
 }

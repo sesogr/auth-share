@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ConvertedUser } from "./types/types.ts";
 import { useParams } from "react-router-dom";
 
-const User = () => {
+const User: React.FC = () => {
   const [userList, setUserList] = useState<ConvertedUser[]>([]);
   const [error, setError] = useState<string | null>(null);
   //Deconstruction

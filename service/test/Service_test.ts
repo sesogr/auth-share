@@ -1,7 +1,4 @@
-import {
-  assertArrayIncludes,
-  assertEquals,
-} from "https://deno.land/std@0.224.0/assert/mod.ts";
+import { assertArrayIncludes, assertEquals } from "@std/assert";
 import { Service } from "../src/classes/Service.ts";
 import { ServiceCredential } from "../src/classes/ServiceCredential.ts";
 import { User } from "../src/classes/User.ts";

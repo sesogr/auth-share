@@ -1,8 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
+import { assertArrayIncludes, assertEquals } from "@std/assert";
 import { Group } from "../src/classes/Group.ts";
 import { User } from "../src/classes/User.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
-import { assertArrayIncludes } from "https://deno.land/std@0.224.0/assert/assert_array_includes.ts";
 import { Invitation } from "../src/classes/Invitation.ts";
 
 const userCredential = new UserCredential("Hans Meiser", "abcdef");

@@ -1,4 +1,4 @@
-import { assertFalse } from "https://deno.land/std@0.224.0/assert/assert_false.ts";
+import { assertFalse } from "@std/assert";
 import { ServiceCredential } from "../src/classes/ServiceCredential.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
 

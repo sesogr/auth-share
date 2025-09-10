@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "react-router-dom": "npm:react-router-dom",
+    "react-dom/client": "npm:react-dom/client",
+    "react": "npm:react",
+    "vite/client": "npm:vite/client",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react",
+    "vite": "npm:vite"
+  }
+}
