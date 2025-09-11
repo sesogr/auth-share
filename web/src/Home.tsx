@@ -10,9 +10,8 @@ const Home: React.FC = () => {
   //const parameter = useParams();
   //const { serviceName } = parameter
   const { serviceName } = useParams();
-
   useEffect(() => {
-    fetch("http://localhost:8000/user/owned") // Port/Host anpassen
+    fetch(import.meta.env.VITE_APIURL + "/user/owned") // Port/Host anpassen
       .then((res): Promise<ConvertedService[]> => {
         if (!res.ok) throw new Error("Netzwerkfehler");
         return res.json();

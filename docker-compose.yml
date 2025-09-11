@@ -23,6 +23,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       DENO_ENV: development
+      VITE_APIURL: http://localhost:8000
     volumes:
       - ./web/src:/app/src
     ports:

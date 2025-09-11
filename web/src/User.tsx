@@ -11,7 +11,7 @@ const User: React.FC = () => {
   const { displayname } = useParams();
 
   useEffect(() => {
-    fetch("http://localhost:8000/user") // Port/Host anpassen
+    fetch(import.meta.env.VITE_APIURL + "/user") // Port/Host anpassen
       .then((res): Promise<ConvertedUser[]> => {
         if (!res.ok) throw new Error("Netzwerkfehler");
         return res.json();
