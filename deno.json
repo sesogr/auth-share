@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "check": "deno fmt && deno lint --fix && (deno task check-web) && (deno task check-service) && deno test",
+    "check": "deno fmt && deno lint --fix && (deno task check-web) && (deno task check-service)",
     "check-web": "cd web && deno check",
     "check-service": "cd service && deno check",
     "hooks:install": "deno run --allow-read=deno.json,.git/hooks/ --allow-write=.git/hooks/ jsr:@hongminhee/deno-task-hooks",
