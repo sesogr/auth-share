@@ -1,19 +1,24 @@
 import { Displayable } from "../interfaces/Displayable.ts";
+import { Entity } from "../interfaces/Entity.ts";
 import { ConvertedService } from "../types/types.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
 import { User } from "./User.ts";
 
-export class Service implements Displayable {
+export class Service implements Displayable, Entity {
   private constructor(
     private credentials: ServiceCredential,
     private serviceName: string = "",
+    private readonly id = crypto.randomUUID(),
     private owners: User[] = [],
     private users: User[] = [],
     private groups: Group[] = [],
     private sentInvitations: Invitation<Service, Group>[] = [], //private services or callable: Service[] = []
   ) {}
+  getId(): string {
+    return this.id;
+  }
   getDisplayName(): string {
     return this.serviceName;
   }

@@ -1,20 +1,24 @@
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 import { Displayable } from "../interfaces/Displayable.ts";
+import { Entity } from "../interfaces/Entity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { User } from "./User.ts";
 
-export class Group implements Displayable {
+export class Group implements Displayable, Entity {
   private constructor(
     private groupname: string,
-    // private groupList: Group[] = []
     private owner: User,
+    private readonly id = crypto.randomUUID(),
     private users: User[] = [],
     private serviceList: Service[] = [],
     private sentInvitations: Invitation<Group, User>[] = [],
     private serviceInvitations: Invitation<Service, Group>[] = [],
   ) {}
+  getId(): string {
+    return this.id;
+  }
   getDisplayName(): string {
     return this.groupname;
   }

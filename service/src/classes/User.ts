@@ -5,16 +5,21 @@ import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 import { ConvertedUser } from "../types/types.ts";
-export class User implements Displayable {
+import { Entity } from "../interfaces/Entity.ts";
+export class User implements Displayable, Entity {
   private constructor(
     private credentials: UserCredential,
     private displayName: string = "",
+    private readonly id = crypto.randomUUID(),
     private owned: Service[] = [],
     private callable: Service[] = [],
     private groups: Group[] = [],
     private userGroupInvitations: Invitation<Group, User>[] = [],
     private ownedGroups: Group[] = [],
   ) {}
+  getId(): string {
+    return this.id;
+  }
 
   getDisplayName(): string {
     return this.displayName;
