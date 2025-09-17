@@ -1,11 +1,11 @@
-import { Displayable } from "../interfaces/Displayable.ts";
+import { Displayable } from "../interfaceTypes/Displayable.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 import { ConvertedUser } from "../types/types.ts";
-import { Entity } from "../interfaces/Entity.ts";
+import { Entity } from "../interfaceTypes/Entity.ts";
 export class User implements Displayable, Entity {
   private constructor(
     private credentials: UserCredential,

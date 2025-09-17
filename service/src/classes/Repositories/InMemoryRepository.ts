@@ -1,4 +1,4 @@
-import { Entity } from "../../interfaces/Entity.ts";
+import { Entity } from "../../interfaceTypes/Entity.ts";
 import { Displayable } from "../../interfaceTypes/Displayable.ts";
 import { Repository } from "../../interfaceTypes/Repository.ts";
 

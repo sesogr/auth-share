@@ -1,5 +1,5 @@
-import { Displayable } from "../interfaces/Displayable.ts";
-import { Entity } from "../interfaces/Entity.ts";
+import { Displayable } from "../interfaceTypes/Displayable.ts";
+import { Entity } from "../interfaceTypes/Entity.ts";
 import { ConvertedService } from "../types/types.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";

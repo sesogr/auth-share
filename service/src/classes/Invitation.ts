@@ -1,5 +1,5 @@
 import { ValueClass } from "./ValueClass.ts";
-import { Displayable } from "../interfaces/Displayable.ts";
+import { Displayable } from "../interfaceTypes/Displayable.ts";
 import { User } from "./User.ts";
 export class Invitation<
   ObjType extends Displayable,

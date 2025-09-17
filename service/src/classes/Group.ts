@@ -1,6 +1,6 @@
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
-import { Displayable } from "../interfaces/Displayable.ts";
-import { Entity } from "../interfaces/Entity.ts";
+import { Displayable } from "../interfaceTypes/Displayable.ts";
+import { Entity } from "../interfaceTypes/Entity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
