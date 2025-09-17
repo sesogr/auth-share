@@ -1,6 +1,6 @@
-import { Displayable } from "../../interfaces/Displayable.ts";
 import { Entity } from "../../interfaces/Entity.ts";
-import { Repository } from "../../interfaces/Repository.ts";
+import { Displayable } from "../../interfaceTypes/Displayable.ts";
+import { Repository } from "../../interfaceTypes/Repository.ts";
 
 export class InMemoryRepository<T extends Displayable & Entity>
   implements Repository<T> {
