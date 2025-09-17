@@ -1,3 +1,4 @@
+import { GroupAlreadyAuthorizedError } from "../errors/GroupAlreadyAuthorizedError.ts";
 import { Displayable } from "../interfaceTypes/Displayable.ts";
 import { Entity } from "../interfaceTypes/Entity.ts";
 import { ConvertedService } from "../types/types.ts";
@@ -14,7 +15,7 @@ export class Service implements Displayable, Entity {
     private owners: User[] = [],
     private users: User[] = [],
     private groups: Group[] = [],
-    private sentInvitations: Invitation<Service, Group>[] = [], //private services or callable: Service[] = []
+    private sentInvitations: Invitation<Service, Group>[] = [],
   ) {}
   getId(): string {
     return this.id;
@@ -31,22 +32,14 @@ export class Service implements Displayable, Entity {
   listOwners(): User[] {
     return [...this.owners];
   }
-  // createService should also have an exception
   static createService(
     credentials: ServiceCredential,
     serviceName: string,
     serviceOwner: User,
   ): Service {
-    /*if(this.serviceIsInList(serviceName)) {
-      throw new Error(
-        `The service called ${serviceName} is already found in the callable list.`
-      )
-    }
-    */
     const service = new Service(credentials, serviceName);
     service.owners.push(serviceOwner);
     serviceOwner.addOwnedService(service);
-    //service.services or callable.push(service);
     return service;
   }
   giveAuthorizationToUser(userFromList: User) {
@@ -55,7 +48,7 @@ export class Service implements Displayable, Entity {
 
   sendInvitation(receiver: Group, sender: User = this.owners[0]) {
     if (this.receiverIsInGroups(receiver)) {
-      throw new Error(
+      throw new GroupAlreadyAuthorizedError(
         `The group ${receiver.getDisplayName()} is already using the service ${this.getDisplayName()}!`,
       );
     }

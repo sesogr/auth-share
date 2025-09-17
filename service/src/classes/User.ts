@@ -6,6 +6,7 @@ import { UserCredential } from "./UserCredential.ts";
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 import { ConvertedUser } from "../types/types.ts";
 import { Entity } from "../interfaceTypes/Entity.ts";
+import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
 export class User implements Displayable, Entity {
   private constructor(
     private credentials: UserCredential,
@@ -33,7 +34,7 @@ export class User implements Displayable, Entity {
   // exception! Unique Username(rules like lenght, what kind of special characters, ..)
   static createUser(credentials: UserCredential, displayName: string) {
     if (User.stringToLong(displayName)) {
-      throw new Error(
+      throw new NameTooLongError(
         "Your Username is too long, please use a Name with max 40 characters.",
       );
     }

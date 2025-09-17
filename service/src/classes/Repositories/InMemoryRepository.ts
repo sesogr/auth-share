@@ -1,6 +1,8 @@
 import { Entity } from "../../interfaceTypes/Entity.ts";
 import { Displayable } from "../../interfaceTypes/Displayable.ts";
 import { Repository } from "../../interfaceTypes/Repository.ts";
+import { NotFoundError } from "../../errors/NotFoundError.ts";
+import { ItemAlreadyExistsError } from "../../errors/ItemAlreadyExistsError.ts";
 
 export class InMemoryRepository<T extends Displayable & Entity>
   implements Repository<T> {
@@ -12,13 +14,13 @@ export class InMemoryRepository<T extends Displayable & Entity>
 
   findById(id: string): T {
     const found = this.inMemList.find((i) => i.getId() === id);
-    if (!found) throw new Error(`Item with id=${id} not found`);
+    if (!found) throw new NotFoundError(`Item with id=${id} not found`);
     return found;
   }
 
   findByName(name: string): T {
     if (!this.inMemList.some((i) => i.getDisplayName() === name)) {
-      throw new Error(`Item with name=${name} not found`);
+      throw new NotFoundError(`Item with name=${name} not found`);
     }
     return this.inMemList.find((i) => i.getDisplayName() === name)!;
   }
@@ -28,12 +30,16 @@ export class InMemoryRepository<T extends Displayable & Entity>
   }
   add(item: T): void {
     if (this.inMemList.some((i) => i.getId() === item.getId())) {
-      throw new Error(`Item with id=${item.getId()} already exists`);
+      throw new ItemAlreadyExistsError(
+        `Item with id=${item.getId()} already exists`,
+      );
     }
     if (
       this.inMemList.some((i) => i.getDisplayName() === item.getDisplayName())
     ) {
-      throw new Error(`Item with name=${item.getDisplayName()} already exists`);
+      throw new ItemAlreadyExistsError(
+        `Item with name=${item.getDisplayName()} already exists`,
+      );
     }
     this.inMemList.push(item);
   }
