@@ -1,3 +1,3 @@
-export interface Displayable {
+export type Displayable = {
   getDisplayName(): string;
-}
+};
