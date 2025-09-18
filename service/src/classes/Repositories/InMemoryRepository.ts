@@ -44,10 +44,10 @@ export class InMemoryRepository<T extends Displayable & Entity>
     this.inMemList.push(item);
   }
 
-  removeById(id: string): boolean {
+  removeById(id: string): void {
     const before = this.inMemList.length;
     this.inMemList = this.inMemList.filter((i) => i.getId() !== id);
-    return this.inMemList.length < before;
+    if (this.inMemList.length >= before) throw Error("id not removed");
   }
   // findOwnedByUserName(userName: string): T[] {
   //   const ownedService = this.inMemList.filter((i) =>
