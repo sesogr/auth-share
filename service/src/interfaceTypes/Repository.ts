@@ -3,5 +3,5 @@ export type Repository<T> = {
   findByName(name: string): T;
   findAll(): T[];
   add(item: T): void;
-  removeById(id: string): boolean;
+  removeById(id: string): void;
 };

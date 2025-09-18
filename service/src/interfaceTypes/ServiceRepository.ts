@@ -11,5 +11,4 @@ export type ServiceRepository = Repository<Service> & {
     credentials: ServiceCredential,
     serviceName: string,
   ): void;
-  deleteService(): void;
 };
