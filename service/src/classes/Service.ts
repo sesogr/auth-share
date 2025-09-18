@@ -1,51 +1,63 @@
-import { GroupAlreadyAuthorizedError } from "../errors/GroupAlreadyAuthorizedError.ts";
+//import { GroupAlreadyAuthorizedError } from "../errors/GroupAlreadyAuthorizedError.ts";
 import { Displayable } from "../interfaceTypes/Displayable.ts";
 import { Entity } from "../interfaceTypes/Entity.ts";
-import { ConvertedService } from "../types/types.ts";
+//import { ConvertedService } from "../types/types.ts";
+import { AllowedServiceMap } from "./AllowedServiceMap.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
-import { User } from "./User.ts";
+//import { User } from "./User.ts";
 
 export class Service implements Displayable, Entity {
+  private static readonly _allowedService: AllowedServiceMap[] = [];
+  public static get allowedService(): AllowedServiceMap[] {
+    return [...Service._allowedService];
+  }
   private constructor(
+    private ownerId: string,
     private credentials: ServiceCredential,
     private serviceName: string = "",
     private readonly id = crypto.randomUUID(),
-    private owners: User[] = [],
-    private users: User[] = [],
     private groups: Group[] = [],
     private sentInvitations: Invitation<Service, Group>[] = [],
-  ) {}
+  ) {
+  }
   getId(): string {
     return this.id;
   }
   getDisplayName(): string {
     return this.serviceName;
   }
-  listUsers(): User[] {
-    return [...this.users];
+  listUsers(): string[] {
+    return Service.allowedService.filter((e) => e.serviceId === this.id).map((
+      e,
+    ) => e.userId);
   }
   listGroups(): Group[] {
     return [...this.groups];
   }
-  listOwners(): User[] {
-    return [...this.owners];
+  listOwners(): string[] {
+    return Service.allowedService.filter((e) => e.serviceId === this.id).filter(
+      (e) => e.isOwner,
+    ).map((
+      e,
+    ) => e.userId);
   }
   static createService(
+    ownerId: string,
     credentials: ServiceCredential,
     serviceName: string,
-    serviceOwner: User,
   ): Service {
-    const service = new Service(credentials, serviceName);
-    service.owners.push(serviceOwner);
-    serviceOwner.addOwnedService(service);
+    const service = new Service(ownerId, credentials, serviceName);
+    Service._allowedService.push(
+      new AllowedServiceMap(ownerId, service.id, true),
+    );
     return service;
   }
-  giveAuthorizationToUser(userFromList: User) {
-    this.owners.push(userFromList);
+  giveAuthorizationToUser(userId: string): void {
+    Service._allowedService.push(new AllowedServiceMap(userId, this.id));
   }
-
+  /*
   sendInvitation(receiver: Group, sender: User = this.owners[0]) {
     if (this.receiverIsInGroups(receiver)) {
       throw new GroupAlreadyAuthorizedError(
@@ -63,10 +75,10 @@ export class Service implements Displayable, Entity {
     this.groups.forEach((currGroup) => {
       currGroup.removeService(this);
     });
-    /*this.invitation.forEach((currInvitation)=> {
+    this.invitation.forEach((currInvitation)=> {
     currInvitation.
-  })*/
-  }
+  })
+
 
   callService() {}
 

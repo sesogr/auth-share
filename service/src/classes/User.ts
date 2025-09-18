@@ -4,7 +4,7 @@ import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
-import { ConvertedUser } from "../types/types.ts";
+//import { ConvertedUser } from "../types/types.ts";
 import { Entity } from "../interfaceTypes/Entity.ts";
 import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
 export class User implements Displayable, Entity {
@@ -12,8 +12,6 @@ export class User implements Displayable, Entity {
     private credentials: UserCredential,
     private displayName: string = "",
     private readonly id = crypto.randomUUID(),
-    private owned: Service[] = [],
-    private callable: Service[] = [],
     private groups: Group[] = [],
     private userGroupInvitations: Invitation<Group, User>[] = [],
     private ownedGroups: Group[] = [],
@@ -28,8 +26,10 @@ export class User implements Displayable, Entity {
   addOwnedGroup(newGroup: Group) {
     this.ownedGroups.push(newGroup);
   }
-  listOwnedServices(): Service[] {
-    return [...this.owned];
+  listOwnedServices(): string[] {
+    return Service.allowedService.filter((e) => e.userId === this.id).filter(
+      (e) => e.isOwner,
+    ).map((e) => e.serviceId);
   }
   // exception! Unique Username(rules like lenght, what kind of special characters, ..)
   static createUser(credentials: UserCredential, displayName: string) {
@@ -64,6 +64,8 @@ export class User implements Displayable, Entity {
       },
     );
   }
+}
+/*
   listServices(): Service[] {
     return [...this.callable];
   }
@@ -113,3 +115,4 @@ export class User implements Displayable, Entity {
     return this.toConvertedUser();
   }
 }
+  */
