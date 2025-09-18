@@ -12,11 +12,11 @@ import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemServiceRepository extends InMemoryRepository<Service>
   implements ServiceRepository {
-  private readonly _allowedUser: AllowedUserMap[] = [];
+  private _allowedUser: AllowedUserMap[] = [];
   public get allowedUser(): AllowedUserMap[] {
     return [...this._allowedUser];
   }
-  private readonly _allowedGroups: AllowedGroupMap[] = [];
+  private _allowedGroups: AllowedGroupMap[] = [];
   public get allowedGroups(): AllowedGroupMap[] {
     return [...this._allowedGroups];
   }
@@ -58,7 +58,18 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   giveAuthorizationToUser(serviceId: string, userId: string): void {
     this._allowedUser.push(new AllowedUserMap(userId, serviceId));
   }
-  deleteService(): void {
+  override removeById(serviceId: string): void {
+    try {
+      super.removeById(serviceId);
+    } catch (e) {
+      throw Error(`service: ${serviceId} not removed, ${e}`);
+    }
+    this._allowedUser = this.allowedUser.filter((e) =>
+      e.serviceId !== serviceId
+    );
+    this._allowedGroups = this.allowedGroups.filter((e) =>
+      e.serviceId !== serviceId
+    );
   }
   toJsonString(serviceId: string): string {
     return JSON.stringify(this.convertToSerializeableObj(serviceId));
