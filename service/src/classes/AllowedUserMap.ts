@@ -1,6 +1,6 @@
 import { ValueClass } from "./ValueClass.ts";
 
-export class AllowedServiceMap extends ValueClass {
+export class AllowedUserMap extends ValueClass {
   public get isOwner(): boolean {
     return this._isOwner;
   }
