@@ -1,0 +1,25 @@
+@startuml
+class Entity
+class ValueObject
+class Aggregate
+class AggregateRoot
+
+AggregateRoot --|> Entity
+Aggregate o-- "0..n" Entity
+Aggregate o-- "0..n" ValueObject
+Aggregate "1" *-- "1" AggregateRoot
+Repository "1" o-- "0..n" AggregateRoot
+
+object "MyUserAccount <<Aggregate>>" as a
+object "myUser:User" as u
+object "otherUserA:User" as ua
+object "otherUserB:User" as ub
+object "groupA:Group" as ga
+object "groupB:Group" as gb
+
+a o-- u
+u -- ga: ownedGroup
+u -- gb: ownedGroup
+ua --o ga
+ub --o ga
+@enduml

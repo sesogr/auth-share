@@ -1,5 +1,66 @@
 @startuml
 
+package UserAggregate {
+    entity User{
+    }
+    struct UserCredentials <<ValueObject>> {
+    }
+    class GroupView {
+    }
+    class ServiceView {
+    }
+    struct GroupInvitation {
+        groupId
+        senderId
+    }
+}
+package GroupAggregate {
+    entity Group{
+    }
+    class UserView {
+    }
+    class GroupInvitationView {
+        receiverId
+        senderId
+    }
+}
+package ServiceAggregate {
+    entity Service{
+    }
+    struct ServiceCredentials <<ValueObject>> {
+    }
+}
+User *--> UserCredentials
+Service *--> ServiceCredentials
+User o--> GroupView: membership
+User o--> GroupView: ownership
+User o--> ServiceView: permission
+User o--> ServiceView: ownership
+User o--> GroupInvitation
+Group o--> UserView: membership
+Group o--> UserView: ownership
+Group o--> GroupInvitationView
+Group --- GroupView
+User --- UserView
+GroupInvitation --- GroupInvitationView
+Service --- ServiceView
+Group o..> Service
+@enduml
+
+@startuml
+aController -> GroupRepository ++: createGroup(:User)
+GroupRepository -> aGroup **: new(:User)
+aGroup -> aGroup: setOwner(:User)
+return aGroup
+aController -> GroupRepository: save(aGroup)
+
+aController -> UserRepository ++: findById(userId)
+return aUser
+aController -> aUser ++: inviteToGroup(groupId)
+aController -> UserRepository: save(aUser)
+@enduml
+
+@startuml
 entity User{
 
     displayName: string
@@ -30,6 +91,11 @@ struct Invitation <<ValueObject>>{
 
 }
 
+struct AllowedService <<ValueObject>>{
+    +userId: string
+    +serviceId: string
+}
+
 entity Service{
 
     servicename: string
@@ -49,7 +115,8 @@ entity Service{
 
     
 }
-
+Service *--> AllowedService
+User o--> AllowedService
 struct UserCredentials <<ValueObject>>{
 
     +username: string
