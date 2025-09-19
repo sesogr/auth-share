@@ -5,8 +5,10 @@ import { ConvertedGroup } from "../types/types.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { User } from "./User.ts";
+import {GroupInvitationView} from "./Repositories/InMemGroupRepository.ts";
 
 export class Group implements Displayable, Entity {
+  groupInvitations: GroupInvitationView[];
   private constructor(
     private groupname: string,
     private owner: User,
@@ -85,5 +87,9 @@ export class Group implements Displayable, Entity {
 
   toJson() {
     return this.convertToSerializeableObj();
+  }
+
+  setInvitedUsers(groupInvitations: GroupInvitationView[]) {
+    this.groupInvitations = groupInvitations;
   }
 }
