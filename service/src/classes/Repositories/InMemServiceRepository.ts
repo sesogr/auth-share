@@ -3,7 +3,7 @@ import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
 import { ConvertedService } from "../../types/ConvertedService.ts";
 
 import { AllowedGroupMap } from "../AllowedGroupMap.ts";
-import { AllowedUserMap } from "../AllowedUserMap.ts";
+import { AllowedUserServiceMap } from "../AllowedUserServiceMap.ts";
 
 import { Service } from "../Service.ts";
 import { ServiceCredential } from "../ServiceCredential.ts";
@@ -12,8 +12,8 @@ import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemServiceRepository extends InMemoryRepository<Service>
   implements ServiceRepository {
-  private _allowedUser: AllowedUserMap[] = [];
-  public get allowedUser(): AllowedUserMap[] {
+  private _allowedUser: AllowedUserServiceMap[] = [];
+  public get allowedUser(): AllowedUserServiceMap[] {
     return [...this._allowedUser];
   }
   private _allowedGroups: AllowedGroupMap[] = [];
@@ -52,11 +52,11 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   ): void {
     const service = new Service(credentials, serviceName);
     this._allowedUser.push(
-      new AllowedUserMap(ownerId, service.getId(), true),
+      new AllowedUserServiceMap(ownerId, service.getId(), true),
     );
   }
   giveAuthorizationToUser(serviceId: string, userId: string): void {
-    this._allowedUser.push(new AllowedUserMap(userId, serviceId));
+    this._allowedUser.push(new AllowedUserServiceMap(userId, serviceId));
   }
   override removeById(serviceId: string): void {
     try {
