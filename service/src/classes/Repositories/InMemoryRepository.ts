@@ -4,13 +4,15 @@ import { Repository } from "../../interfaceTypes/Repository.ts";
 import { NotFoundError } from "../../errors/NotFoundError.ts";
 import { ItemAlreadyExistsError } from "../../errors/ItemAlreadyExistsError.ts";
 
-export class InMemoryRepository<T extends Displayable & Entity>
+export abstract class InMemoryRepository<T extends Displayable & Entity>
   implements Repository<T> {
   protected inMemList: T[] = [];
 
   constructor(initial: T[] = []) {
     this.inMemList = initial.slice();
   }
+  abstract save(item: T): void;
+  abstract hydrate(item: T): T;
 
   findById(id: string): T {
     const found = this.inMemList.find((i) => i.getId() === id);
