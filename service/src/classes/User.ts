@@ -7,30 +7,48 @@ import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 //import { ConvertedUser } from "../types/types.ts";
 import { Entity } from "../interfaceTypes/Entity.ts";
 import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
+import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
+import { ConvertedUser } from "../types/ConvertedUser.ts";
+import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 export class User implements Displayable, Entity {
   private constructor(
     private credentials: UserCredential,
     private displayName: string = "",
     private readonly id = crypto.randomUUID(),
+    //callableService includes owned and used Services of an User
+    private callableService: AllowedUserServiceMap[] = [],
     private groups: Group[] = [],
     private userGroupInvitations: Invitation<Group, User>[] = [],
-    private ownedGroups: Group[] = [],
+    //..includes owned and used
+    private joinedGroups: AllowedUserGroupMap[] = [],
   ) {}
   getId(): string {
     return this.id;
   }
-
   getDisplayName(): string {
     return this.displayName;
   }
-  addOwnedGroup(newGroup: Group) {
-    this.ownedGroups.push(newGroup);
+  listServices(owned = false): string[] {
+    const mapCallback = (currentElement: AllowedUserServiceMap): string =>
+      currentElement.serviceId;
+    if (owned) {
+      return this.callableService.filter((currentElement) =>
+        currentElement.isOwner
+      ).map(mapCallback);
+    }
+    return this.callableService.map(mapCallback);
   }
-  listOwnedServices(): string[] {
-    return Service.allowedService.filter((e) => e.userId === this.id).filter(
-      (e) => e.isOwner,
-    ).map((e) => e.serviceId);
+  listJoinedGroups(owned = false): string[] {
+    const mapCallback = (currentElement: AllowedUserGroupMap): string =>
+      currentElement.groupId;
+    if (owned) {
+      return this.joinedGroups.filter((currentElement) =>
+        currentElement.isOwner
+      ).map(mapCallback);
+    }
+    return this.joinedGroups.map(mapCallback);
   }
+
   // exception! Unique Username(rules like lenght, what kind of special characters, ..)
   static createUser(credentials: UserCredential, displayName: string) {
     if (User.stringToLong(displayName)) {
@@ -64,35 +82,10 @@ export class User implements Displayable, Entity {
       },
     );
   }
-}
-/*
-  listServices(): Service[] {
-    return [...this.callable];
-  }
   changeUserCredentials(_newCredentials: UserCredential) {}
-
-  listOwnedGroups(): Group[] {
-    return [...this.ownedGroups];
-  }
-
-  listUserGroups(): Group[] {
-    return [...this.groups];
-  }
 
   listUserGroupInvitation(): Invitation<Group, User>[] {
     return [...this.userGroupInvitations];
-  }
-  addOwnedService(newService: Service) {
-    this.owned.push(newService);
-  }
-  removeOwnedService(service: Service) {
-    this.owned = this.owned.filter((e) => e != service);
-  }
-  removeService(service: Service) {
-    this.callable = this.callable.filter((e) => e != service);
-  }
-  addService(newService: Service) {
-    this.callable.push(newService);
   }
   requestAuthorization(_newService: Service) {}
 
@@ -103,11 +96,11 @@ export class User implements Displayable, Entity {
     return {
       credentials: this.credentials.toString(),
       displayname: this.displayName,
-      owned: this.owned.map((e) => e.getDisplayName()),
-      callable: this.callable.map((e) => e.getDisplayName()),
-      groups: this.groups.map((e) => e.getDisplayName()),
+      owned: this.listServices(true),
+      callable: this.listServices(),
       userGroupInvitations: this.userGroupInvitations.map((e) => e.toString()),
-      ownedGroups: this.ownedGroups.map((e) => e.getDisplayName()),
+      ownedGroups: this.listJoinedGroups(true),
+      groups: this.listJoinedGroups(),
     };
   }
 
@@ -115,4 +108,3 @@ export class User implements Displayable, Entity {
     return this.toConvertedUser();
   }
 }
-  */

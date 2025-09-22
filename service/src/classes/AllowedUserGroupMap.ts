@@ -7,9 +7,13 @@ export class AllowedUserGroupMap extends ValueClass {
   public get userId(): string {
     return this._userId;
   }
+  public get isOwner(): boolean {
+    return this._isOwner;
+  }
   constructor(
     private readonly _groupId: string,
     private readonly _userId: string,
+    private readonly _isOwner: boolean = false,
   ) {
     super();
   }
