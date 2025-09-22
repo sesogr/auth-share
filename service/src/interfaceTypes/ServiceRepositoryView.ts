@@ -5,7 +5,7 @@ import { Invitation } from "../classes/Invitation.ts";
 import { Service } from "../classes/Service.ts";
 
 export type ServiceRepositoryView = {
-  allowedUser: AllowedUserServiceMap;
-  allowedGroups: AllowedGroupMap;
-  invitedGroups: Invitation<Service, Group>;
+  allowedUser: AllowedUserServiceMap[];
+  allowedGroups: AllowedGroupMap[];
+  invitedGroups: Invitation<Service, Group>[];
 };
