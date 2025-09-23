@@ -1,5 +1,6 @@
 import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { Displayable } from "../../interfaceTypes/Displayable.ts";
+import { Entity } from "../../interfaceTypes/Entity.ts";
 import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
 import { ServiceRepositoryView } from "../../interfaceTypes/ServiceRepositoryView.ts";
 import { AllowedGroupServiceMap } from "../AllowedGroupServiceMap.ts";
@@ -77,7 +78,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
       filterCallback,
     );
     const filterCallback2 = (
-      currElement: Invitation<Displayable, Displayable>,
+      currElement: Invitation<Displayable & Entity, Displayable & Entity>,
     ): boolean => currElement.objReference.getId() === groupId;
     const sentInvitationList = this._invitationList.filter(filterCallback2);
     const serviceInvitations = this.serviceRepoView.viewInvitedGroups().filter(
