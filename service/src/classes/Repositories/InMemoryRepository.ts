@@ -15,20 +15,23 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
   abstract hydrate(item: T): T;
 
   findById(id: string): T {
-    const found = this.inMemList.find((i) => i.getId() === id);
-    if (!found) throw new NotFoundError(`Item with id=${id} not found`);
-    return found;
+    const item = this.inMemList.find((i) => i.getId() === id);
+    if (!item) throw new NotFoundError(`Item with id=${id} not found`);
+    const hydratedItem = this.hydrate(item);
+    return hydratedItem;
   }
 
   findByName(name: string): T {
-    if (!this.inMemList.some((i) => i.getDisplayName() === name)) {
+    const item = this.inMemList.find((i) => i.getDisplayName() === name);
+    if (!item) {
       throw new NotFoundError(`Item with name=${name} not found`);
     }
-    return this.inMemList.find((i) => i.getDisplayName() === name)!;
+    const hydratedItem = this.hydrate(item);
+    return hydratedItem;
   }
 
   findAll(): T[] {
-    return this.inMemList.slice();
+    return this.inMemList.slice().map((e) => this.hydrate(e));
   }
   add(item: T): void {
     if (this.inMemList.some((i) => i.getId() === item.getId())) {
