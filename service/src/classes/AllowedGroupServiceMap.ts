@@ -1,6 +1,6 @@
 import { ValueClass } from "./ValueClass.ts";
 
-export class AllowedGroupMap extends ValueClass {
+export class AllowedGroupServiceMap extends ValueClass {
   public get groupId(): string {
     return this._groupId;
   }

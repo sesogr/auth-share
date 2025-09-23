@@ -1,7 +1,7 @@
 import { Displayable } from "../interfaceTypes/Displayable.ts";
 import { Entity } from "../interfaceTypes/Entity.ts";
 import { ConvertedService } from "../types/types.ts";
-import { AllowedGroupMap } from "./AllowedGroupMap.ts";
+import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
@@ -27,7 +27,7 @@ export class Service implements Displayable, Entity {
     private _sentInvitations: Invitation<Service, Group>[] = [],
     //List for AuthorizedUsers
     private authorizedUsers: AllowedUserServiceMap[] = [],
-    private authorizedGroups: AllowedGroupMap[] = [],
+    private authorizedGroups: AllowedGroupServiceMap[] = [],
   ) {
   }
   getId(): string {
@@ -46,7 +46,7 @@ export class Service implements Displayable, Entity {
     return this.authorizedUsers.map(mapCallback);
   }
   listAuthorizedGroups(): string[] {
-    const mapCallback = (currElement: AllowedGroupMap): string =>
+    const mapCallback = (currElement: AllowedGroupServiceMap): string =>
       currElement.groupId;
     return this.authorizedGroups.map(mapCallback);
   }
