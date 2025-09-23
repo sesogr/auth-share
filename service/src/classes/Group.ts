@@ -2,6 +2,8 @@ import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 import { Displayable } from "../interfaceTypes/Displayable.ts";
 import { Entity } from "../interfaceTypes/Entity.ts";
 import { ConvertedGroup } from "../types/types.ts";
+import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { User } from "./User.ts";
@@ -9,12 +11,13 @@ import { User } from "./User.ts";
 export class Group implements Displayable, Entity {
   private constructor(
     private groupname: string,
-    private owner: User,
+    private owner: string,
     private readonly id = crypto.randomUUID(),
-    private users: User[] = [],
-    private serviceList: Service[] = [],
+    private users: string[] = [],
+    private serviceList: AllowedGroupServiceMap[] = [],
     private sentInvitations: Invitation<Group, User>[] = [],
     private serviceInvitations: Invitation<Service, Group>[] = [],
+    private allowedUser: AllowedUserGroupMap[] = [],
   ) {}
   getId(): string {
     return this.id;
@@ -22,26 +25,37 @@ export class Group implements Displayable, Entity {
   getDisplayName(): string {
     return this.groupname;
   }
+  listAllowedUsers(owned = false): string[] {
+    const mapCallback = (currElement: AllowedUserGroupMap): string =>
+      currElement.userId;
+    if (owned) {
+      return this.allowedUser.filter((currentElement) => currentElement.isOwner)
+        .map(mapCallback);
+    }
+    return this.allowedUser.map(mapCallback);
+  }
   listServiceInvitation(): Invitation<Service, Group>[] {
     return [...this.serviceInvitations];
   }
   listSentInvitation(): Invitation<Group, User>[] {
     return [...this.sentInvitations];
   }
-  static createUserGroup(groupname: string, owner: User): Group {
-    const newGroup = new Group(groupname, owner);
-    owner.addOwnedGroup(newGroup);
+  static createUserGroup(groupname: string, ownerId: string): Group {
+    const newGroup = new Group(groupname, ownerId);
+    newGroup.allowedUser.push(
+      new AllowedUserGroupMap(newGroup.getId(), ownerId, true),
+    );
     return newGroup;
   }
-  sendInvitation(receiver: User) {
-    const invite: Invitation<Group, User> = new Invitation(
-      this.owner,
-      this,
-      receiver,
-    );
-    this.sentInvitations.push(invite);
-    receiver.addInvitation(invite);
-  }
+  // sendInvitation(receiver: User) {
+  //   const invite: Invitation<Group, User> = new Invitation(
+  //     this.owner,
+  //     this,
+  //     receiver,
+  //   );
+  //   this.sentInvitations.push(invite);
+  //   receiver.addInvitation(invite);
+  // }
   addServiceInvitation(newServiceInvite: Invitation<Service, Group>) {
     const receiver = newServiceInvite.receiverReference;
     if (receiver != this) {
@@ -51,39 +65,27 @@ export class Group implements Displayable, Entity {
     }
     this.serviceInvitations.push(newServiceInvite);
   }
-  removeServiceInvitation(invitation: Invitation<Service, Group>) {
-    this.serviceInvitations = this.serviceInvitations.filter(
-      (currInvitation) => {
-        return currInvitation != invitation;
-      },
-    );
-  }
-  removeService(service: Service) {
-    this.serviceList = this.serviceList.filter(
-      (currService) => service != currService,
-    );
-  }
   /*groupAlreadyExist(groupname: string): boolean{
   return this.groupList.includes(groupname);
   */
-  getOwner(): User {
+  getOwner(): string {
     return this.owner;
   }
   toJsonString(): string {
-    return JSON.stringify(this.convertToSerializeableObj());
+    return JSON.stringify(this.showAll());
   }
-  private convertToSerializeableObj(): ConvertedGroup {
+  private showAll(): ConvertedGroup {
     return {
       groupname: this.groupname,
-      owner: this.owner.getDisplayName(),
-      users: this.users.map((e) => e.getDisplayName()),
-      serviceList: this.serviceList.map((e) => e.getDisplayName()),
+      owner: this.owner,
+      users: this.users,
+      serviceList: this.serviceList.map((e) => e.serviceId),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
     };
   }
 
   toJson() {
-    return this.convertToSerializeableObj();
+    return this.showAll();
   }
 }
