@@ -13,6 +13,17 @@ import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemServiceRepository extends InMemoryRepository<Service>
   implements ServiceRepository {
+  private allowedUser: AllowedUserServiceMap[] = [];
+  private allowedGroups: AllowedGroupServiceMap[] = [];
+  private invitations: Invitation<Service, Group>[] = [];
+  constructor(user: User) {
+    const serviceList: Service[] = [];
+    for (let i = 0; i < 10; i++) {
+      const fakeService = FakeObjectGen.createFakeService(user);
+      serviceList.push(fakeService);
+    }
+    super(serviceList);
+  }
   override save(service: Service): void {
     let serviceIndex = this.inMemList.findIndex((e) =>
       service.getId() === e.getId()
@@ -32,7 +43,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     );
     this.invitations.push(...missingInvites);
     const deletedInvites = this.invitations.filter((e) =>
-      invites.some((f) => e.equals(f))
+      !invites.some((f) => e.equals(f))
     );
     this.invitations = this.invitations.filter((e) =>
       !deletedInvites.some((f) => e.equals(f))
@@ -64,18 +75,6 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   }
   override hydrate(_item: Service): Service {
     throw new Error("unimplemented");
-  }
-  private allowedUser: AllowedUserServiceMap[] = [];
-
-  private allowedGroups: AllowedGroupServiceMap[] = [];
-  private invitations: Invitation<Service, Group>[] = [];
-  constructor(user: User) {
-    const serviceList: Service[] = [];
-    for (let i = 0; i < 10; i++) {
-      const fakeService = FakeObjectGen.createFakeService(user);
-      serviceList.push(fakeService);
-    }
-    super(serviceList);
   }
   createService(
     _ownerId: string,

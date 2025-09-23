@@ -1,7 +1,6 @@
 import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
 import { AllowedUserGroupMap } from "../AllowedUserGroupMap.ts";
-import { AllowedUserServiceMap } from "../AllowedUserServiceMap.ts";
 import { Group } from "../Group.ts";
 import { User } from "../User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
@@ -22,18 +21,25 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
 
     super(testGroup);
   }
+  override save(item: Group): void {
+    throw new Error("Method not implemented.");
+  }
+  override hydrate(item: Group): Group {
+    throw new Error("Method not implemented.");
+  }
+  viewAllowedUser(): AllowedUserGroupMap[] {
+    throw new Error("Method not implemented.");
+  }
+  findOwnedByUserId(userId: string): Group[] {
+    throw new Error("Method not implemented.");
+  }
   listOwners(groupId: string): string {
-    return this.findById(groupId).getOwnerId();
+    return this.findById(groupId).getOwner();
   }
   listAllowedUsers(groupId: string): string[] {
     return this.allowedUser.filter((e) => e.groupId === groupId)
       .map((
         e,
       ) => e.userId);
-  }
-  createUserGroup(groupname: string, ownerId: string): Group {
-    const newGroup = new Group(groupname, ownerId);
-    this._allowedUser.push(new AllowedUserGroupMap(newGroup.getId(), ownerId));
-    return newGroup;
   }
 }
