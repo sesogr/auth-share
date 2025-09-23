@@ -18,6 +18,6 @@ export class AllowedUserGroupMap extends ValueClass {
     super();
   }
   override toString(): string {
-    return `${this.userId}:${this.groupId}`;
+    return `${this.userId}:${this.groupId}:${this.isOwner}`;
   }
 }

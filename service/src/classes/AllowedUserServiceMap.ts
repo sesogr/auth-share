@@ -18,6 +18,6 @@ export class AllowedUserServiceMap extends ValueClass {
     super();
   }
   override toString(): string {
-    return `${this.userId}:${this.serviceId}`;
+    return `${this.userId}:${this.serviceId}:${this.isOwner}`;
   }
 }
