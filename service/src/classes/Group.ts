@@ -9,15 +9,23 @@ import { Service } from "./Service.ts";
 import { User } from "./User.ts";
 
 export class Group implements Displayable, Entity {
-  private constructor(
+  public get sentInvitations(): Invitation<Group, User>[] {
+    return this._sentInvitations;
+  }
+  public get allowedUser(): AllowedUserGroupMap[] {
+    return this._allowedUser;
+  }
+  public set allowedUser(value: AllowedUserGroupMap[]) {
+    this._allowedUser = value;
+  }
+  public constructor(
     private groupname: string,
     private owner: string,
-    private readonly id = crypto.randomUUID(),
-    private users: string[] = [],
+    private readonly id: string = crypto.randomUUID(),
     private serviceList: AllowedGroupServiceMap[] = [],
-    private sentInvitations: Invitation<Group, User>[] = [],
+    private _sentInvitations: Invitation<Group, User>[] = [],
     private serviceInvitations: Invitation<Service, Group>[] = [],
-    private allowedUser: AllowedUserGroupMap[] = [],
+    private _allowedUser: AllowedUserGroupMap[] = [],
   ) {}
   getId(): string {
     return this.id;
@@ -78,7 +86,7 @@ export class Group implements Displayable, Entity {
     return {
       groupname: this.groupname,
       owner: this.owner,
-      users: this.users,
+      users: this._allowedUser.map((e) => e.userId),
       serviceList: this.serviceList.map((e) => e.serviceId),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),

@@ -1,17 +1,25 @@
 import { FakeObjectGen } from "../../FakeObjectGen.ts";
+import { Displayable } from "../../interfaceTypes/Displayable.ts";
 import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
+import { ServiceRepositoryView } from "../../interfaceTypes/ServiceRepositoryView.ts";
+import { AllowedGroupServiceMap } from "../AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "../AllowedUserGroupMap.ts";
 import { Group } from "../Group.ts";
+import { Invitation } from "../Invitation.ts";
 import { User } from "../User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemGroupRepository extends InMemoryRepository<Group>
   implements GroupRepository {
   private _allowedUser: AllowedUserGroupMap[] = [];
+  private _invitationList: Invitation<Group, User>[] = [];
+  public get invitationList(): Invitation<Group, User>[] {
+    return this._invitationList;
+  }
   public get allowedUser(): AllowedUserGroupMap[] {
     return [...this._allowedUser];
   }
-  constructor(user: User) {
+  constructor(user: User, private serviceRepoView: ServiceRepositoryView) {
     const testGroup: Group[] = [];
 
     for (let i = 0; i < 5; i++) {
@@ -21,17 +29,83 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
 
     super(testGroup);
   }
-  override save(item: Group): void {
-    throw new Error("Method not implemented.");
+  override save(group: Group): void {
+    let groupIndex = this.inMemList.findIndex((e) =>
+      group.getId() === e.getId()
+    );
+    if (!group) {
+      this.add(group);
+      groupIndex = this.inMemList.length - 1;
+    }
+    this.inMemList[groupIndex] = group;
+    this.updateAllowedUsers(group.allowedUser);
+    this.updateInvites(group.sentInvitations);
   }
-  override hydrate(item: Group): Group {
-    throw new Error("Method not implemented.");
+  private updateAllowedUsers(allowedUser: AllowedUserGroupMap[]) {
+    const missingAllowedUsers = allowedUser.filter((e) =>
+      !this.allowedUser.some((f) => e.equals(f))
+    );
+    this.allowedUser.push(...missingAllowedUsers);
+    const unauthorizedUsers = this.allowedUser.filter((e) =>
+      allowedUser.some((f) => e.equals(f))
+    );
+    this._allowedUser = this.allowedUser.filter((e) =>
+      !unauthorizedUsers.some((f) => e.equals(f))
+    );
+  }
+  private updateInvites(invites: Invitation<Group, User>[]) {
+    const missingInvites = invites.filter((e) =>
+      !this._invitationList.some((f) => e.equals(f))
+    );
+    this._invitationList.push(...missingInvites);
+    const deletedInvites = this._invitationList.filter((e) =>
+      !invites.some((f) => e.equals(f))
+    );
+    this._invitationList = this._invitationList.filter((e) =>
+      !deletedInvites.some((f) => e.equals(f))
+    );
+  }
+  override hydrate(_item: Group): Group {
+    //get a db reference per parameter-->..-->return
+    const groupDisplayName = _item.getDisplayName();
+    const groupOwner = _item.getOwner();
+    const groupId = _item.getId();
+    const filterCallback = (
+      currElement: AllowedGroupServiceMap,
+    ): boolean => currElement.groupId === groupId;
+    const serviceList = this.serviceRepoView.viewAllowedGroups().filter(
+      filterCallback,
+    );
+    const filterCallback2 = (
+      currElement: Invitation<Displayable, Displayable>,
+    ): boolean => currElement.objReference.getId() === groupId;
+    const sentInvitationList = this._invitationList.filter(filterCallback2);
+    const serviceInvitations = this.serviceRepoView.viewInvitedGroups().filter(
+      filterCallback2,
+    );
+    const allowedUser = this._allowedUser.filter((currElement) =>
+      currElement.groupId === groupId
+    );
+
+    const group: Group = new Group(
+      groupDisplayName,
+      groupOwner,
+      groupId,
+      serviceList,
+      sentInvitationList,
+      serviceInvitations,
+      allowedUser,
+    );
+
+    return group;
   }
   viewAllowedUser(): AllowedUserGroupMap[] {
-    throw new Error("Method not implemented.");
+    return [...this.allowedUser];
   }
   findOwnedByUserId(userId: string): Group[] {
-    throw new Error("Method not implemented.");
+    return this.allowedUser.filter((currMap) =>
+      (currMap.userId === userId) && currMap.isOwner
+    ).map((currMap) => this.findById(currMap.groupId));
   }
   listOwners(groupId: string): string {
     return this.findById(groupId).getOwner();
