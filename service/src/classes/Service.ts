@@ -8,6 +8,18 @@ import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
 
 export class Service implements Displayable, Entity {
+  public get authorizedGroups(): AllowedGroupServiceMap[] {
+    return [...this._authorizedGroups];
+  }
+  public set authorizedGroups(value: AllowedGroupServiceMap[]) {
+    this._authorizedGroups = value;
+  }
+  public get authorizedUsers(): AllowedUserServiceMap[] {
+    return [...this._authorizedUsers];
+  }
+  public set authorizedUsers(value: AllowedUserServiceMap[]) {
+    this._authorizedUsers = value;
+  }
   public get sentInvitations(): Invitation<Service, Group>[] {
     return this._sentInvitations;
   }
@@ -26,8 +38,8 @@ export class Service implements Displayable, Entity {
     private readonly id = crypto.randomUUID(),
     private _sentInvitations: Invitation<Service, Group>[] = [],
     //List for AuthorizedUsers
-    private authorizedUsers: AllowedUserServiceMap[] = [],
-    private authorizedGroups: AllowedGroupServiceMap[] = [],
+    private _authorizedUsers: AllowedUserServiceMap[] = [],
+    private _authorizedGroups: AllowedGroupServiceMap[] = [],
   ) {
   }
   getId(): string {
