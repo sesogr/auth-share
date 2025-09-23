@@ -12,6 +12,6 @@ export type ServiceRepository =
       credentials: ServiceCredential,
       serviceName: string,
     ): Service;
-    findOwnedByUserId(userId: string): Service;
-    findAuthorizedForId(Id: string): Service;
+    findOwnedByUserId(userId: string): Service[];
+    findAuthorizedForId(Id: string): Service[];
   };
