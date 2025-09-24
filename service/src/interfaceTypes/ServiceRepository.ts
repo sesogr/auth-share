@@ -14,4 +14,5 @@ export type ServiceRepository =
     ): Service;
     findOwnedByUserId(userId: string): Service[];
     findAuthorizedForId(Id: string): Service[];
+    fillWithMockData(): void;
   };
