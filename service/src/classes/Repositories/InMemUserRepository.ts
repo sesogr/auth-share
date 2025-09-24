@@ -1,15 +1,16 @@
 import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { GroupRepositoryView } from "../../interfaceTypes/GroupRepositoryView.ts";
 import { ServiceRepositoryView } from "../../interfaceTypes/ServiceRepositoryView.ts";
+import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
 import { User } from "../User.ts";
 import { UserCredential } from "../UserCredential.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
-export class InMemUserRepository extends InMemoryRepository<User> {
+export class InMemUserRepository extends InMemoryRepository<User>
+  implements UserRepository {
   constructor(
-    private serviceRepoView?: ServiceRepositoryView,
-    private groupRepoView?: GroupRepositoryView,
-    private viewsetup?: boolean,
+    private serviceRepoView: ServiceRepositoryView,
+    private groupRepoView: GroupRepositoryView,
   ) {
     const userList: User[] = [];
     for (let i = 0; i < 10; i++) {
@@ -17,17 +18,9 @@ export class InMemUserRepository extends InMemoryRepository<User> {
       userList.push(fakeUser);
     }
     super(userList);
-    if (serviceRepoView && groupRepoView) {
-      this.viewsetup = true;
-    }
   }
-  setUpViews(
-    serviceRepoView: ServiceRepositoryView,
-    groupRepoView: GroupRepositoryView,
-  ) {
-    this.serviceRepoView = serviceRepoView;
-    this.groupRepoView = groupRepoView;
-    this.viewsetup = true;
+  fillWithMockData(): void {
+    throw new Error("Method not implemented.");
   }
   override save(item: User): void {
     const index = this.inMemList.findIndex((e) => e.getId() === item.getId());
@@ -37,10 +30,27 @@ export class InMemUserRepository extends InMemoryRepository<User> {
     }
     this.inMemList[index] = item;
   }
-  override hydrate(item: User): User { //todo fix for actual userclass
-    return User.createUser(
-      new UserCredential("", ""),
-      item.getDisplayName(),
+  override hydrate(item: User): User {
+    const id = item.getId();
+    const displayname = item.getDisplayName();
+    const credentials = item.getCredentials();
+    const serviceList = this.serviceRepoView.viewAllowedUser().filter((e) =>
+      e.userId === id
     );
+    const joinedGroups = this.groupRepoView.viewAllowedUser().filter((e) =>
+      e.userId === id
+    );
+    const invitations = this.groupRepoView.viewInvitations().filter((e) =>
+      e.receiverReference.getId() === id
+    );
+    const user: User = new User(
+      credentials,
+      displayname,
+      id,
+      serviceList,
+      invitations,
+      joinedGroups,
+    );
+    return user;
   }
 }
