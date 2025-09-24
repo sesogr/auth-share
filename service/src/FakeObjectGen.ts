@@ -14,11 +14,13 @@ export class FakeObjectGen {
   }
   static createFakeGroup(
     groupDisplayName = faker.internet.domainName(),
-    user: User = FakeObjectGen.createFakeUser(),
+    userId: string = FakeObjectGen.createFakeUser().getId(),
   ) {
-    return Group.createUserGroup(groupDisplayName, user);
+    return Group.createUserGroup(groupDisplayName, userId);
   }
-  static createFakeService(futureOwner: User = FakeObjectGen.createFakeUser()) {
+  static createFakeService(
+    futureOwner: string = FakeObjectGen.createFakeUser().getId(),
+  ) {
     return Service.createService(
       new ServiceCredential(
         faker.internet.userName(),
