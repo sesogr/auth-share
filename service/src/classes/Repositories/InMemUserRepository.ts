@@ -21,7 +21,7 @@ export class InMemUserRepository extends InMemoryRepository<User>
   }
   override save(item: User): void {
     const index = this.inMemList.findIndex((e) => e.getId() === item.getId());
-    if (!index) {
+    if (index < 0) {
       this.add(item);
       return;
     }

@@ -30,7 +30,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     let serviceIndex = this.inMemList.findIndex((e) =>
       service.getId() === e.getId()
     );
-    if (!serviceIndex) {
+    if (serviceIndex < 0) {
       this.add(service);
       serviceIndex = this.inMemList.length - 1;
     }

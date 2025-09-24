@@ -40,7 +40,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     let groupIndex = this.inMemList.findIndex((e) =>
       group.getId() === e.getId()
     );
-    if (!group) {
+    if (groupIndex < 0) {
       this.add(group);
       groupIndex = this.inMemList.length - 1;
     }
