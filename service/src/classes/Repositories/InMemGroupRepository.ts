@@ -1,4 +1,3 @@
-import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { Displayable } from "../../interfaceTypes/Displayable.ts";
 import { Entity } from "../../interfaceTypes/Entity.ts";
 import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
@@ -23,16 +22,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
   constructor(private serviceRepoView: ServiceRepositoryView) {
     super();
   }
-  fillWithMockData(userIdList: string[]): void {
-    for (let i = 0; i < 5; i++) {
-      const rand = Math.round(Math.random() * userIdList.length);
-      const fakeGroup = FakeObjectGen.createFakeGroup(
-        undefined,
-        userIdList[rand],
-      );
-      this.save(fakeGroup);
-    }
-  }
+
   viewInvitations(): Invitation<Group, User>[] {
     return [...this._invitationList];
   }

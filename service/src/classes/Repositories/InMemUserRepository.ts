@@ -1,4 +1,3 @@
-import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { GroupRepositoryView } from "../../interfaceTypes/GroupRepositoryView.ts";
 import { ServiceRepositoryView } from "../../interfaceTypes/ServiceRepositoryView.ts";
 import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
@@ -13,12 +12,7 @@ export class InMemUserRepository extends InMemoryRepository<User>
   ) {
     super();
   }
-  fillWithMockData(): void {
-    for (let i = 0; i < 10; i++) {
-      const fakeUser = FakeObjectGen.createFakeUser();
-      this.save(fakeUser);
-    }
-  }
+
   override save(item: User): void {
     const index = this.inMemList.findIndex((e) => e.getId() === item.getId());
     if (index < 0) {

@@ -1,4 +1,3 @@
-import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
 
 import { AllowedGroupServiceMap } from "../AllowedGroupServiceMap.ts";
@@ -19,13 +18,6 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     super();
   }
 
-  fillWithMockData(userIdList: string[]): void {
-    for (let i = 0; i < 10; i++) {
-      const rand = Math.round(Math.random() * userIdList.length);
-      const fakeService = FakeObjectGen.createFakeService(userIdList[rand]);
-      this.save(fakeService);
-    }
-  }
   override save(service: Service): void {
     let serviceIndex = this.inMemList.findIndex((e) =>
       service.getId() === e.getId()
