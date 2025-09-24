@@ -35,12 +35,22 @@ export class Service implements Displayable, Entity {
   constructor(
     private _credentials: ServiceCredential,
     private serviceName: string = "",
-    private readonly id = crypto.randomUUID(),
+    private readonly id: string = crypto.randomUUID(),
     private _sentInvitations: Invitation<Service, Group>[] = [],
     //List for AuthorizedUsers
     private _authorizedUsers: AllowedUserServiceMap[] = [],
     private _authorizedGroups: AllowedGroupServiceMap[] = [],
   ) {
+  }
+  static createService(
+    credentials: ServiceCredential,
+    serviceName: string,
+    ownerId: string,
+    id: string = crypto.randomUUID(),
+  ) {
+    const service = new Service(credentials, serviceName, id);
+    service.authorizedUsers.push(new AllowedUserServiceMap(ownerId, id, true));
+    return service;
   }
   getId(): string {
     return this.id;

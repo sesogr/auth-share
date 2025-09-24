@@ -11,19 +11,21 @@ import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { ConvertedUser } from "../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 export class User implements Displayable, Entity {
-  private constructor(
+  constructor(
     private credentials: UserCredential,
     private displayName: string = "",
-    private readonly id = crypto.randomUUID(),
+    private readonly id: string = crypto.randomUUID(),
     //callableService includes owned and used Services of an User
     private callableService: AllowedUserServiceMap[] = [],
-    private groups: Group[] = [],
     private userGroupInvitations: Invitation<Group, User>[] = [],
     //..includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
   ) {}
   getId(): string {
     return this.id;
+  }
+  getCredentials() {
+    return this.credentials;
   }
   getDisplayName(): string {
     return this.displayName;
