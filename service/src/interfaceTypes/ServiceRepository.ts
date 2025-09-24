@@ -8,5 +8,4 @@ export type ServiceRepository =
   & {
     findOwnedByUserId(userId: string): Service[];
     findAuthorizedForId(Id: string): Service[];
-    fillWithMockData(userIdList: string[]): void;
   };

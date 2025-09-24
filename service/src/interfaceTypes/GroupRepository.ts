@@ -7,5 +7,4 @@ export type GroupRepository =
   & GroupRepositoryView
   & {
     findOwnedByUserId(userId: string): Group[];
-    fillWithMockData(userIdList: string[]): void;
   };
