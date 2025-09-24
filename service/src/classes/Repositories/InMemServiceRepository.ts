@@ -8,7 +8,6 @@ import { Invitation } from "../Invitation.ts";
 
 import { Service } from "../Service.ts";
 import { ServiceCredential } from "../ServiceCredential.ts";
-import { User } from "../User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemServiceRepository extends InMemoryRepository<Service>
@@ -16,13 +15,16 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   private allowedUser: AllowedUserServiceMap[] = [];
   private allowedGroups: AllowedGroupServiceMap[] = [];
   private invitations: Invitation<Service, Group>[] = [];
-  constructor(user: User) {
-    const serviceList: Service[] = [];
+  constructor() {
+    super();
+  }
+
+  fillWithMockData(userIdList: string[]): void {
     for (let i = 0; i < 10; i++) {
-      const fakeService = FakeObjectGen.createFakeService(user);
-      serviceList.push(fakeService);
+      const rand = Math.round(Math.random() * userIdList.length);
+      const fakeService = FakeObjectGen.createFakeService(userIdList[rand]);
+      this.save(fakeService);
     }
-    super(serviceList);
   }
   override save(service: Service): void {
     let serviceIndex = this.inMemList.findIndex((e) =>
@@ -73,23 +75,34 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
       !unauthorizedUsers.some((f) => e.equals(f))
     );
   }
-  override hydrate(_item: Service): Service {
-    throw new Error("unimplemented");
-  }
-  createService(
-    _ownerId: string,
-    _credentials: ServiceCredential,
-    _serviceName: string,
-  ): Service {
-    throw new Error("Method not implemented.");
+  override hydrate(service: Service): Service {
+    const credentials = new ServiceCredential(
+      ...service.credentials.split(":"),
+    );
+    const serviceName = service.getDisplayName();
+    const serviceId = service.getId();
+    const sentInvitations = service.sentInvitations;
+    const authorizedUsers = service.authorizedUsers;
+    const authorizedGroups = service.authorizedGroups;
+    const hydratedService: Service = new Service(
+      credentials,
+      serviceName,
+      serviceId,
+      sentInvitations,
+      authorizedUsers,
+      authorizedGroups,
+    );
+    return hydratedService;
   }
   findOwnedByUserId(userId: string): Service[] {
     return this.allowedUser.filter((currMap) =>
       (currMap.userId === userId) && currMap.isOwner
     ).map((currMap) => this.findById(currMap.serviceId));
   }
-  findAuthorizedForId(_Id: string): Service[] {
-    throw new Error("Method not implemented.");
+  findAuthorizedForId(id: string): Service[] {
+    return this.allowedUser.filter((e) => e.userId === id).map((f) =>
+      this.findById(f.serviceId)
+    );
   }
   viewAllowedUser(): AllowedUserServiceMap[] {
     return [...this.allowedUser];

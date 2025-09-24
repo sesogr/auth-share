@@ -20,15 +20,21 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
   public get allowedUser(): AllowedUserGroupMap[] {
     return [...this._allowedUser];
   }
-  constructor(user: User, private serviceRepoView: ServiceRepositoryView) {
-    const testGroup: Group[] = [];
-
+  constructor(private serviceRepoView: ServiceRepositoryView) {
+    super();
+  }
+  fillWithMockData(userIdList: string[]): void {
     for (let i = 0; i < 5; i++) {
-      const fakeGroup = FakeObjectGen.createFakeGroup(undefined, user);
-      testGroup.push(fakeGroup);
+      const rand = Math.round(Math.random() * userIdList.length);
+      const fakeGroup = FakeObjectGen.createFakeGroup(
+        undefined,
+        userIdList[rand],
+      );
+      this.save(fakeGroup);
     }
-
-    super(testGroup);
+  }
+  viewInvitations(): Invitation<Group, User>[] {
+    return [...this._invitationList];
   }
   override save(group: Group): void {
     let groupIndex = this.inMemList.findIndex((e) =>

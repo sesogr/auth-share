@@ -3,7 +3,6 @@ import { GroupRepositoryView } from "../../interfaceTypes/GroupRepositoryView.ts
 import { ServiceRepositoryView } from "../../interfaceTypes/ServiceRepositoryView.ts";
 import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
 import { User } from "../User.ts";
-import { UserCredential } from "../UserCredential.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemUserRepository extends InMemoryRepository<User>
@@ -12,15 +11,13 @@ export class InMemUserRepository extends InMemoryRepository<User>
     private serviceRepoView: ServiceRepositoryView,
     private groupRepoView: GroupRepositoryView,
   ) {
-    const userList: User[] = [];
-    for (let i = 0; i < 10; i++) {
-      const fakeUser = FakeObjectGen.createFakeUser();
-      userList.push(fakeUser);
-    }
-    super(userList);
+    super();
   }
   fillWithMockData(): void {
-    throw new Error("Method not implemented.");
+    for (let i = 0; i < 10; i++) {
+      const fakeUser = FakeObjectGen.createFakeUser();
+      this.save(fakeUser);
+    }
   }
   override save(item: User): void {
     const index = this.inMemList.findIndex((e) => e.getId() === item.getId());
