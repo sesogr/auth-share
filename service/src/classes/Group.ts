@@ -51,7 +51,7 @@ export class Group implements Displayable, Entity {
   static createUserGroup(groupname: string, ownerId: string): Group {
     const newGroup = new Group(groupname, ownerId);
     newGroup.allowedUser.push(
-      new AllowedUserGroupMap(newGroup.getId(), ownerId, true),
+      new AllowedUserGroupMap(ownerId, newGroup.getId(), true),
     );
     return newGroup;
   }

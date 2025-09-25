@@ -11,8 +11,8 @@ export class AllowedUserGroupMap extends ValueClass {
     return this._isOwner;
   }
   constructor(
-    private readonly _groupId: string,
     private readonly _userId: string,
+    private readonly _groupId: string,
     private readonly _isOwner: boolean = false,
   ) {
     super();
