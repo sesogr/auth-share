@@ -49,7 +49,7 @@ export class Service implements Displayable, Entity {
     id: string = crypto.randomUUID(),
   ) {
     const service = new Service(credentials, serviceName, id);
-    service.authorizedUsers.push(new AllowedUserServiceMap(ownerId, id, true));
+    service._authorizedUsers.push(new AllowedUserServiceMap(ownerId, id, true));
     return service;
   }
   getId(): string {
@@ -82,8 +82,8 @@ export class Service implements Displayable, Entity {
       new AllowedUserServiceMap(ownerId, service.getId(), true),
     );
   }
-  giveAuthorizationToUser(serviceId: string, userId: string): void {
-    this.authorizedUsers.push(new AllowedUserServiceMap(userId, serviceId));
+  giveAuthorizationToUser(userId: string): void {
+    this._authorizedUsers.push(new AllowedUserServiceMap(userId, this.getId()));
   }
   toJsonString(): string {
     return JSON.stringify(this.convertToSerializeableObj());
