@@ -6,9 +6,14 @@ import { GroupRepository } from "../src/interfaceTypes/GroupRepository.ts";
 import { ServiceRepository } from "../src/interfaceTypes/ServiceRepository.ts";
 import { UserRepository } from "../src/interfaceTypes/UserRepository.ts";
 import { User } from "../src/classes/User.ts";
-import { assertArrayIncludes } from "https://deno.land/std@0.224.0/assert/assert_array_includes.ts";
+import { assertArrayIncludes } from "@std/assert";
 import { FakeObjectGen } from "../src/FakeObjectGen.ts";
 import { NotFoundError } from "../src/errors/NotFoundError.ts";
+import { spy } from "@std/testing/mock";
+import { AllowedGroupServiceMap } from "../src/classes/AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "../src/classes/AllowedUserGroupMap.ts";
+import { AllowedUserServiceMap } from "../src/classes/AllowedUserServiceMap.ts";
+import { UserCredential } from "../src/classes/UserCredential.ts";
 
 const serviceRepository: ServiceRepository = new InMemServiceRepository();
 const groupRepository: GroupRepository = new InMemGroupRepository(
@@ -77,3 +82,46 @@ Deno.test("Test for method removeById", () => {
     userRepository.findById(deletedId);
   }, NotFoundError);
 });
+
+Deno.test("Test for method removeById", () => {
+  const serviceDatabase = {
+    viewAllowedGroups: spy(() => {
+      return [1, 2, 3, 4].map((e) =>
+        new AllowedGroupServiceMap(e + "", e + "")
+      );
+    }),
+    viewAllowedUser: spy(() => {
+      return [1, 2, 3, 4].map((e) => new AllowedUserServiceMap(e + "", e + ""));
+    }),
+    viewInvitedGroups: spy(() => {
+      return [];
+    }),
+  };
+  const groupRepository = {
+    viewAllowedUser: spy(() => {
+      return [1, 2, 3, 4].map((e) => new AllowedUserGroupMap(e + "", e + ""));
+    }),
+    viewInvitations: spy(() => {
+      return [];
+    }),
+  };
+  const userRepository = new InMemUserRepository(
+    serviceDatabase,
+    groupRepository,
+  );
+
+  userRepository.save(new User(new UserCredential("", ""), "", "1"));
+  //const deletedId = mockUserIdList[2];
+  userRepository.findById("1");
+  console.log(groupRepository.viewAllowedUser.call.length);
+  assertEquals(groupRepository.viewAllowedUser.call.length, 1);
+  assertEquals(groupRepository.viewAllowedUser.call.length, 0);
+  userRepository.removeById("1");
+  assertThrows(() => {
+    userRepository.findById("1");
+  });
+});
+
+/* wir brauchen für new inMemUserRepository const serviceRepository und const groupRepository
+mit den typen groupRepositoryView und serviceRepositoryView und das für jeden test.
+nur die UserRepository muss mit Mock daten Befüllt werden. */
