@@ -8,6 +8,7 @@
     "deno-check": "deno task check-web && deno task check-service"
   },
   "imports": {
+    "@std/testing": "jsr:@std/testing@^1.0.15",
     "react-router-dom": "npm:react-router-dom",
     "react-dom/client": "npm:react-dom/client",
     "react": "npm:react",
