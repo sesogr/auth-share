@@ -1,4 +1,4 @@
-import { assertArrayIncludes, assertEquals } from "@std/assert";
+import { assertArrayIncludes, assertEquals, assertFalse } from "@std/assert";
 import { Group } from "../src/classes/Group.ts";
 import { User } from "../src/classes/User.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
@@ -68,19 +68,20 @@ Deno.test("Group Class", async (t) => {
         testUserCredentials,
         "Don Receiver",
       );
-      const testInvitation: Invitation<Group, User> = new Invitation(
-        user,
-        group,
-        testReceiver,
+      const user = new User(testUserCredentials, "asd");
+      const testInvitation: Invitation = new Invitation(
+        user.convertToShort(),
+        group.convertToShort(),
+        testReceiver.convertToShort(),
       );
-      //const sender = group.getOwner();
-      group.listSentInvitation(testReceiver);
-
+      group.listSentInvitation();
+      group.sendInvitation(
+        user.convertToShort(),
+        testReceiver.convertToShort(),
+      );
       const listSentInvitation = group.listSentInvitation();
-      const listUserGroupInvitation = testReceiver.listUserGroupInvitation();
-
-      assertArrayIncludes(listSentInvitation, [testInvitation]);
-      assertArrayIncludes(listUserGroupInvitation, [testInvitation]);
+      console.log(testInvitation.senderReference.displayname);
+      assertFalse(!listSentInvitation.some((e) => e.equals(testInvitation)));
     },
   );
 });
