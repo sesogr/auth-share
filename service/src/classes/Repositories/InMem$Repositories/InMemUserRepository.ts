@@ -1,7 +1,7 @@
-import { GroupRepositoryView } from "../../interfaceTypes/GroupRepositoryView.ts";
-import { ServiceRepositoryView } from "../../interfaceTypes/ServiceRepositoryView.ts";
-import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
-import { User } from "../User.ts";
+import { GroupRepositoryView } from "../../../interfaceTypes/GroupRepositoryView.ts";
+import { ServiceRepositoryView } from "../../../interfaceTypes/ServiceRepositoryView.ts";
+import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
+import { User } from "../../User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemUserRepository extends InMemoryRepository<User>
