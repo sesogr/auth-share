@@ -20,7 +20,7 @@ export class Service extends Entity {
     this._authorizedUsers = value;
   }
   public get sentInvitations(): Invitation[] {
-    return this._sentInvitations;
+    return [...this._sentInvitations];
   }
   public set sentInvitations(value: Invitation[]) {
     this._sentInvitations = value;

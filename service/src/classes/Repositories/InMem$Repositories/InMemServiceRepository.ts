@@ -1,7 +1,6 @@
 import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
-import { Group } from "../../Group.ts";
 import { Invitation } from "../../Invitation.ts";
 import { Service } from "../../Service.ts";
 import { ServiceCredential } from "../../ServiceCredential.ts";
@@ -100,7 +99,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   viewAllowedGroups(): AllowedGroupServiceMap[] {
     return [...this.allowedGroups];
   }
-  viewInvitedGroups(): Invitation<Service, Group>[] {
+  viewInvitedGroups(): Invitation[] {
     return [...this.invitations];
   }
   override removeById(serviceId: string): void {
