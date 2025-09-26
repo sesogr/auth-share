@@ -1,16 +1,11 @@
 import { ValueClass } from "./ValueClass.ts";
-import { Displayable } from "../interfaceTypes/Displayable.ts";
-import { Entity } from "../interfaceTypes/Entity.ts";
-type DisplayableEntity = Displayable & Entity;
+import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
 
-export class Invitation<
-  ObjType extends DisplayableEntity,
-  ReceiverType extends DisplayableEntity,
-> extends ValueClass {
-  public get receiverReference(): ReceiverType {
+export class Invitation extends ValueClass {
+  public get receiverReference(): DisplayableEntity {
     return this._receiverReference;
   }
-  public get objReference(): ObjType {
+  public get objReference(): DisplayableEntity {
     return this._objReference;
   }
   public get senderReference(): DisplayableEntity {
@@ -18,8 +13,8 @@ export class Invitation<
   }
   constructor(
     private readonly _senderReference: DisplayableEntity,
-    private readonly _objReference: ObjType,
-    private readonly _receiverReference: ReceiverType,
+    private readonly _objReference: DisplayableEntity,
+    private readonly _receiverReference: DisplayableEntity,
   ) {
     super();
   }
