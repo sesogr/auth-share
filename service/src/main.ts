@@ -7,7 +7,7 @@ import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
 import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
 import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
-import { InMemUserRepository } from "./classes/Repositories/InMemUserRepository.ts";
+import { InMemUserRepository } from "./classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 
 //initialize repositories
