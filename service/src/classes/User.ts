@@ -1,26 +1,31 @@
-import { Displayable } from "../interfaceTypes/Displayable.ts";
-import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 //import { ConvertedUser } from "../types/types.ts";
-import { Entity } from "../interfaceTypes/Entity.ts";
 import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { ConvertedUser } from "../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
-export class User implements Displayable, Entity {
+import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
+export class User implements DisplayableEntity {
   constructor(
     private credentials: UserCredential,
     private displayName: string = "",
     private readonly id: string = crypto.randomUUID(),
     //callableService includes owned and used Services of an User
     private callableService: AllowedUserServiceMap[] = [],
-    private userGroupInvitations: Invitation<Group, User>[] = [],
+    private userGroupInvitations: Invitation[] = [],
     //..includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
   ) {}
+  convertToShort(): DisplayableEntity {
+    return {
+      getId: () => this.getId(),
+      getDisplayName: () => this.getDisplayName(),
+      convertToShort: () => this.convertToShort(),
+    };
+  }
   getId(): string {
     return this.id;
   }
@@ -68,7 +73,7 @@ export class User implements Displayable, Entity {
     return new User(credentials);
   }
 
-  addInvitation(newInvite: Invitation<Group, User>) {
+  addInvitation(newInvite: Invitation) {
     const receiver = newInvite.receiverReference;
     if (receiver != this) {
       throw new WrongReceiverError(
@@ -77,7 +82,7 @@ export class User implements Displayable, Entity {
     }
     this.userGroupInvitations.push(newInvite);
   }
-  removeInvitation(invite: Invitation<Group, User>) {
+  removeInvitation(invite: Invitation) {
     this.userGroupInvitations = this.userGroupInvitations.filter(
       (currInvitation) => {
         return currInvitation.equals(invite);
@@ -86,7 +91,7 @@ export class User implements Displayable, Entity {
   }
   changeUserCredentials(_newCredentials: UserCredential) {}
 
-  listUserGroupInvitation(): Invitation<Group, User>[] {
+  listUserGroupInvitation(): Invitation[] {
     return [...this.userGroupInvitations];
   }
   requestAuthorization(_newService: Service) {}

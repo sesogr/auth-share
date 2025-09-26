@@ -6,14 +6,13 @@ import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { Group } from "../../Group.ts";
 import { Invitation } from "../../Invitation.ts";
-import { User } from "../../User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemGroupRepository extends InMemoryRepository<Group>
   implements GroupRepository {
   private _allowedUser: AllowedUserGroupMap[] = [];
-  private _invitationList: Invitation<Group, User>[] = [];
-  public get invitationList(): Invitation<Group, User>[] {
+  private _invitationList: Invitation[] = [];
+  public get invitationList(): Invitation[] {
     return this._invitationList;
   }
   public get allowedUser(): AllowedUserGroupMap[] {
@@ -23,7 +22,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     super();
   }
 
-  viewInvitations(): Invitation<Group, User>[] {
+  viewInvitations(): Invitation[] {
     return [...this._invitationList];
   }
   override save(group: Group): void {
@@ -36,7 +35,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     }
     this.inMemList[groupIndex] = group;
     this.updateAllowedUsers(group.allowedUser);
-    this.updateInvites(group.sentInvitations);
+    this.updateInvites(group.listSentInvitation());
   }
   private updateAllowedUsers(allowedUser: AllowedUserGroupMap[]) {
     const missingAllowedUsers = allowedUser.filter((e) =>
@@ -50,7 +49,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
       !unauthorizedUsers.some((f) => e.equals(f))
     );
   }
-  private updateInvites(invites: Invitation<Group, User>[]) {
+  private updateInvites(invites: Invitation[]) {
     const missingInvites = invites.filter((e) =>
       !this._invitationList.some((f) => e.equals(f))
     );

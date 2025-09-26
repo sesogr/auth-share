@@ -11,7 +11,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   implements ServiceRepository {
   private allowedUser: AllowedUserServiceMap[] = [];
   private allowedGroups: AllowedGroupServiceMap[] = [];
-  private invitations: Invitation<Service, Group>[] = [];
+  private invitations: Invitation[] = [];
   constructor() {
     super();
   }
@@ -29,7 +29,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     this.updateAllowedUsers(service.authorizedUsers);
     this.updateAllowedGroups(service.authorizedGroups);
   }
-  private updateInvites(invites: Invitation<Service, Group>[]) {
+  private updateInvites(invites: Invitation[]) {
     const missingInvites = invites.filter((e) =>
       !this.invitations.some((f) => e.equals(f))
     );

@@ -1,13 +1,13 @@
-import { Displayable } from "../interfaceTypes/Displayable.ts";
-import { Entity } from "../interfaceTypes/Entity.ts";
+import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
 import { ConvertedService } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
+import { User } from "./User.ts";
 
-export class Service implements Displayable, Entity {
+export class Service implements DisplayableEntity {
   public get authorizedGroups(): AllowedGroupServiceMap[] {
     return [...this._authorizedGroups];
   }
@@ -20,10 +20,10 @@ export class Service implements Displayable, Entity {
   public set authorizedUsers(value: AllowedUserServiceMap[]) {
     this._authorizedUsers = value;
   }
-  public get sentInvitations(): Invitation<Service, Group>[] {
+  public get sentInvitations(): Invitation[] {
     return this._sentInvitations;
   }
-  public set sentInvitations(value: Invitation<Service, Group>[]) {
+  public set sentInvitations(value: Invitation[]) {
     this._sentInvitations = value;
   }
   public get credentials(): string {
@@ -36,7 +36,7 @@ export class Service implements Displayable, Entity {
     private _credentials: ServiceCredential,
     private serviceName: string = "",
     private readonly id: string = crypto.randomUUID(),
-    private _sentInvitations: Invitation<Service, Group>[] = [],
+    private _sentInvitations: Invitation[] = [],
     //List for AuthorizedUsers
     private _authorizedUsers: AllowedUserServiceMap[] = [],
     private _authorizedGroups: AllowedGroupServiceMap[] = [],
@@ -51,6 +51,13 @@ export class Service implements Displayable, Entity {
     const service = new Service(credentials, serviceName, id);
     service._authorizedUsers.push(new AllowedUserServiceMap(ownerId, id, true));
     return service;
+  }
+  convertToShort(): DisplayableEntity {
+    return {
+      getId: () => this.getId(),
+      getDisplayName: () => this.getDisplayName(),
+      convertToShort: () => this.convertToShort(),
+    };
   }
   getId(): string {
     return this.id;
@@ -102,24 +109,13 @@ export class Service implements Displayable, Entity {
   toJson() {
     return this.convertToSerializeableObj();
   }
-  /**
- * sendInvitation(receiver: Group, sender: User = this.owners[0]) {
-    if (this.receiverIsInGroups(receiver)) {
-      throw new GroupAlreadyAuthorizedError(
-        `The group ${receiver.getDisplayName()} is already using the service ${this.getDisplayName()}!`,
-      );
-    }
-    const invitation = new Invitation<Service, Group>(sender, this, receiver);
-    this.sentInvitations.push(invitation);
-    receiver.addServiceInvitation(invitation);
+  sendInvitation(receiver: Group, sender: User) {
+    const invitation = new Invitation(sender, this.convertToShort(), receiver);
+    this._sentInvitations.push(invitation);
   }
-  */
 
   callService() {}
 
-  // receiverIsInGroups(receiver: Group): boolean {
-  //   return this.groups.includes(receiver);
-  // }
   /*serviceIsInList(serviceName: string): boolean{
   return this.services.includes(serviceName);
 } */

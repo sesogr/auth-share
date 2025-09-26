@@ -1,32 +1,29 @@
-import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
-import { Displayable } from "../interfaceTypes/Displayable.ts";
-import { Entity } from "../interfaceTypes/Entity.ts";
+import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { Invitation } from "./Invitation.ts";
-import { Service } from "./Service.ts";
-import { User } from "./User.ts";
 
-export class Group implements Displayable, Entity {
-  public get sentInvitations(): Invitation<Group, User>[] {
-    return this._sentInvitations;
-  }
+export class Group implements DisplayableEntity {
   public get allowedUser(): AllowedUserGroupMap[] {
     return this._allowedUser;
-  }
-  public set allowedUser(value: AllowedUserGroupMap[]) {
-    this._allowedUser = value;
   }
   public constructor(
     private groupname: string,
     private owner: string,
     private readonly id: string = crypto.randomUUID(),
     private serviceList: AllowedGroupServiceMap[] = [],
-    private _sentInvitations: Invitation<Group, User>[] = [],
-    private serviceInvitations: Invitation<Service, Group>[] = [],
+    private sentInvitations: Invitation[] = [],
+    private serviceInvitations: Invitation[] = [],
     private _allowedUser: AllowedUserGroupMap[] = [],
   ) {}
+  convertToShort(): DisplayableEntity {
+    return {
+      getId: () => this.getId(),
+      getDisplayName: () => this.getDisplayName(),
+      convertToShort: () => this.convertToShort(),
+    };
+  }
   getId(): string {
     return this.id;
   }
@@ -42,10 +39,10 @@ export class Group implements Displayable, Entity {
     }
     return this.allowedUser.map(mapCallback);
   }
-  listServiceInvitation(): Invitation<Service, Group>[] {
+  listServiceInvitation(): Invitation[] {
     return [...this.serviceInvitations];
   }
-  listSentInvitation(): Invitation<Group, User>[] {
+  listSentInvitation(): Invitation[] {
     return [...this.sentInvitations];
   }
   static createUserGroup(groupname: string, ownerId: string): Group {
@@ -55,27 +52,18 @@ export class Group implements Displayable, Entity {
     );
     return newGroup;
   }
-  // sendInvitation(receiver: User) {
-  //   const invite: Invitation<Group, User> = new Invitation(
-  //     this.owner,
-  //     this,
-  //     receiver,
-  //   );
-  //   this.sentInvitations.push(invite);
-  //   receiver.addInvitation(invite);
-  // }
-  addServiceInvitation(newServiceInvite: Invitation<Service, Group>) {
-    const receiver = newServiceInvite.receiverReference;
-    if (receiver != this) {
-      throw new WrongReceiverError(
-        `This is not Group: ${receiver.getDisplayName()}`,
-      );
-    }
-    this.serviceInvitations.push(newServiceInvite);
+  sendInvitation(
+    senderReference: DisplayableEntity,
+    receiverObj: DisplayableEntity,
+  ) {
+    this.sentInvitations.push(
+      new Invitation(
+        senderReference,
+        this.convertToShort(),
+        receiverObj,
+      ),
+    );
   }
-  /*groupAlreadyExist(groupname: string): boolean{
-  return this.groupList.includes(groupname);
-  */
   getOwner(): string {
     return this.owner;
   }
