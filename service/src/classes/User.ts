@@ -1,38 +1,33 @@
 import { Invitation } from "./Invitation.ts";
 import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
-import { WrongReceiverError } from "../errors/WrongReceiverError.ts";
 //import { ConvertedUser } from "../types/types.ts";
 import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { ConvertedUser } from "../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
-import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
-export class User implements DisplayableEntity {
+import { Entity } from "./Entity.ts";
+export class User extends Entity {
   constructor(
     private credentials: UserCredential,
     private displayName: string = "",
-    private readonly id: string = crypto.randomUUID(),
+    protected override readonly id: string = crypto.randomUUID(),
     //callableService includes owned and used Services of an User
     private callableService: AllowedUserServiceMap[] = [],
     private userGroupInvitations: Invitation[] = [],
     //..includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
-  ) {}
-  convertToShort(): DisplayableEntity {
-    return {
-      getId: () => this.getId(),
-      getDisplayName: () => this.getDisplayName(),
-      convertToShort: () => this.convertToShort(),
-    };
+  ) {
+    super(id, displayName);
   }
-  getId(): string {
+
+  override getId(): string {
     return this.id;
   }
   getCredentials() {
     return this.credentials;
   }
-  getDisplayName(): string {
+  override getDisplayName(): string {
     return this.displayName;
   }
   listServices(owned = false): string[] {
@@ -73,15 +68,6 @@ export class User implements DisplayableEntity {
     return new User(credentials);
   }
 
-  addInvitation(newInvite: Invitation) {
-    const receiver = newInvite.receiverReference;
-    if (receiver != this) {
-      throw new WrongReceiverError(
-        `This isn't User ${receiver.getDisplayName()}`,
-      );
-    }
-    this.userGroupInvitations.push(newInvite);
-  }
   removeInvitation(invite: Invitation) {
     this.userGroupInvitations = this.userGroupInvitations.filter(
       (currInvitation) => {

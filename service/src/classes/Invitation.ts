@@ -1,24 +1,24 @@
 import { ValueClass } from "./ValueClass.ts";
-import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
+import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 
 export class Invitation extends ValueClass {
-  public get receiverReference(): DisplayableEntity {
+  public get receiverReference(): ShortEntity {
     return this._receiverReference;
   }
-  public get objReference(): DisplayableEntity {
+  public get objReference(): ShortEntity {
     return this._objReference;
   }
-  public get senderReference(): DisplayableEntity {
+  public get senderReference(): ShortEntity {
     return this._senderReference;
   }
   constructor(
-    private readonly _senderReference: DisplayableEntity,
-    private readonly _objReference: DisplayableEntity,
-    private readonly _receiverReference: DisplayableEntity,
+    private readonly _senderReference: ShortEntity,
+    private readonly _objReference: ShortEntity,
+    private readonly _receiverReference: ShortEntity,
   ) {
     super();
   }
   override toString() {
-    return `${this.senderReference.getDisplayName()}:${this.objReference.getDisplayName()}:${this.receiverReference.getDisplayName()}`;
+    return `${this.senderReference.displayname}:${this.objReference.displayname}:${this.receiverReference.displayname}`;
   }
 }

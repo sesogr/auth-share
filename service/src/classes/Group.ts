@@ -1,33 +1,29 @@
-import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
+import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
+import { Entity } from "./Entity.ts";
 import { Invitation } from "./Invitation.ts";
 
-export class Group implements DisplayableEntity {
+export class Group extends Entity {
   public get allowedUser(): AllowedUserGroupMap[] {
     return this._allowedUser;
   }
   public constructor(
     private groupname: string,
     private owner: string,
-    private readonly id: string = crypto.randomUUID(),
+    protected override readonly id: string = crypto.randomUUID(),
     private serviceList: AllowedGroupServiceMap[] = [],
     private sentInvitations: Invitation[] = [],
     private serviceInvitations: Invitation[] = [],
     private _allowedUser: AllowedUserGroupMap[] = [],
-  ) {}
-  convertToShort(): DisplayableEntity {
-    return {
-      getId: () => this.getId(),
-      getDisplayName: () => this.getDisplayName(),
-      convertToShort: () => this.convertToShort(),
-    };
+  ) {
+    super(id, groupname);
   }
-  getId(): string {
+  override getId(): string {
     return this.id;
   }
-  getDisplayName(): string {
+  override getDisplayName(): string {
     return this.groupname;
   }
   listAllowedUsers(owned = false): string[] {
@@ -53,14 +49,14 @@ export class Group implements DisplayableEntity {
     return newGroup;
   }
   sendInvitation(
-    senderReference: DisplayableEntity,
-    receiverObj: DisplayableEntity,
+    senderReference: ShortEntity,
+    receiverReference: ShortEntity,
   ) {
     this.sentInvitations.push(
       new Invitation(
         senderReference,
         this.convertToShort(),
-        receiverObj,
+        receiverReference,
       ),
     );
   }
