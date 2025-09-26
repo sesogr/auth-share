@@ -1,23 +1,23 @@
 import { Hono } from "@hono/hono";
 import { cors } from "@hono/hono/cors";
-import { User } from "./classes/User.ts";
-import { Repository } from "./interfaceTypes/Repository.ts";
 import { rootController } from "./controller/rootController.ts";
 import { dataController } from "./controller/dataController.ts";
 import { serviceController } from "./controller/serviceController.ts";
 import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
-import { InMemoryRepository } from "./classes/Repositories/InMemoryRepository.ts";
-import { InMemGroupRepository } from "./classes/Repositories/InMemGroupRepository.ts";
-import { InMemServiceRepository } from "./classes/Repositories/InMemServiceRepository.ts";
+import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
+import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
+import { InMemUserRepository } from "./classes/Repositories/InMemUserRepository.ts";
+import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 
 //initialize repositories
-const userRepository: Repository<User> = new InMemoryRepository<User>();
-const _groupRepository: GroupRepository = new InMemGroupRepository(
-  userRepository.findAll()[0],
+const serviceRepository: ServiceRepository = new InMemServiceRepository();
+const groupRepository: GroupRepository = new InMemGroupRepository(
+  serviceRepository,
 );
-const serviceRepository: ServiceRepository = new InMemServiceRepository(
-  userRepository.findAll()[0],
+const userRepository: UserRepository = new InMemUserRepository(
+  serviceRepository,
+  groupRepository,
 );
 
 export const app = new Hono();
