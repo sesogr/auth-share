@@ -4,11 +4,12 @@ import { UserRepository } from "../src/interfaceTypes/UserRepository.ts";
 import { User } from "../src/classes/User.ts";
 import { FakeObjectGen } from "../src/FakeObjectGen.ts";
 import { NotFoundError } from "../src/errors/NotFoundError.ts";
-import { Spy, spy } from "@std/testing/mock";
+import { spy } from "@std/testing/mock";
 import { AllowedUserGroupMap } from "../src/classes/AllowedUserGroupMap.ts";
 import { AllowedUserServiceMap } from "../src/classes/AllowedUserServiceMap.ts";
 import { ServiceRepositoryView } from "../src/interfaceTypes/ServiceRepositoryView.ts";
 import { GroupRepositoryView } from "../src/interfaceTypes/GroupRepositoryView.ts";
+import { SpyObject } from "./HelperTypes.ts";
 Deno.test("UserRepository", async (t) => {
   await t.step("Test for method findById()", () => {
     const {
@@ -32,7 +33,6 @@ Deno.test("UserRepository", async (t) => {
   });
 
   await t.step("Test for method findByName()", () => {
-    console.log(1);
     const { fakeUserList, userRepository }: UserRepoTestSuit = buildUp();
     //changing index of the fakeUserList > 9 => Test failed
     const userName: string = fakeUserList[9].getDisplayName();
@@ -43,7 +43,6 @@ Deno.test("UserRepository", async (t) => {
   });
 
   await t.step("Test for method findAll()", () => {
-    console.log(2);
     const { userRepository, mockUserIdList }: UserRepoTestSuit = buildUp();
     const userList: User[] = userRepository.findAll();
     const userIdList: string[] = userList.map((e) => e.getId());
@@ -61,10 +60,10 @@ Deno.test("UserRepository", async (t) => {
 });
 
 function buildUp(): UserRepoTestSuit {
-  const fakeUserList: User[] = fillWithMockUserData();
+  const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const serviceRepository: SpyObject<ServiceRepositoryView> =
-    createServiceDatabase(mockUserIdList);
+    createServiceRepository(mockUserIdList);
   const groupRepository: SpyObject<GroupRepositoryView> = createGroupRepository(
     mockUserIdList,
   );
@@ -82,7 +81,7 @@ function buildUp(): UserRepoTestSuit {
   };
 }
 
-function createServiceDatabase(
+function createServiceRepository(
   userIdList: string[],
 ): SpyObject<ServiceRepositoryView> {
   const serviceDatabase: SpyObject<ServiceRepositoryView> = {
@@ -113,20 +112,6 @@ function createGroupRepository(
   };
   return groupRepository;
 }
-
-function fillWithMockUserData(): User[] {
-  const fakeUserList: User[] = [];
-  for (let i = 0; i < 10; i++) {
-    const fakeUser = FakeObjectGen.createFakeUser();
-    fakeUserList.push(fakeUser);
-  }
-  return fakeUserList;
-}
-type SpyObject<T> = {
-  [K in keyof T]: T[K] extends (...args: infer Args) => infer Return
-    ? Spy<unknown, Args, Return>
-    : never;
-};
 
 type UserRepoTestSuit = {
   mockUserIdList: string[];
