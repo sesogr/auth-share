@@ -14,7 +14,7 @@ services:
       - ./service:/app
     ports:
       - "8000:8000"
-    entrypoint: ["deno", "run", "dev"]
+    entrypoint: ["deno", "task", "denodb"]
 
   web-dev:
     container_name: dev-web
