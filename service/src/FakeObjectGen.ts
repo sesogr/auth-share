@@ -30,4 +30,30 @@ export class FakeObjectGen {
       futureOwner,
     );
   }
+
+  static generateFakeUsers(count: number = 10): User[] {
+    const fakeUserList: User[] = [];
+    for (let i = 0; i < count; i++) {
+      const fakeUser = FakeObjectGen.createFakeUser();
+      fakeUserList.push(fakeUser);
+    }
+    return fakeUserList;
+  }
+
+  static generateFakeGroups(count: number = 10): Group[] {
+    const fakeGroupList: Group[] = [];
+    for (let i = 0; i < count; i++) {
+      const fakeUser = FakeObjectGen.createFakeGroup();
+      fakeGroupList.push(fakeUser);
+    }
+    return fakeGroupList;
+  }
+  static generateFakeServices(count: number = 10): Service[] {
+    const fakeServiceList: Service[] = [];
+    for (let i = 0; i < count; i++) {
+      const fakeService = FakeObjectGen.createFakeService();
+      fakeServiceList.push(fakeService);
+    }
+    return fakeServiceList;
+  }
 }
