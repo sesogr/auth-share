@@ -9,6 +9,7 @@ import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/
 import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
 import { InMemUserRepository } from "./classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
+import { FakeObjectGen } from "./FakeObjectGen.ts";
 
 //initialize repositories
 const serviceRepository: ServiceRepository = new InMemServiceRepository();
@@ -19,7 +20,12 @@ const userRepository: UserRepository = new InMemUserRepository(
   serviceRepository,
   groupRepository,
 );
-
+FakeObjectGen.generateFakeUsers().forEach((e) => userRepository.save(e));
+FakeObjectGen.generateFakeGroups().forEach((e) => groupRepository.save(e));
+FakeObjectGen.generateFakeServices().forEach((e) => serviceRepository.save(e));
+userRepository.findAll().forEach((e) => {
+  serviceRepository.save(FakeObjectGen.createFakeService(e.getId()));
+});
 export const app = new Hono();
 app.use(
   "*",
@@ -37,7 +43,7 @@ app.get("/data", dataController);
 
 app.get(
   "/user/owned",
-  serviceController(serviceRepository, userRepository.findAll()[0].getId()), //TODO!!! Needs to be fixed!
+  serviceController(serviceRepository, userRepository), //TODO!!! Needs to be fixed!
 );
 
 //app.get("/group", groupController);

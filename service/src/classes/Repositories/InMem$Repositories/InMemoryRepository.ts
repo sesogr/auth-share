@@ -31,7 +31,11 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
   }
 
   findAll(): T[] {
-    return this.inMemList.slice().map((e) => this.hydrate(e));
+    const itemListe = this.inMemList.slice().map((e) => this.hydrate(e));
+    if (itemListe.length === 0) {
+      throw new NotFoundError("No items found");
+    }
+    return itemListe;
   }
   add(item: T): void {
     if (this.inMemList.some((i) => i.getId() === item.getId())) {

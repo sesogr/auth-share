@@ -45,11 +45,12 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
       !this.allowedUser.some((f) => e.equals(f))
     );
     this.allowedUser.push(...missingAllowedUsers);
-    const unauthorizedUsers = this.allowedUser.filter((e) =>
-      authorizedUsers.some((f) => e.equals(f))
-    );
+
+    const extraAllowedUsers = this.allowedUser.filter((e) =>
+      e.serviceId === authorizedUsers[0].serviceId
+    ).filter((e) => !authorizedUsers.some((f) => e.equals(f)));
     this.allowedUser = this.allowedUser.filter((e) =>
-      !unauthorizedUsers.some((f) => e.equals(f))
+      extraAllowedUsers.every((f) => !e.equals(f))
     );
   }
   private updateAllowedGroups(authorizedGroups: AllowedGroupServiceMap[]) {
@@ -70,9 +71,15 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     );
     const serviceName = service.getDisplayName();
     const serviceId = service.getId();
-    const sentInvitations = service.sentInvitations;
-    const authorizedUsers = service.authorizedUsers;
-    const authorizedGroups = service.authorizedGroups;
+    const sentInvitations = this.invitations.filter((e) =>
+      e.objReference.id === serviceId
+    );
+    const authorizedUsers = this.allowedUser.filter((e) =>
+      e.serviceId === serviceId
+    );
+    const authorizedGroups = this.allowedGroups.filter((e) =>
+      e.serviceId === serviceId
+    );
     const hydratedService: Service = new Service(
       credentials,
       serviceName,
