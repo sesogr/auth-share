@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . .
 
 # Compile the main app
-RUN deno install
+RUN deno install --allow-import
 
 # Run the app
 

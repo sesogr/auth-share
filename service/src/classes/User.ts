@@ -75,7 +75,9 @@ export class User extends Entity {
       },
     );
   }
-  changeUserCredentials(_newCredentials: UserCredential) {}
+  changeUserCredentials(_newCredentials: UserCredential) {
+    this.credentials = _newCredentials;
+  }
 
   listUserGroupInvitation(): Invitation[] {
     return [...this.userGroupInvitations];

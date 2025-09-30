@@ -10,7 +10,7 @@ import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositorie
 import { InMemUserRepository } from "./classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 import { FakeObjectGen } from "./FakeObjectGen.ts";
-import { userController } from "./controller/userController.ts";
+import { userController as createUserController } from "./controller/userController.ts";
 
 //initialize repositories
 const serviceRepository: ServiceRepository = new InMemServiceRepository();
@@ -40,12 +40,17 @@ app.get("/", rootController("Trees"));
 
 app.get("/data", dataController);
 
-app.get("/user", userController(userRepository));
+const userController = createUserController(userRepository);
+app.get("/user", userController.read);
+
+app.put("/user/me/password", userController.changePassword);
 
 app.get(
   "/user/owned",
   serviceController(serviceRepository, userRepository), //TODO!!! Needs to be fixed!
 );
+
+app.put();
 
 //app.get("/group", groupController);
 

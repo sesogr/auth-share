@@ -7,8 +7,8 @@ WORKDIR /app
 COPY . .
 
 # Compile the main app
-RUN deno install 
-RUN deno cache src/classes/Repositories/MySQL/DbUserRepository.ts
+RUN deno install --allow-import
+RUN deno cache --allow-import src/main.ts
 
 # Run the app
 ENTRYPOINT ["deno", "run", "--allow-net","--allow-env", "src/main.ts"]
