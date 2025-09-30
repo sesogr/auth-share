@@ -3,18 +3,20 @@ import { Group } from "../src/classes/Group.ts";
 import { User } from "../src/classes/User.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
 import { Invitation } from "../src/classes/Invitation.ts";
+import { IdNameMap } from "../src/classes/IdNameMap.ts";
 
 const userCredential = new UserCredential("Hans Meiser", "abcdef");
 const user = "asddh";
 
+const shortUser = new IdNameMap(user, "hallo");
 function createTestGroup(): Group {
-  return Group.createUserGroup("Schachverein", user);
+  return Group.createUserGroup("Schachverein", shortUser);
 }
 Deno.test("Group Class", async (t) => {
   await t.step("test the method createUserGroup", () => {
     const group = createTestGroup();
     const owner = group.getOwner();
-    assertEquals(owner, user);
+    assertEquals(owner, shortUser);
   });
 
   await t.step("test the method getDisplayName on groupname", () => {

@@ -1,15 +1,31 @@
+import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { ValueClass } from "./ValueClass.ts";
 
 export class AllowedGroupServiceMap extends ValueClass {
   public get groupId(): string {
-    return this._groupId;
+    return this._groupRef.id;
+  }
+  public get groupname(): string {
+    return this._groupRef.displayname;
   }
   public get serviceId(): string {
-    return this._serviceId;
+    return this._serviceRef.id;
   }
+  public get servicename(): string {
+    return this._serviceRef.displayname;
+  }
+
+  public get serviceRef(): ShortEntity {
+    return this._serviceRef;
+  }
+
+  public get groupRef(): ShortEntity {
+    return this.groupRef;
+  }
+
   constructor(
-    private readonly _groupId: string,
-    private readonly _serviceId: string,
+    private readonly _groupRef: ShortEntity,
+    private readonly _serviceRef: ShortEntity,
   ) {
     super();
   }

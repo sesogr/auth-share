@@ -25,7 +25,7 @@ FakeObjectGen.generateFakeUsers().forEach((e) => userRepository.save(e));
 FakeObjectGen.generateFakeGroups().forEach((e) => groupRepository.save(e));
 FakeObjectGen.generateFakeServices().forEach((e) => serviceRepository.save(e));
 userRepository.findAll().forEach((e) => {
-  serviceRepository.save(FakeObjectGen.createFakeService(e.getId()));
+  serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
 });
 export const app = new Hono();
 app.use(

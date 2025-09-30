@@ -8,6 +8,7 @@ import { SpyObject } from "./HelperTypes.ts";
 import { Group } from "../src/classes/Group.ts";
 import { GroupRepository } from "../src/interfaceTypes/GroupRepository.ts";
 import { assertEquals } from "@std/assert";
+import { IdNameMap } from "../src/classes/IdNameMap.ts";
 
 Deno.test("Group Repository", async (t) => {
   await t.step("findbyid", () => {
@@ -40,7 +41,10 @@ function createServiceRepository(
   const serviceDatabase: SpyObject<ServiceRepositoryView> = {
     viewAllowedGroups: spy(() => {
       return groupList.map((e, i) =>
-        new AllowedGroupServiceMap(e.getId() + "", i + "")
+        new AllowedGroupServiceMap(
+          e.convertToShort(),
+          new IdNameMap(i + "", ""),
+        )
       );
     }),
     viewAllowedUser: spy(() => {
