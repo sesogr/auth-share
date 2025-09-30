@@ -19,6 +19,8 @@ export const userController = (userRepository: UserRepository) => ({
     myself.changeUserCredentials(
       new UserCredential(myself.getCredentials().username, newPassword),
     );
-    return c.json({ myself });
+    userRepository.save(myself);
+    //204 no content
+    return c.status(204);
   },
 });
