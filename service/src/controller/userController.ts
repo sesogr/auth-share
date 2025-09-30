@@ -1,6 +1,11 @@
 import { Context } from "@hono/hono";
+import { UserRepository } from "../interfaceTypes/UserRepository.ts";
+import { ConvertedUser } from "../types/ConvertedUser.ts";
 
-export const userController = (c: Context) => {
-  //const convertedList: ConvertedUser[] = userList.map((e) => e.toJson());
-  return c; //.json();//convertedList);
-};
+export const userController =
+  (userRepository: UserRepository) => (c: Context) => {
+    const user: ConvertedUser[] = userRepository.findAll().map((e) =>
+      e.toJson()
+    );
+    return c.json(user);
+  };

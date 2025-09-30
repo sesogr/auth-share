@@ -10,6 +10,7 @@ import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositorie
 import { InMemUserRepository } from "./classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 import { FakeObjectGen } from "./FakeObjectGen.ts";
+import { userController } from "./controller/userController.ts";
 
 //initialize repositories
 const serviceRepository: ServiceRepository = new InMemServiceRepository();
@@ -39,7 +40,7 @@ app.get("/", rootController("Trees"));
 
 app.get("/data", dataController);
 
-//app.get("/user", userController);
+app.get("/user", userController(userRepository));
 
 app.get(
   "/user/owned",
