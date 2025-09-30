@@ -101,13 +101,4 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
       (currMap.userId === userId) && currMap.isOwner
     ).map((currMap) => this.findById(currMap.groupId));
   }
-  listOwners(groupId: string): string {
-    return this.findById(groupId).getOwner();
-  }
-  listAllowedUsers(groupId: string): string[] {
-    return this.allowedUser.filter((e) => e.groupId === groupId)
-      .map((
-        e,
-      ) => e.userId);
-  }
 }
