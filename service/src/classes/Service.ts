@@ -45,11 +45,13 @@ export class Service extends Entity {
   static createService(
     credentials: ServiceCredential,
     serviceName: string,
-    ownerId: string,
+    owner: ShortEntity,
     id: string = crypto.randomUUID(),
   ) {
     const service = new Service(credentials, serviceName, id);
-    service._authorizedUsers.push(new AllowedUserServiceMap(ownerId, id, true));
+    service._authorizedUsers.push(
+      new AllowedUserServiceMap(owner, service.convertToShort(), true),
+    );
     return service;
   }
   override getDisplayName(): string {
@@ -57,7 +59,7 @@ export class Service extends Entity {
   }
   listAuthorizedUsers(onlyOwners = false): string[] {
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
-      currentElement.userId;
+      currentElement.username;
     if (onlyOwners) {
       return this.authorizedUsers.filter((currElement) => currElement.isOwner)
         .map(mapCallback);
@@ -66,21 +68,23 @@ export class Service extends Entity {
   }
   listAuthorizedGroups(): string[] {
     const mapCallback = (currElement: AllowedGroupServiceMap): string =>
-      currElement.groupId;
+      currElement.groupname;
     return this.authorizedGroups.map(mapCallback);
   }
   createService(
-    ownerId: string,
+    owner: ShortEntity,
     credentials: ServiceCredential,
     serviceName: string,
   ): void {
     const service = new Service(credentials, serviceName);
     this.authorizedUsers.push(
-      new AllowedUserServiceMap(ownerId, service.getId(), true),
+      new AllowedUserServiceMap(owner, service.convertToShort(), true),
     );
   }
-  giveAuthorizationToUser(userId: string): void {
-    this._authorizedUsers.push(new AllowedUserServiceMap(userId, this.getId()));
+  giveAuthorizationToUser(user: ShortEntity): void {
+    this._authorizedUsers.push(
+      new AllowedUserServiceMap(user, this.convertToShort()),
+    );
   }
   toJsonString(): string {
     return JSON.stringify(this.convertToSerializeableObj());

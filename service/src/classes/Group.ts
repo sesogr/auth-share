@@ -11,7 +11,7 @@ export class Group extends Entity {
   }
   public constructor(
     private groupname: string,
-    private owner: string,
+    private owner: ShortEntity,
     protected override readonly id: string = crypto.randomUUID(),
     private serviceList: AllowedGroupServiceMap[] = [],
     private sentInvitations: Invitation[] = [],
@@ -41,10 +41,10 @@ export class Group extends Entity {
   listSentInvitation(): Invitation[] {
     return [...this.sentInvitations];
   }
-  static createUserGroup(groupname: string, ownerId: string): Group {
-    const newGroup = new Group(groupname, ownerId);
+  static createUserGroup(groupname: string, owner: ShortEntity): Group {
+    const newGroup = new Group(groupname, owner);
     newGroup.allowedUser.push(
-      new AllowedUserGroupMap(ownerId, newGroup.getId(), true),
+      new AllowedUserGroupMap(owner, newGroup.convertToShort(), true),
     );
     return newGroup;
   }
@@ -60,7 +60,7 @@ export class Group extends Entity {
       ),
     );
   }
-  getOwner(): string {
+  getOwner(): ShortEntity {
     return this.owner;
   }
   toJsonString(): string {
@@ -69,9 +69,9 @@ export class Group extends Entity {
   private showAll(): ConvertedGroup {
     return {
       groupname: this.groupname,
-      owner: this.owner,
-      users: this._allowedUser.map((e) => e.userId),
-      serviceList: this.serviceList.map((e) => e.serviceId),
+      owner: this.getOwner().displayname,
+      users: this._allowedUser.map((e) => e.username),
+      serviceList: this.serviceList.map((e) => e.servicename),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
     };
