@@ -10,6 +10,7 @@ import { AllowedUserServiceMap } from "../src/classes/AllowedUserServiceMap.ts";
 import { ServiceRepositoryView } from "../src/interfaceTypes/ServiceRepositoryView.ts";
 import { GroupRepositoryView } from "../src/interfaceTypes/GroupRepositoryView.ts";
 import { SpyObject } from "./HelperTypes.ts";
+import { IdNameMap } from "../src/classes/IdNameMap.ts";
 Deno.test("UserRepository", async (t) => {
   await t.step("Test for method findById()", () => {
     const {
@@ -90,7 +91,10 @@ function createServiceRepository(
     }),
     viewAllowedUser: spy(() => {
       return userIdList.map((e, i) =>
-        new AllowedUserServiceMap(e + "", i + "")
+        new AllowedUserServiceMap(
+          new IdNameMap(e + "", e + ""),
+          new IdNameMap(i + "", i + ""),
+        )
       );
     }),
     viewInvitedGroups: spy(() => {
@@ -104,7 +108,12 @@ function createGroupRepository(
 ): SpyObject<GroupRepositoryView> {
   const groupRepository: SpyObject<GroupRepositoryView> = {
     viewAllowedUser: spy(() => {
-      return userIdList.map((e, i) => new AllowedUserGroupMap(e + "", i + ""));
+      return userIdList.map((e, i) =>
+        new AllowedUserGroupMap(
+          new IdNameMap(e + "", e + ""),
+          new IdNameMap(i + "", i + ""),
+        )
+      );
     }),
     viewInvitations: spy(() => {
       return [];

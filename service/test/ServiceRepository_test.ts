@@ -29,7 +29,7 @@ Deno.test("ServiceRepository", async (t) => {
       "1234567",
     );
     const currService = serviceList[3];
-    currService.giveAuthorizationToUser(user.getId());
+    currService.giveAuthorizationToUser(user.convertToShort());
     serviceRepository.save(currService);
 
     // Assert that the service was saved correctly

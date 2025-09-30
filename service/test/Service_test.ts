@@ -3,17 +3,19 @@ import { Service } from "../src/classes/Service.ts";
 import { ServiceCredential } from "../src/classes/ServiceCredential.ts";
 import { FakeObjectGen } from "../src/FakeObjectGen.ts";
 import { Invitation } from "../src/classes/Invitation.ts";
+import { ShortEntity } from "../src/interfaceTypes/ShortEntity.ts";
+import { IdNameMap } from "../src/classes/IdNameMap.ts";
 
 const serviceCredential = new ServiceCredential("", "");
-const userId = "Uwe";
-const user2Id = "Swe";
+const userShort: ShortEntity = new IdNameMap("", "uwe");
+const user2Short: ShortEntity = new IdNameMap("", "Swe");
 const user = FakeObjectGen.createFakeUser();
 const user2 = FakeObjectGen.createFakeUser();
-const service = Service.createService(serviceCredential, "sag", userId);
+const service = Service.createService(serviceCredential, "sag", userShort);
 Deno.test("Service Class", async (t) => {
   await t.step("Service Creates with correct Owner", () => {
     const owners: string[] = service.listAuthorizedUsers(true);
-    assertArrayIncludes(owners, [userId]);
+    assertArrayIncludes(owners, [userShort.displayname]);
   });
 
   await t.step("lists that should be empty are empty", () => {
@@ -27,8 +29,10 @@ Deno.test("Service Class", async (t) => {
   await t.step(
     "Service Authorize new User successfully puts User into owners",
     () => {
-      service.giveAuthorizationToUser(user2Id);
-      assertArrayIncludes(service.listAuthorizedUsers(), [user2Id]);
+      service.giveAuthorizationToUser(user2Short);
+      assertArrayIncludes(service.listAuthorizedUsers(), [
+        user2Short.displayname,
+      ]);
     },
   );
   await t.step("send invitation", () => {
