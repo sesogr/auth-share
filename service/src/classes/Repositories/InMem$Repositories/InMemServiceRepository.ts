@@ -1,3 +1,4 @@
+import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
 import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
@@ -7,7 +8,7 @@ import { ServiceCredential } from "../../ServiceCredential.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemServiceRepository extends InMemoryRepository<Service>
-  implements ServiceRepository {
+  implements ServiceRepository, ServiceAggregateView {
   private allowedUser: AllowedUserServiceMap[] = [];
   private allowedGroups: AllowedGroupServiceMap[] = [];
   private invitations: Invitation[] = [];

@@ -1,5 +1,6 @@
+import { GroupAggregateView } from "../../../interfaceTypes/GroupAggregateView.ts";
 import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
-import { ServiceRepositoryView } from "../../../interfaceTypes/ServiceRepositoryView.ts";
+import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { Group } from "../../Group.ts";
@@ -7,7 +8,7 @@ import { Invitation } from "../../Invitation.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemGroupRepository extends InMemoryRepository<Group>
-  implements GroupRepository {
+  implements GroupRepository, GroupAggregateView {
   private _allowedUser: AllowedUserGroupMap[] = [];
   private _invitationList: Invitation[] = [];
   public get invitationList(): Invitation[] {
@@ -16,7 +17,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
   public get allowedUser(): AllowedUserGroupMap[] {
     return [...this._allowedUser];
   }
-  constructor(private serviceRepoView: ServiceRepositoryView) {
+  constructor(private serviceRepoView: ServiceAggregateView) {
     super();
   }
 

@@ -1,5 +1,5 @@
-import { GroupRepositoryView } from "../../../interfaceTypes/GroupRepositoryView.ts";
-import { ServiceRepositoryView } from "../../../interfaceTypes/ServiceRepositoryView.ts";
+import { GroupAggregateView } from "../../../interfaceTypes/GroupAggregateView.ts";
+import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { User } from "../../User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
@@ -7,8 +7,8 @@ import { InMemoryRepository } from "./InMemoryRepository.ts";
 export class InMemUserRepository extends InMemoryRepository<User>
   implements UserRepository {
   constructor(
-    private serviceRepoView: ServiceRepositoryView,
-    private groupRepoView: GroupRepositoryView,
+    private serviceRepoView: ServiceAggregateView,
+    private groupRepoView: GroupAggregateView,
   ) {
     super();
   }

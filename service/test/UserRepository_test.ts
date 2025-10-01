@@ -7,8 +7,8 @@ import { NotFoundError } from "../src/errors/NotFoundError.ts";
 import { spy } from "@std/testing/mock";
 import { AllowedUserGroupMap } from "../src/classes/AllowedUserGroupMap.ts";
 import { AllowedUserServiceMap } from "../src/classes/AllowedUserServiceMap.ts";
-import { ServiceRepositoryView } from "../src/interfaceTypes/ServiceRepositoryView.ts";
-import { GroupRepositoryView } from "../src/interfaceTypes/GroupRepositoryView.ts";
+import { ServiceAggregateView } from "../src/interfaceTypes/ServiceAggregateView.ts";
+import { GroupAggregateView } from "../src/interfaceTypes/GroupAggregateView.ts";
 import { SpyObject } from "./HelperTypes.ts";
 import { IdNameMap } from "../src/classes/IdNameMap.ts";
 Deno.test("UserRepository", async (t) => {
@@ -63,9 +63,9 @@ Deno.test("UserRepository", async (t) => {
 function buildUp(): UserRepoTestSuit {
   const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
-  const serviceRepository: SpyObject<ServiceRepositoryView> =
+  const serviceRepository: SpyObject<ServiceAggregateView> =
     createServiceRepository(mockUserIdList);
-  const groupRepository: SpyObject<GroupRepositoryView> = createGroupRepository(
+  const groupRepository: SpyObject<GroupAggregateView> = createGroupRepository(
     mockUserIdList,
   );
   const userRepository: UserRepository = new InMemUserRepository(
@@ -84,8 +84,8 @@ function buildUp(): UserRepoTestSuit {
 
 function createServiceRepository(
   userIdList: string[],
-): SpyObject<ServiceRepositoryView> {
-  const serviceDatabase: SpyObject<ServiceRepositoryView> = {
+): SpyObject<ServiceAggregateView> {
+  const serviceDatabase: SpyObject<ServiceAggregateView> = {
     viewAllowedGroups: spy(() => {
       throw new Error("Not your business");
     }),
@@ -105,8 +105,8 @@ function createServiceRepository(
 }
 function createGroupRepository(
   userIdList: string[],
-): SpyObject<GroupRepositoryView> {
-  const groupRepository: SpyObject<GroupRepositoryView> = {
+): SpyObject<GroupAggregateView> {
+  const groupRepository: SpyObject<GroupAggregateView> = {
     viewAllowedUser: spy(() => {
       return userIdList.map((e, i) =>
         new AllowedUserGroupMap(
@@ -125,7 +125,7 @@ function createGroupRepository(
 type UserRepoTestSuit = {
   mockUserIdList: string[];
   userRepository: UserRepository;
-  serviceRepository: SpyObject<ServiceRepositoryView>;
-  groupRepository: SpyObject<GroupRepositoryView>;
+  serviceRepository: SpyObject<ServiceAggregateView>;
+  groupRepository: SpyObject<GroupAggregateView>;
   fakeUserList: User[];
 };

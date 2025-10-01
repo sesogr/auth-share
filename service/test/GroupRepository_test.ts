@@ -3,7 +3,7 @@ import { AllowedGroupServiceMap } from "../src/classes/AllowedGroupServiceMap.ts
 import { Invitation } from "../src/classes/Invitation.ts";
 import { InMemGroupRepository } from "../src/classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
 import { FakeObjectGen } from "../src/FakeObjectGen.ts";
-import { ServiceRepositoryView } from "../src/interfaceTypes/ServiceRepositoryView.ts";
+import { ServiceAggregateView } from "../src/interfaceTypes/ServiceAggregateView.ts";
 import { SpyObject } from "./HelperTypes.ts";
 import { Group } from "../src/classes/Group.ts";
 import { GroupRepository } from "../src/interfaceTypes/GroupRepository.ts";
@@ -22,7 +22,7 @@ Deno.test("Group Repository", async (t) => {
 type GroupRepoTestsuit = {
   groupList: Group[];
   groupRepository: GroupRepository;
-  serviceRepository: SpyObject<ServiceRepositoryView>;
+  serviceRepository: SpyObject<ServiceAggregateView>;
 };
 
 function buildUp(): GroupRepoTestsuit {
@@ -37,8 +37,8 @@ function buildUp(): GroupRepoTestsuit {
 
 function createServiceRepository(
   groupList: Group[],
-): SpyObject<ServiceRepositoryView> {
-  const serviceDatabase: SpyObject<ServiceRepositoryView> = {
+): SpyObject<ServiceAggregateView> {
+  const serviceDatabase: SpyObject<ServiceAggregateView> = {
     viewAllowedGroups: spy(() => {
       return groupList.map((e, i) =>
         new AllowedGroupServiceMap(
