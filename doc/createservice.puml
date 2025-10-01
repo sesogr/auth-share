@@ -1,0 +1,68 @@
+@startuml
+participant Service
+participant AllowedUserServiceMap
+participant AllowedGroupServiceMap
+
+Service -> AllowedUserServiceMap: isOwner(username, service)
+activate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: find(username)
+activate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: return result
+deactivate AllowedUserServiceMap
+AllowedUserServiceMap --> Service: result
+deactivate Service
+Service -> AllowedGroupServiceMap: isAuthorizedGroup(groupname, service)
+activate AllowedGroupServiceMap
+AllowedGroupServiceMap -> AllowedGroupServiceMap: find(groupname)
+activate AllowedGroupServiceMap
+AllowedGroupServiceMap -> AllowedGroupServiceMap: return result
+deactivate AllowedGroupServiceMap
+AllowedGroupServiceMap --> Service: result
+deactivate Service
+Service -> Service: createService(service)
+activate Service
+Service -> Service: return newService
+deactivate Service
+Service -> AllowedUserServiceMap: add(username, newService)
+activate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: items.push({username, newService})
+deactivate AllowedUserServiceMap
+AllowedUserServiceMap --> Service: success
+deactivate Service
+Service -> AllowedGroupServiceMap: add(groupname, newService)
+activate AllowedGroupServiceMap
+AllowedGroupServiceMap -> AllowedGroupServiceMap: items.push({groupname, newService})
+deactivate AllowedGroupServiceMap
+AllowedGroupServiceMap --> Service: success
+deactivate Service
+Service -> Service: return newService
+deactivate Service
+Service --> User:
+
+@enduml
+
+
+@startuml
+participant Service
+participant AllowedUserServiceMap
+
+Service -> Service: createService(owner, credentials, serviceName)
+activate Service
+Service -> Service: const service = new Service(credentials, serviceName)
+activate Service
+Service -> AllowedUserServiceMap: new AllowedUserServiceMap(owner, service.convertToShort(), true)
+activate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: constructor(owner, serviceId, isOwner)
+activate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: this.owner = owner
+deactivate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: this.serviceId = serviceId
+deactivate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: this.isOwner = isOwner
+deactivate AllowedUserServiceMap
+Service -> Service: this.authorizedUsers.push(newAllowedUserServiceMap)
+activate Service
+Service -> Service: return
+deactivate Service
+
+@enduml

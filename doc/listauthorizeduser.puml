@@ -1,0 +1,14 @@
+@startuml
+actor User
+participant Service
+participant AllowedUserServiceMap
+
+User -> Service: listAuthorizedUsers()
+activate Service
+Service -> Service: authorizedUsers()
+activate AllowedUserServiceMap
+AllowedUserServiceMap -> AllowedUserServiceMap: isOwner()
+deactivate AllowedUserServiceMap
+AllowedUserServiceMap --> Service: isOwner
+deactivate Service
+Service --> User:
