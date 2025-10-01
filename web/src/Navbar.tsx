@@ -17,6 +17,9 @@ const Navbar: React.FC = () => {
       <NavLink to="/user" style={linkStyle}>
         User
       </NavLink>
+      <NavLink to="/user/create" style={linkStyle}>
+        CreateUser
+      </NavLink>
     </nav>
   );
 };
