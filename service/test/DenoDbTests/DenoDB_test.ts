@@ -132,8 +132,13 @@ console.log(
 console.log(
   await DbUser.find("testID5"),
 );
-//Object of DbUserCredential and .credentials an Objectmethod of DbUser
 
-// console.log(
-//   await (await DbUser.find("testID1")).credentials(),
-// );
+//Object of DbUserCredential and .credentials an Objectmethod of DbUser
+//deno-ignore
+const dbuser: DbUser =
+  (await DbUser.where("id", "testID1").get() as DbUser[])[0];
+if (dbuser != null) {
+  console.log(
+    dbuser.credentials(),
+  );
+}
