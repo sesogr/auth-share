@@ -8,6 +8,10 @@ export class DbUser extends Model {
     displayname: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
+  static credentials() {
+    return this.hasOne(DbUserCredential);
+  }
 }
 //(FK,PK)
+
 Relationships.belongsTo(DbUserCredential, DbUser);
