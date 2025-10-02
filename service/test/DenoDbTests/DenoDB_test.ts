@@ -10,10 +10,10 @@ import { DbUserGroup } from "../../src/classes/Repositories/DenoDB/Models/DbUser
 import { DbUserService } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 
 const connector = new MySQLConnector({
-  database: "mariadb",
-  host: "localhost:13006",
-  username: "authshare",
-  password: "5ES2#7PhHZplRm",
+  database: Deno.env.get("DB_NAME")!,
+  host: Deno.env.get("DB_HOST")!,
+  username: Deno.env.get("DB_USER")!,
+  password: Deno.env.get("DB_PASSWORD")!,
 });
 const db = new Database(connector);
 
