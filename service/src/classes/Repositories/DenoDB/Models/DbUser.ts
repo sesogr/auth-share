@@ -14,7 +14,10 @@ export class DbUser extends Model {
 
   displayname!: string;
   id!: string;
+  credentials() {
+    return DbUser.where("id", this.id).credentials();
+  }
 }
-//(FK,PK)
 
+//(FK,PK)
 Relationships.belongsTo(DbUserCredential, DbUser);
