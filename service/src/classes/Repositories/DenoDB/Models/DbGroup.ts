@@ -6,11 +6,9 @@ export class DbGroup extends Model {
     groupname: DataTypes.string(40),
     owner: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
-    serviceList: DataTypes.JSON,
-    sentInvitations: DataTypes.JSON,
-    serviceInvitations: DataTypes.JSON,
-    _allowedUser: DataTypes.JSON,
-    //TODO add foreign key
-    //Datentype.JSON? Reference to each List?
   };
+
+  groupname!: string;
+  owner!: string;
+  id!: string;
 }

@@ -5,11 +5,14 @@ export class DbServiceCredential extends Model {
   static override table = "ServiceCredentials";
   static override timestamps = true;
   static override fields = {
-    _username: DataTypes.string(40),
-    _password: DataTypes.string(40),
+    username: DataTypes.string(40),
+    password: DataTypes.string(40),
     //TODO add foreign key, primary key etc.
   };
   static service() {
     return this.hasOne(DbService);
   }
+
+  username!: string;
+  password!: string;
 }

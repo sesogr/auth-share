@@ -11,6 +11,9 @@ export class DbUser extends Model {
   static credentials() {
     return this.hasOne(DbUserCredential);
   }
+
+  displayname!: string;
+  id!: string;
 }
 //(FK,PK)
 

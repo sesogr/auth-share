@@ -5,9 +5,12 @@ export class DbUserCredential extends Model {
   static override table = "UserCredentials";
   static override timestamps = true;
   static override fields = {
-    _username: DataTypes.string(40),
-    _password: DataTypes.string(40),
+    username: DataTypes.string(40),
+    password: DataTypes.string(40),
   };
+
+  username!: string;
+  password!: string;
   static user() {
     return this.hasOne(DbUser);
   }
