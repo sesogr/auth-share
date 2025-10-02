@@ -1,14 +1,6 @@
-import { Database, DataTypes, Model, MySQLConnector } from "@denodb";
-//Ausalgern in seperate Datei --> import dieser Datei?
-const connector = new MySQLConnector({
-  database: Deno.env.get("DB_NAME")!,
-  host: Deno.env.get("DB_HOST")!,
-  username: Deno.env.get("DB_USER")!,
-  password: Deno.env.get("DB_PASSWORD")!,
-});
-const db = new Database(connector);
+import { DataTypes, Model } from "@denodb";
 
-class Group extends Model {
+export class DbGroup extends Model {
   static override table = "Groups";
   static override timestamps = true;
   static override fields = {
@@ -23,6 +15,3 @@ class Group extends Model {
     //Datentype.JSON? Reference to each List?
   };
 }
-db.link([Group]);
-
-await db.sync({ drop: true });
