@@ -40,12 +40,12 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     const missingAllowedUsers = allowedUser.filter((e) =>
       !this.allowedUser.some((f) => e.equals(f))
     );
-    this.allowedUser.push(...missingAllowedUsers);
-    const unauthorizedUsers = this.allowedUser.filter((e) =>
-      allowedUser.some((f) => e.equals(f))
-    );
+    this._allowedUser.push(...missingAllowedUsers);
+    const extraAllowedUsers = this.allowedUser.filter((e) =>
+      e.groupId === allowedUser[0].groupId
+    ).filter((e) => !allowedUser.some((f) => e.equals(f)));
     this._allowedUser = this.allowedUser.filter((e) =>
-      !unauthorizedUsers.some((f) => e.equals(f))
+      extraAllowedUsers.every((f) => !e.equals(f))
     );
   }
   private updateInvites(invites: Invitation[]) {

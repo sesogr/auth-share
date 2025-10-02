@@ -34,11 +34,12 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
       !this.invitations.some((f) => e.equals(f))
     );
     this.invitations.push(...missingInvites);
-    const deletedInvites = this.invitations.filter((e) =>
-      !invites.some((f) => e.equals(f))
-    );
+
+    const extraInvites = this.invitations.filter((e) =>
+      e.objId === invites[0].objId
+    ).filter((e) => !invites.some((f) => e.equals(f)));
     this.invitations = this.invitations.filter((e) =>
-      !deletedInvites.some((f) => e.equals(f))
+      extraInvites.every((f) => !e.equals(f))
     );
   }
   private updateAllowedUsers(authorizedUsers: AllowedUserServiceMap[]) {
@@ -59,11 +60,11 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
       !this.allowedGroups.some((f) => e.equals(f))
     );
     this.allowedGroups.push(...missingAllowedGroups);
-    const unauthorizedUsers = this.allowedGroups.filter((e) =>
-      authorizedGroups.some((f) => e.equals(f))
-    );
+    const extraAllowedGroups = this.allowedGroups.filter((e) =>
+      e.serviceId === authorizedGroups[0].serviceId
+    ).filter((e) => !authorizedGroups.some((f) => e.equals(f)));
     this.allowedGroups = this.allowedGroups.filter((e) =>
-      !unauthorizedUsers.some((f) => e.equals(f))
+      extraAllowedGroups.every((f) => !e.equals(f))
     );
   }
   override hydrate(service: Service): Service {
