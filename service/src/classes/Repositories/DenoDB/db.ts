@@ -19,14 +19,58 @@ const db = new Database(connector);
 
 db.link([
   DbUser,
-  DbUserCredential,
-  DbUserService,
   DbService,
-  DbServiceCredential,
   DbGroup,
+  DbUserService,
+  DbUserCredential,
+  DbServiceCredential,
   DbUserGroup,
   DbGroupService,
   DbInvitation,
 ]);
 
 await db.sync({ drop: true });
+
+await DbUser.create(
+  {
+    displayname: "Hans Meiser",
+    id: "testID1",
+  },
+);
+DbUserCredential.create({
+  dbuser_id: "testID1",
+  _username: "Hans Meiser",
+  _password: "1234",
+});
+
+await DbService.create({
+  serviceName: "MyService",
+  id: "testID2",
+});
+DbServiceCredential.create({
+  dbservice_id: "testID2",
+  _username: "ServiceCredentials1",
+  _password: "4321",
+});
+
+DbUserService.create({
+  dbuser_id: "testID1",
+  dbservice_id: "testID2",
+  isOwner: true,
+});
+
+DbUserService.create({
+  dbuser_id: "testID1",
+  dbservice_id: "testID2",
+  isOwner: true,
+});
+
+DbGroup.create({
+  groupname: "TestGroup1",
+  owner: "testID1",
+  id: "awsedrf",
+  serviceList: JSON.stringify([]),
+  sentInvitations: JSON.stringify([]),
+  serviceInvitations: JSON.stringify([]),
+  _allowedUser: JSON.stringify([]),
+});

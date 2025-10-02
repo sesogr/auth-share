@@ -1,9 +1,11 @@
-import { DataTypes, Model } from "@denodb";
-export class DbUserGroup extends Model {
-  static override table = "UserGroups";
-  static override timestamps = true;
-  static override fields = {
-    groupId: { type: DataTypes.INTEGER, foreignKey: true },
-    serviceId: { type: DataTypes.INTEGER, foreignKey: true },
-  };
-}
+import { DataTypes, Relationships } from "@denodb";
+import { DbGroup } from "./DbGroup.ts";
+import { DbUser } from "./DbUser.ts";
+export const DbUserGroup = Relationships.manyToMany(
+  DbUser,
+  DbGroup,
+);
+DbUserGroup.fields = {
+  ...DbUserGroup.fields,
+  isOwner: DataTypes.BOOLEAN,
+};

@@ -1,9 +1,7 @@
-import { DataTypes, Model } from "@denodb";
-export class DbGroupService extends Model {
-  static override table = "GroupServices";
-  static override timestamps = true;
-  static override fields = {
-    groupRef: { type: DataTypes.INTEGER, foreignKey: true },
-    serviceRef: { type: DataTypes.INTEGER, foreignKey: true },
-  };
-}
+import { Relationships } from "@denodb";
+import { DbGroup } from "./DbGroup.ts";
+import { DbService } from "./DbService.ts";
+export const DbGroupService = Relationships.manyToMany(
+  DbGroup,
+  DbService,
+);

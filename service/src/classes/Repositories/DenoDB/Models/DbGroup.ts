@@ -1,5 +1,4 @@
 import { DataTypes, Model } from "@denodb";
-
 export class DbGroup extends Model {
   static override table = "Groups";
   static override timestamps = true;
