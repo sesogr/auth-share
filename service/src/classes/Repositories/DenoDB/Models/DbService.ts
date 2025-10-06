@@ -11,6 +11,9 @@ export class DbService extends Model {
   static displayname() {
     return this.hasOne(DbIdDisplayname);
   }
+  static credentials() {
+    return this.hasOne(DbServiceCredential);
+  }
   servicename!: string;
   id!: string;
 }

@@ -10,6 +10,8 @@ export class DbIdDisplayname extends Model {
     id: DataTypes.STRING,
     displayname: DataTypes.STRING,
   };
+  id!: string;
+  displayname!: string;
 }
 Relationships.belongsTo(DbIdDisplayname, DbUser, { foreignKey: "id" });
 Relationships.belongsTo(DbIdDisplayname, DbService);
