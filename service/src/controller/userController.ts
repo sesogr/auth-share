@@ -2,8 +2,9 @@ import { Context } from "@hono/hono";
 import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { User } from "../classes/User.ts";
 import { UserCredential } from "../classes/UserCredential.ts";
-import { User as DbUser } from "../classes/Repositories/DenoDB/Models/DbUser.ts";
-import { UserCredential as DbUserCredential } from "../classes/Repositories/DenoDB/Models/DbUser.ts";
+import { DbUser } from "../classes/Repositories/DenoDB/Models/DbUser.ts";
+import { DbUserCredential } from "../classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
+import { ConvertedUser } from "../types/types.ts";
 
 export const userController = (
   userRepository: UserRepository,
@@ -47,5 +48,19 @@ export const userController = (
     userRepository.save(myself);
     //204 no content
     return c.status(204);
+  },
+  create: async (c: Context) => {
+    const requestData: ConvertedUser = await c.req.json();
+
+    const newUser = new User(
+      new UserCredential(
+        requestData.credentials.split(":")[0],
+        requestData.credentials.split(":")[1],
+      ),
+      requestData.displayname,
+      requestData.id,
+    );
+    userRepository.save(newUser);
+    return c.status(201);
   },
 });
