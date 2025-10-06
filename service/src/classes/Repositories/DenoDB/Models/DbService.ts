@@ -1,5 +1,6 @@
 import { DataTypes, Model, Relationships } from "@denodb";
 import { DbServiceCredential } from "./DbServiceCredentials.ts";
+import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 export class DbService extends Model {
   static override table = "Services";
   static override timestamps = true;
@@ -7,7 +8,9 @@ export class DbService extends Model {
     servicename: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
-
+  static displayname() {
+    return this.hasOne(DbIdDisplayname);
+  }
   servicename!: string;
   id!: string;
 }

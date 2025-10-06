@@ -1,4 +1,5 @@
 import { DataTypes, Model } from "@denodb";
+import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 export class DbGroup extends Model {
   static override table = "Groups";
   static override timestamps = true;
@@ -7,7 +8,9 @@ export class DbGroup extends Model {
     owner: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
-
+  static displayname() {
+    return this.hasOne(DbIdDisplayname);
+  }
   groupname!: string;
   owner!: string;
   id!: string;

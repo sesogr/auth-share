@@ -1,5 +1,6 @@
 import { DataTypes, Model, Relationships } from "@denodb";
 import { DbUserCredential } from "./DbUserCredentials.ts";
+import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 
 export class DbUser extends Model {
   static override table = "Users";
@@ -10,6 +11,9 @@ export class DbUser extends Model {
   };
   static credentials() {
     return this.hasOne(DbUserCredential);
+  }
+  static displayname() {
+    return this.hasOne(DbIdDisplayname);
   }
 
   displayname!: string;
