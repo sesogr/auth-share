@@ -9,7 +9,7 @@ import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/
 import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 import { FakeObjectGen } from "./FakeObjectGen.ts";
-import { userController as createUserController } from "./controller/userController.ts";
+import { createUserController } from "./controller/userController.ts";
 import { DbUserRepository } from "./classes/Repositories/DenoDB/DbUserRepository.ts";
 import { ServiceAggregateView } from "./interfaceTypes/ServiceAggregateView.ts";
 

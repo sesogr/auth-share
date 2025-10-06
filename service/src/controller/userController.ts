@@ -6,7 +6,7 @@ import { DbUser } from "../classes/Repositories/DenoDB/Models/DbUser.ts";
 import { DbUserCredential } from "../classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
 import { ConvertedUser } from "../types/types.ts";
 
-export const userController = (
+export const createUserController = (
   userRepository: UserRepository,
 ) => ({
   read: async (c: Context) => {
