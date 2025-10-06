@@ -1,4 +1,5 @@
 import type React from "react";
+import type { ConvertedUser } from "./types/types.ts";
 
 const CreateUser: React.FC = () => {
   // deno-lint-ignore no-explicit-any
@@ -8,6 +9,23 @@ const CreateUser: React.FC = () => {
     const password = event.target.elements.password.value;
     // Handle form submission here, e.g. send data to server
     console.log(`Name: ${name}, Password: ${password}`);
+
+    const newUserData: ConvertedUser = {
+      "displayname": name,
+      "credentials": name + ":" + password,
+      "id": crypto.randomUUID(),
+    };
+    console.log(newUserData);
+    fetch(import.meta.env.VITE_APIURL + "/user/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newUserData),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.error(error));
   };
 
   return (
