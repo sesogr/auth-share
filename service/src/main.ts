@@ -7,26 +7,27 @@ import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
 import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
 import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
-import { InMemUserRepository } from "./classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 import { FakeObjectGen } from "./FakeObjectGen.ts";
 import { userController as createUserController } from "./controller/userController.ts";
+import { DbUserRepository } from "./classes/Repositories/DenoDB/DbUserRepository.ts";
+import { ServiceAggregateView } from "./interfaceTypes/ServiceAggregateView.ts";
 
 //initialize repositories
-const serviceRepository: ServiceRepository = new InMemServiceRepository();
+const serviceRepository: ServiceAggregateView & ServiceRepository =
+  new InMemServiceRepository();
 const groupRepository: GroupRepository = new InMemGroupRepository(
   serviceRepository,
 );
-const userRepository: UserRepository = new InMemUserRepository(
-  serviceRepository,
-  groupRepository,
-);
-FakeObjectGen.generateFakeUsers().forEach((e) => userRepository.save(e));
+const userRepository: UserRepository = new DbUserRepository();
+// FakeObjectGen.generateFakeUsers().forEach(async (e) =>
+//   await userRepository.save(e)
+// );
 FakeObjectGen.generateFakeGroups().forEach((e) => groupRepository.save(e));
 FakeObjectGen.generateFakeServices().forEach((e) => serviceRepository.save(e));
-userRepository.findAll().forEach((e) => {
-  serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
-});
+// userRepository.findAll().forEach((e) => {
+//   serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
+// });
 export const app = new Hono();
 app.use(
   "*",
@@ -51,6 +52,8 @@ app.get(
 );
 
 app.put();
+
+app.post("/user", userController.create);
 
 //app.get("/group", groupController);
 
