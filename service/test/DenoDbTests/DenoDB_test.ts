@@ -85,6 +85,13 @@ await DbGroup.create({
   id: "awsedrf",
 });
 
+await DbGroup.where("id", "awsedrf").update({ "id": "updatedID" });
+
+console.log(
+  await DbGroup.where("id", "updatedID").get(),
+  "erste Ausgabe",
+);
+
 //const _test = DbUser.where("id", "adskfj").get();
 //DbUser.find("adskfj").then((e) => e.credentials());
 
@@ -131,6 +138,11 @@ console.log(
 //Object of DbUser
 console.log(
   await DbUser.find("testID5"),
+);
+
+//Try to change the User_id
+console.log(
+  await DbUser.where("id", "testID5").get(),
 );
 
 //Object of DbUserCredential and .credentials an Objectmethod of DbUser
