@@ -87,8 +87,9 @@ export class DbServiceRepository implements ServiceRepository {
     array: Model[],
   ) => Promise<AllowedUserServiceMap | AllowedGroupServiceMap> {
     return async (e) => {
-      if (!e[type && "_id"]) throw new NotFoundError("group_id");
-      const id = e[type && "_id"]!.toString();
+      if (!e[type + "_id"]) throw new NotFoundError("group_id");
+      const id = e[type + "_id"]!.toString();
+
       const displayname = await DbIdDisplayname.where(
         "id",
         id.toString(),
