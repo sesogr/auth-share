@@ -8,6 +8,7 @@ import { DbService } from "./Models/DbService.ts";
 import { DbServiceCredential } from "./Models/DbServiceCredentials.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
 import { DbUserService } from "./Models/DbUserService.ts";
+import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
 
 const connector = new MySQLConnector({
   database: Deno.env.get("DB_NAME")!,
@@ -27,6 +28,7 @@ db.link([
   DbUserGroup,
   DbGroupService,
   DbInvitation,
+  DbIdDisplayname,
 ]);
 
 await db.sync({ drop: true });

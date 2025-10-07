@@ -1,7 +1,4 @@
-import { DataTypes, Model, Relationships } from "@denodb";
-import { DbUser } from "./DbUser.ts";
-import { DbService } from "./DbService.ts";
-import { DbGroup } from "./DbGroup.ts";
+import { DataTypes, Model } from "@denodb";
 
 export class DbIdDisplayname extends Model {
   static override table = "IdDisplayname";
@@ -13,6 +10,6 @@ export class DbIdDisplayname extends Model {
   id!: string;
   displayname!: string;
 }
-Relationships.belongsTo(DbIdDisplayname, DbUser, { foreignKey: "id" });
-Relationships.belongsTo(DbIdDisplayname, DbService);
-Relationships.belongsTo(DbIdDisplayname, DbGroup);
+// Relationships.belongsTo(DbIdDisplayname, DbUser, { foreignKey: "id" });
+// Relationships.belongsTo(DbIdDisplayname, DbService);
+// Relationships.belongsTo(DbIdDisplayname, DbGroup);
