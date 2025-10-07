@@ -1,8 +1,8 @@
 export type Repository<T> = {
-  findById(id: string): T;
-  findByName(name: string): T;
-  findAll(): T[];
-  add(item: T): void;
-  removeById(id: string): void;
-  save(item: T): void;
+  findById(id: string): Promise<T>;
+  findByName(name: string): Promise<T>;
+  findAll(): Promise<T>[];
+  add(item: T): Promise<void>;
+  removeById(id: string): Promise<void>;
+  save(item: T): Promise<void>;
 };
