@@ -14,26 +14,31 @@ import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { Invitation } from "../../Invitation.ts";
 
 export class DbServiceRepository implements ServiceRepository {
-  findById(_id: string): Service {
+  findOwnedByUserId(_userId: string): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
-  findByName(_name: string): Service {
+  findAuthorizedForId(_Id: string): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
-  findAll(): Service[] {
+  findById(_id: string): Promise<Service> {
     throw new Error("Method not implemented.");
   }
-  add(_item: Service): void {
+  findByName(_name: string): Promise<Service> {
     throw new Error("Method not implemented.");
   }
-  removeById(_id: string): void {
+  findAll(): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
-  save(item: Service): void {
-    if (!this.findById(item.getId())) {
-      this.add(item);
-    }
+  add(_item: Service): Promise<void> {
+    throw new Error("Method not implemented.");
   }
+  removeById(_id: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  save(_item: Service): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
   async hydrate(item: typeof DbService, query: string = ""): Promise<Service> {
     const service = await item.first();
     if (!service) throw new NotFoundError("Item not Found: " + query);
@@ -108,6 +113,7 @@ export class DbServiceRepository implements ServiceRepository {
           e.is_owner?.valueOf() as boolean ?? false,
         );
       }
+
       if (type == "group") {
         return new AllowedGroupServiceMap(
           new IdNameMap(
@@ -119,11 +125,5 @@ export class DbServiceRepository implements ServiceRepository {
       }
       throw new RuntimeError();
     };
-  }
-  findOwnedByUserId(_userId: string): Service[] {
-    throw new Error("Method not implemented.");
-  }
-  findAuthorizedForId(_Id: string): Service[] {
-    throw new Error("Method not implemented.");
   }
 }

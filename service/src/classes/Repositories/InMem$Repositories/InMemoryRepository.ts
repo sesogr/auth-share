@@ -11,10 +11,10 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
   constructor(initial: T[] = []) {
     this.inMemList = initial.slice();
   }
-  abstract save(item: T): void;
-  abstract hydrate(item: T): T;
+  abstract save(item: T): Promise<void>;
+  abstract hydrate(item: T): Promise<T>;
 
-  findById(id: string): T {
+  findById(id: string): Promise<T> {
     const item = this.inMemList.find((i) => i.getId() === id);
     if (!item) throw new NotFoundError(`Item with id=${id} not found`);
     const hydratedItem = this.hydrate(item);
