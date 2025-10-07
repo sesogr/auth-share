@@ -9,6 +9,7 @@ const Home: React.FC = () => {
   //Deconstruction
   //const parameter = useParams();
   //const { serviceName } = parameter
+  const navigate = useNavigate();
   const { serviceName } = useParams();
   useEffect(() => {
     fetch(import.meta.env.VITE_APIURL + "/user/owned") // Port/Host anpassen
@@ -20,40 +21,42 @@ const Home: React.FC = () => {
       .catch((err) => setError(err.message));
   }, []);
   if (error) return <div>Fehler: {error}</div>;
-  if (!serviceList) return <div>Lade...</div>;
+  if (serviceList.length == 0) return <div>Lade...</div>;
 
-  const service = serviceList.find(
-    (currService: ConvertedService) => serviceName == currService.serviceName,
-  );
-  const navigate = useNavigate();
+  const service = serviceName
+    ? serviceList.find(
+      (currService: ConvertedService) => serviceName == currService.serviceName,
+    )
+    : undefined;
 
   return (
     <div>
       <h1>Service List</h1>
       <ul>
-        {serviceList.map((e: ConvertedService) => {
-          //should be the final path like "/serviceName/details or /serviceName/settings"??
-          const urlPath = "/" + e.serviceName;
-          return (
-            <li>
-              {e.serviceName}
-              <button
-                type="button"
-                onClick={() => navigate(urlPath)}
-                aria-label={`Launch the ${e.serviceName}`}
-              >
-                Launch
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(urlPath)}
-                aria-label={`Settings for ${e.serviceName}`}
-              >
-                Settings
-              </button>
-            </li>
-          );
-        })}
+        {Array.isArray(serviceList) &&
+          serviceList.map((e: ConvertedService) => {
+            //should be the final path like "/serviceName/details or /serviceName/settings"??
+            const urlPath = "/" + e.serviceName;
+            return (
+              <li>
+                {e.serviceName}
+                <button
+                  type="button"
+                  onClick={() => navigate(urlPath)}
+                  aria-label={`Launch the ${e.serviceName}`}
+                >
+                  Launch
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(urlPath)}
+                  aria-label={`Settings for ${e.serviceName}`}
+                >
+                  Settings
+                </button>
+              </li>
+            );
+          })}
       </ul>
       {service && <Service service={service} />}
     </div>
