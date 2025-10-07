@@ -20,8 +20,8 @@ export class DbServiceRepository implements ServiceRepository {
   findAuthorizedForId(_Id: string): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
-  findById(_id: string): Promise<Service> {
-    throw new Error("Method not implemented.");
+  findById(id: string): Promise<Service> {
+    return this.hydrate(id);
   }
   findByName(_name: string): Promise<Service> {
     throw new Error("Method not implemented.");
@@ -39,9 +39,10 @@ export class DbServiceRepository implements ServiceRepository {
     throw new Error("Method not implemented.");
   }
 
-  async hydrate(item: typeof DbService, query: string = ""): Promise<Service> {
+  async hydrate(searchedId: string): Promise<Service> {
+    const item = DbService.where("id", searchedId);
     const service = await item.first();
-    if (!service) throw new NotFoundError("Item not Found: " + query);
+    if (!service) throw new NotFoundError("Item not Found: " + searchedId);
     const id = service.id?.toString() ?? "";
     const servicename = service.servicename?.toString() ?? "";
     let credentials: Model | ServiceCredential = await item.credentials();

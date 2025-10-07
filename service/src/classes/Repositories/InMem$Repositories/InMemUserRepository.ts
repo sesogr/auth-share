@@ -13,35 +13,39 @@ export class InMemUserRepository extends InMemoryRepository<User>
     super();
   }
 
-  override save(item: User): void {
-    const index = this.inMemList.findIndex((e) => e.getId() === item.getId());
-    if (index < 0) {
-      this.add(item);
-      return;
-    }
-    this.inMemList[index] = item;
+  override save(item: User): Promise<void> {
+    return new Promise(() => {
+      const index = this.inMemList.findIndex((e) => e.getId() === item.getId());
+      if (index < 0) {
+        this.add(item);
+        return;
+      }
+      this.inMemList[index] = item;
+    });
   }
-  override hydrate(item: User): User {
-    const id = item.getId();
-    const displayname = item.getDisplayName();
-    const credentials = item.getCredentials();
-    const serviceList = this.serviceRepoView.viewAllowedUser().filter((e) =>
-      e.userId === id
-    );
-    const joinedGroups = this.groupRepoView.viewAllowedUser().filter((e) =>
-      e.userId === id
-    );
-    const invitations = this.groupRepoView.viewInvitations().filter((e) =>
-      e.receiverReference.id === id
-    );
-    const user: User = new User(
-      credentials,
-      displayname,
-      id,
-      serviceList,
-      invitations,
-      joinedGroups,
-    );
-    return user;
+  override hydrate(item: User): Promise<User> {
+    return new Promise(() => {
+      const id = item.getId();
+      const displayname = item.getDisplayName();
+      const credentials = item.getCredentials();
+      const serviceList = this.serviceRepoView.viewAllowedUser().filter((e) =>
+        e.userId === id
+      );
+      const joinedGroups = this.groupRepoView.viewAllowedUser().filter((e) =>
+        e.userId === id
+      );
+      const invitations = this.groupRepoView.viewInvitations().filter((e) =>
+        e.receiverReference.id === id
+      );
+      const user: User = new User(
+        credentials,
+        displayname,
+        id,
+        serviceList,
+        invitations,
+        joinedGroups,
+      );
+      return user;
+    });
   }
 }

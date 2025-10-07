@@ -21,7 +21,7 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
     return hydratedItem;
   }
 
-  findByName(name: string): T {
+  findByName(name: string): Promise<T> {
     const item = this.inMemList.find((i) => i.getDisplayName() === name);
     if (!item) {
       throw new NotFoundError(`Item with name=${name} not found`);
@@ -30,33 +30,39 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
     return hydratedItem;
   }
 
-  findAll(): T[] {
-    const itemListe = this.inMemList.slice().map((e) => this.hydrate(e));
-    if (itemListe.length === 0) {
-      throw new NotFoundError("No items found");
-    }
-    return itemListe;
+  findAll(): Promise<T[]> {
+    return new Promise(() => {
+      const itemListe = this.inMemList.slice().map((e) => this.hydrate(e));
+      if (itemListe.length === 0) {
+        throw new NotFoundError("No items found");
+      }
+      return itemListe;
+    });
   }
-  add(item: T): void {
-    if (this.inMemList.some((i) => i.getId() === item.getId())) {
-      throw new ItemAlreadyExistsError(
-        `Item with id=${item.getId()} already exists`,
-      );
-    }
-    if (
-      this.inMemList.some((i) => i.getDisplayName() === item.getDisplayName())
-    ) {
-      throw new ItemAlreadyExistsError(
-        `Item with name=${item.getDisplayName()} already exists`,
-      );
-    }
-    this.inMemList.push(item);
+  add(item: T): Promise<void> {
+    return new Promise(() => {
+      if (this.inMemList.some((i) => i.getId() === item.getId())) {
+        throw new ItemAlreadyExistsError(
+          `Item with id=${item.getId()} already exists`,
+        );
+      }
+      if (
+        this.inMemList.some((i) => i.getDisplayName() === item.getDisplayName())
+      ) {
+        throw new ItemAlreadyExistsError(
+          `Item with name=${item.getDisplayName()} already exists`,
+        );
+      }
+      this.inMemList.push(item);
+    });
   }
 
-  removeById(id: string): void {
-    const before = this.inMemList.length;
-    this.inMemList = this.inMemList.filter((i) => i.getId() !== id);
-    if (this.inMemList.length >= before) throw Error("id not removed");
+  removeById(id: string): Promise<void> {
+    return new Promise(() => {
+      const before = this.inMemList.length;
+      this.inMemList = this.inMemList.filter((i) => i.getId() !== id);
+      if (this.inMemList.length >= before) throw Error("id not removed");
+    });
   }
   // findOwnedByUserName(userName: string): T[] {
   //   const ownedService = this.inMemList.filter((i) =>

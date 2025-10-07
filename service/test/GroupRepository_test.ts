@@ -11,10 +11,10 @@ import { assertEquals } from "@std/assert";
 import { IdNameMap } from "../src/classes/IdNameMap.ts";
 
 Deno.test("Group Repository", async (t) => {
-  await t.step("findbyid", () => {
+  await t.step("findbyid", async () => {
     const { groupList, groupRepository, serviceRepository }: GroupRepoTestsuit =
       buildUp();
-    const testGroup = groupRepository.findById(groupList[0].getId());
+    const testGroup = await groupRepository.findById(groupList[0].getId());
     assertEquals(groupList[0].getId(), testGroup.getId());
     assertEquals(serviceRepository.viewInvitedGroups.calls.length, 1);
   });

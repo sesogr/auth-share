@@ -16,18 +16,20 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     super();
   }
 
-  override save(service: Service): void {
-    let serviceIndex = this.inMemList.findIndex((e) =>
-      service.getId() === e.getId()
-    );
-    if (serviceIndex < 0) {
-      this.add(service);
-      serviceIndex = this.inMemList.length - 1;
-    }
-    this.inMemList[serviceIndex] = service;
-    this.updateInvites(service.sentInvitations);
-    this.updateAllowedUsers(service.authorizedUsers);
-    this.updateAllowedGroups(service.authorizedGroups);
+  override save(service: Service): Promise<void> {
+    return new Promise(() => {
+      let serviceIndex = this.inMemList.findIndex((e) =>
+        service.getId() === e.getId()
+      );
+      if (serviceIndex < 0) {
+        this.add(service);
+        serviceIndex = this.inMemList.length - 1;
+      }
+      this.inMemList[serviceIndex] = service;
+      this.updateInvites(service.sentInvitations);
+      this.updateAllowedUsers(service.authorizedUsers);
+      this.updateAllowedGroups(service.authorizedGroups);
+    });
   }
   private updateInvites(invites: Invitation[]) {
     const missingInvites = invites.filter((e) =>
@@ -67,40 +69,46 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
       extraAllowedGroups.every((f) => !e.equals(f))
     );
   }
-  override hydrate(service: Service): Service {
-    const credentials = new ServiceCredential(
-      ...service.credentials.split(":"),
-    );
-    const serviceName = service.getDisplayName();
-    const serviceId = service.getId();
-    const sentInvitations = this.invitations.filter((e) =>
-      e.objReference.id === serviceId
-    );
-    const authorizedUsers = this.allowedUser.filter((e) =>
-      e.serviceId === serviceId
-    );
-    const authorizedGroups = this.allowedGroups.filter((e) =>
-      e.serviceId === serviceId
-    );
-    const hydratedService: Service = new Service(
-      credentials,
-      serviceName,
-      serviceId,
-      sentInvitations,
-      authorizedUsers,
-      authorizedGroups,
-    );
-    return hydratedService;
+  override hydrate(service: Service): Promise<Service> {
+    return new Promise(() => {
+      const credentials = new ServiceCredential(
+        ...service.credentials.split(":"),
+      );
+      const serviceName = service.getDisplayName();
+      const serviceId = service.getId();
+      const sentInvitations = this.invitations.filter((e) =>
+        e.objReference.id === serviceId
+      );
+      const authorizedUsers = this.allowedUser.filter((e) =>
+        e.serviceId === serviceId
+      );
+      const authorizedGroups = this.allowedGroups.filter((e) =>
+        e.serviceId === serviceId
+      );
+      const hydratedService: Service = new Service(
+        credentials,
+        serviceName,
+        serviceId,
+        sentInvitations,
+        authorizedUsers,
+        authorizedGroups,
+      );
+      return hydratedService;
+    });
   }
-  findOwnedByUserId(userId: string): Service[] {
-    return this.allowedUser.filter((currMap) =>
-      (currMap.userId === userId) && currMap.isOwner
-    ).map((currMap) => this.findById(currMap.serviceId));
+  findOwnedByUserId(userId: string): Promise<Service[]> {
+    return new Promise(() => {
+      return this.allowedUser.filter((currMap) =>
+        (currMap.userId === userId) && currMap.isOwner
+      ).map((currMap) => this.findById(currMap.serviceId));
+    });
   }
-  findAuthorizedForId(id: string): Service[] {
-    return this.allowedUser.filter((e) => e.userId === id).map((f) =>
-      this.findById(f.serviceId)
-    );
+  findAuthorizedForId(id: string): Promise<Service[]> {
+    return new Promise(() => {
+      return this.allowedUser.filter((e) => e.userId === id).map((f) =>
+        this.findById(f.serviceId)
+      );
+    });
   }
   viewAllowedUser(): AllowedUserServiceMap[] {
     return [...this.allowedUser];
@@ -111,17 +119,19 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   viewInvitedGroups(): Invitation[] {
     return [...this.invitations];
   }
-  override removeById(serviceId: string): void {
-    try {
-      super.removeById(serviceId);
-    } catch (e) {
-      throw Error(`service: ${serviceId} not removed, ${e}`);
-    }
-    this.allowedUser = this.allowedUser.filter((e) =>
-      e.serviceId !== serviceId
-    );
-    this.allowedGroups = this.allowedGroups.filter((e) =>
-      e.serviceId !== serviceId
-    );
+  override removeById(serviceId: string): Promise<void> {
+    return new Promise(() => {
+      try {
+        super.removeById(serviceId);
+      } catch (e) {
+        throw Error(`service: ${serviceId} not removed, ${e}`);
+      }
+      this.allowedUser = this.allowedUser.filter((e) =>
+        e.serviceId !== serviceId
+      );
+      this.allowedGroups = this.allowedGroups.filter((e) =>
+        e.serviceId !== serviceId
+      );
+    });
   }
 }

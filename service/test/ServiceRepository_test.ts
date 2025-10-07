@@ -7,13 +7,15 @@ import { User } from "../src/classes/User.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
 
 Deno.test("ServiceRepository", async (t) => {
-  await t.step("findById", () => {
+  await t.step("findById", async () => {
     const { serviceList, serviceRepository }: ServiceRepositoryTestsuit =
       buildUp();
-    const testService = serviceRepository.findById(serviceList[0].getId());
+    const testService = await serviceRepository.findById(
+      serviceList[0].getId(),
+    );
     assertEquals(testService.getId(), serviceList[0].getId());
   });
-  await t.step("InMemServiceRepository - save", () => {
+  await t.step("InMemServiceRepository - save", async () => {
     const { serviceList, serviceRepository }: ServiceRepositoryTestsuit =
       buildUp();
 
@@ -30,10 +32,10 @@ Deno.test("ServiceRepository", async (t) => {
     );
     const currService = serviceList[3];
     currService.giveAuthorizationToUser(user.convertToShort());
-    serviceRepository.save(currService);
+    await serviceRepository.save(currService);
 
     // Assert that the service was saved correctly
-    const savedService = serviceRepository.findById(currService.getId());
+    const savedService = await serviceRepository.findById(currService.getId());
     assertEquals(
       savedService.listAuthorizedUsers(),
       currService.listAuthorizedUsers(),
