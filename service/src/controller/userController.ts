@@ -23,9 +23,11 @@ export const createUserController = (
     );
     userRepository.save(myself);
     //204 no content
-    return c.status(204);
+    c.status(204);
+    return c;
   },
   create: async (c: Context) => {
+    c.res.headers.set("Access-Control-Allow-Origin", "*");
     const requestData: ConvertedUser = await c.req.json();
 
     const newUser = new User(
@@ -36,7 +38,8 @@ export const createUserController = (
       requestData.displayname,
       requestData.id,
     );
-    userRepository.save(newUser);
-    return c.status(201);
+    await userRepository.save(newUser);
+    c.status(201);
+    return c;
   },
 });

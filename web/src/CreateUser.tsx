@@ -16,7 +16,7 @@ const CreateUser: React.FC = () => {
       "id": crypto.randomUUID(),
     };
     console.log(newUserData);
-    fetch(import.meta.env.VITE_APIURL + "/user/", {
+    fetch(import.meta.env.VITE_APIURL + "/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
