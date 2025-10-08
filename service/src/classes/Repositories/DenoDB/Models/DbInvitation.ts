@@ -5,9 +5,9 @@ export class DbInvitation extends Model {
   static override timestamps = true; //needed?
   static override fields = {
     //id: { type: DataTypes.UUID, primaryKey: true }, could be make sense?
-    senderReference: DataTypes.JSON,
-    objReference: DataTypes.JSON,
-    receiverReference: DataTypes.JSON,
+    senderReference: DataTypes.STRING,
+    objReference: DataTypes.STRING,
+    receiverReference: DataTypes.STRING,
     //TODO add foreign key and primary key
     //Datentype.JSON? Reference to each List?
   };
