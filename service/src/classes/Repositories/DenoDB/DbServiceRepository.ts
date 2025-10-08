@@ -12,10 +12,21 @@ import { DbGroupService } from "./Models/DbGroupService.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { Invitation } from "../../Invitation.ts";
+import { DbServiceCredential } from "./Models/DbServiceCredentials.ts";
+import { DbInvitation } from "./Models/DbInvitation.ts";
 
 export class DbServiceRepository implements ServiceRepository {
-  findOwnedByUserId(_userId: string): Promise<Service[]> {
-    throw new Error("Method not implemented.");
+  constructor() {
+  }
+  async findOwnedByUserId(userId: string): Promise<Service[]> {
+    const userServiceData: DbService[] = await DbUserService.where(
+      "user_id",
+      userId,
+    )
+      .hasMany(DbService) as DbService[];
+    return Promise.all(
+      userServiceData.map((e: DbService) => this.hydrate(e.id)),
+    );
   }
   findAuthorizedForId(_Id: string): Promise<Service[]> {
     throw new Error("Method not implemented.");
@@ -29,14 +40,47 @@ export class DbServiceRepository implements ServiceRepository {
   findAll(): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
-  add(_item: Service): Promise<void> {
-    throw new Error("Method not implemented.");
+  async add(item: Service): Promise<void> {
+    await DbService.create({
+      id: item.getId(),
+      serviceName: item.getDisplayName(),
+    });
+    await DbServiceCredential.create({
+      username: item.credentials.split(":")[0],
+      password: item.credentials.split(":")[1],
+    });
+    for (const authorizedUsermap of item.authorizedUsers) {
+      await DbUserService.create({
+        user_id: authorizedUsermap.userId,
+        service_id: authorizedUsermap.serviceId,
+        is_owner: authorizedUsermap.isOwner,
+      });
+    }
+    for (const authorizedGroupmap of item.authorizedGroups) {
+      await DbGroupService.create({
+        group_id: authorizedGroupmap.groupId,
+        service_id: authorizedGroupmap.serviceId,
+      });
+    }
+    for (const invites of item.sentInvitations) {
+      await DbInvitation.create({
+        senderReference: invites.senderId,
+        objReference: invites.objId,
+        receiverReference: invites.receiverId,
+      });
+    }
+    await DbIdDisplayname.create({
+      id: item.getId(),
+      displayname: item.getDisplayName(),
+    });
   }
   removeById(_id: string): Promise<void> {
     throw new Error("Method not implemented.");
   }
-  save(_item: Service): Promise<void> {
-    throw new Error("Method not implemented.");
+  async save(item: Service): Promise<void> {
+    if (!(await this.findById(item.getId()))) {
+      this.add(item);
+    }
   }
 
   async hydrate(searchedId: string): Promise<Service> {
