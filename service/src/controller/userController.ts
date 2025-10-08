@@ -7,7 +7,9 @@ import { ConvertedUser } from "../types/types.ts";
 export const createUserController = (
   userRepository: UserRepository,
 ) => ({
-  read: async (c: Context) => {
+  read: async (
+    c: Context,
+  ) => {
     const user = await userRepository.findById("testID1");
     return c.json(
       user.toJson(),
@@ -24,7 +26,7 @@ export const createUserController = (
     userRepository.save(myself);
     //204 no content
     c.status(204);
-    return c;
+    return c.json({}, 201);
   },
   create: async (c: Context) => {
     c.res.headers.set("Access-Control-Allow-Origin", "*");
@@ -39,7 +41,6 @@ export const createUserController = (
       requestData.id,
     );
     await userRepository.save(newUser);
-    c.status(201);
-    return c;
+    return c.json({}, 201);
   },
 });
