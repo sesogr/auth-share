@@ -29,11 +29,15 @@ export class DbUserRepository implements UserRepository {
       DbUserGroup,
     ]);
   }
-  findByName(_name: string): Promise<User> {
-    throw new Error("Method not implemented.");
+  async findByName(name: string): Promise<User> {
+    const aUser = await DbUser.where("displayname", name).first();
+    if (!aUser.id) {
+      throw new Error("User not found");
+    }
+    return this.hydrate(aUser.id.toString());
   }
-  removeById(_id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async removeById(id: string): Promise<void> {
+    await DbUser.where("id", id).delete();
   }
   findById(id: string): Promise<User> {
     return this.hydrate(id);
@@ -51,18 +55,15 @@ export class DbUserRepository implements UserRepository {
       displayname: item.getDisplayName(),
       id: item.getId(),
     });
-    console.log("create");
     await DbUserCredential.create({
       dbuser_id: item.getId(),
       username: item.getCredentials().username,
       password: item.getCredentials().password,
     });
-    console.log("usercredential");
     await DbIdDisplayname.create({
       id: item.getId(),
       displayname: item.getDisplayName(),
     });
-    console.log("idDisplayname");
   }
 
   async save(item: User) {
@@ -71,23 +72,18 @@ export class DbUserRepository implements UserRepository {
     }
   }
   async hydrate(searchedId: string): Promise<User> {
-    let dbItem = await DbUser.where("id", searchedId).get();
-    if (!Array.isArray(dbItem)) {
+    //For now the only thing i saw to make the code thinner
+    const sql = DbUser.where("id", searchedId);
+
+    const dbItem = await sql.first();
+    if (!dbItem) {
       throw new Error("User not found");
     }
-    dbItem = dbItem[0];
-    const id = dbItem.id;
-    if (!id) {
-      throw new Error("User has no id");
-    }
-
-    const username =
-      (await DbUser.where("id", searchedId).credentials()).username;
+    const username = (await sql.credentials()).username;
     if (!username) {
       throw new Error("User has no credentials");
     }
-    const password =
-      (await DbUser.where("id", searchedId).credentials()).password;
+    const password = (await sql.credentials()).password;
     if (!password) {
       throw new Error("User has no credentials");
     }
@@ -98,7 +94,7 @@ export class DbUserRepository implements UserRepository {
     const displayname = dbItem.displayname;
     const userServiceData = await DbUserService.where(
       "dbuser_id",
-      id.toString(),
+      searchedId,
     )
       .get();
     if (!Array.isArray(userServiceData)) {
@@ -124,7 +120,7 @@ export class DbUserRepository implements UserRepository {
           serviceModel = serviceModel[0];
           const serviceName = serviceModel.displayname;
           return new AllowedUserServiceMap(
-            new IdNameMap(id.toString(), displayname?.toString() ?? ""),
+            new IdNameMap(searchedId, displayname?.toString() ?? ""),
             new IdNameMap(
               e.service_id.toString(),
               serviceName?.toString() ?? "",
@@ -134,7 +130,7 @@ export class DbUserRepository implements UserRepository {
         },
       ),
     );
-    const userGroupData = await DbUserGroup.where("dbuser_id", id.toString())
+    const userGroupData = await DbUserGroup.where("dbuser_id", searchedId)
       .get();
     if (!Array.isArray(userGroupData)) {
       throw new Error("Expected for typesafety");
@@ -155,7 +151,7 @@ export class DbUserRepository implements UserRepository {
           groupModel = groupModel[0];
           const groupName = groupModel.displayname;
           return new AllowedUserGroupMap(
-            new IdNameMap(id.toString(), displayname?.toString() ?? ""),
+            new IdNameMap(searchedId, displayname?.toString() ?? ""),
             new IdNameMap(
               e.group_id?.toString() ?? "",
               groupName?.toString() ?? "",
@@ -169,7 +165,7 @@ export class DbUserRepository implements UserRepository {
     const user: User = new User(
       credentials,
       displayname?.toString() ?? "",
-      id.toString(),
+      searchedId,
       serviceList,
       invitations,
       joinedGroups,
