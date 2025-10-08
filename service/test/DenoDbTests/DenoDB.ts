@@ -156,3 +156,5 @@ if (dbuser != null) {
     dbuser.credentials(),
   );
 }
+await DbIdDisplayname.create({ id: "testID1", displayname: "Hans Meiser" });
+console.log(await DbUser.where("id", "testID1").displayname());
