@@ -9,8 +9,9 @@ export class DbGroup extends Model {
     id: { type: DataTypes.UUID, primaryKey: true },
   };
   static displayname() {
-    return this.hasOne(DbIdDisplayname);
+    return this.hasOne(DbIdDisplayname) as Promise<DbIdDisplayname>;
   }
+
   groupname!: string;
   owner!: string;
   id!: string;

@@ -12,6 +12,6 @@ export class DbUserCredential extends Model {
   username!: string;
   password!: string;
   static user() {
-    return this.hasOne(DbUser);
+    return this.hasOne(DbUser) as Promise<DbUser>;
   }
 }
