@@ -1,18 +1,33 @@
+import { Database, MySQLConnector } from "@denodb";
 import { Hono } from "@hono/hono";
 import { cors } from "@hono/hono/cors";
-import { rootController } from "./controller/rootController.ts";
-import { dataController } from "./controller/dataController.ts";
-import { serviceController } from "./controller/serviceController.ts";
-import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
-import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
+import { FakeObjectGen } from "./FakeObjectGen.ts";
+import { DbUserRepository } from "./classes/Repositories/DenoDB/DbUserRepository.ts";
+import { DbGroup } from "./classes/Repositories/DenoDB/Models/DbGroup.ts";
+import { DbGroupService } from "./classes/Repositories/DenoDB/Models/DbGroupService.ts";
+import { DbService } from "./classes/Repositories/DenoDB/Models/DbService.ts";
+import { DbUser } from "./classes/Repositories/DenoDB/Models/DbUser.ts";
+import { DbUserGroup } from "./classes/Repositories/DenoDB/Models/DbUserGroup.ts";
 import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
 import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
-import { UserRepository } from "./interfaceTypes/UserRepository.ts";
-import { FakeObjectGen } from "./FakeObjectGen.ts";
-import { createUserController } from "./controller/userController.ts";
-import { DbUserRepository } from "./classes/Repositories/DenoDB/DbUserRepository.ts";
+import { UserController } from "./controller/UserController.ts";
+import { DataController } from "./controller/DataController.ts";
+import { RootController } from "./controller/RootController.ts";
+import { ServiceController } from "./controller/ServiceController.ts";
+import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceAggregateView } from "./interfaceTypes/ServiceAggregateView.ts";
+import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
+import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 
+const db = new Database(
+  new MySQLConnector({
+    database: Deno.env.get("DB_NAME")!,
+    host: Deno.env.get("DB_HOST")!,
+    username: Deno.env.get("DB_USER")!,
+    password: Deno.env.get("DB_PASSWORD")!,
+  }),
+);
+db.link([DbGroup, DbUser, DbUserGroup, DbGroupService, DbService]);
 //initialize repositories
 const serviceRepository: ServiceAggregateView & ServiceRepository =
   new InMemServiceRepository();
@@ -36,19 +51,25 @@ app.use(
     allowMethods: ["GET", "POST", "PUT", "DELETE"],
   }),
 );
+//Endpoints
+const rootController = new RootController("Trees");
+app.get("/", rootController.sayHelloFromTrees);
 
-app.get("/", rootController("Trees"));
+const dataController = new DataController();
+app.get("/data", dataController.getData);
 
-app.get("/data", dataController);
-
-const userController = createUserController(userRepository);
+const userController = new UserController(userRepository);
 app.get("/user", userController.read);
 
 app.put("/user/me/password", userController.changePassword);
 
+const serviceController = new ServiceController(
+  serviceRepository,
+  userRepository,
+);
 app.get(
   "/user/owned",
-  serviceController(serviceRepository, userRepository), //TODO!!! Needs to be fixed!
+  serviceController.listMyServices, //TODO!!! Needs to be fixed!
 );
 
 app.put();
