@@ -5,30 +5,12 @@ import { UserCredential } from "../../UserCredential.ts";
 import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
 import { DbUser } from "./Models/DbUser.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
-import { Database, MySQLConnector } from "@denodb";
-import { DbUserService } from "./Models/DbUserService.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { Invitation } from "../../Invitation.ts";
 
 export class DbUserRepository implements UserRepository {
-  private readonly connector = new MySQLConnector({
-    database: Deno.env.get("DB_NAME")!,
-    host: Deno.env.get("DB_HOST")!,
-    username: Deno.env.get("DB_USER")!,
-    password: Deno.env.get("DB_PASSWORD")!,
-  });
-  constructor() {
-    const db = new Database(this.connector);
-    db.link([
-      DbUser,
-      DbUserCredential,
-      DbIdDisplayname,
-      DbUserService,
-      DbUserGroup,
-    ]);
-  }
   async findByName(name: string): Promise<User> {
     const aUser = await DbUser.where("displayname", name).first();
     if (!aUser.id) {
@@ -92,15 +74,14 @@ export class DbUserRepository implements UserRepository {
       password.toString(),
     );
     const displayname = dbItem.displayname;
-    const userServiceData = await DbUserService.where(
-      "dbuser_id",
-      searchedId,
-    )
-      .get();
-    if (!Array.isArray(userServiceData)) {
-      console.log(userServiceData);
-      throw new Error("Expected for typesafety");
-    }
+    const userServiceData = await sql.authorizedServices();
+    //am i get this right?
+    //const userServiceData = await DbUser.where("id", searchedId).hasMany(DbUserService) as Promise<Model[]>;
+
+    // if (!Array.isArray(userServiceData)) {
+    //   console.log(userServiceData);
+    //   throw new Error("Expected for typesafety");
+    // }
     const serviceList: AllowedUserServiceMap[] = await Promise.all(
       userServiceData.map(
         async (e) => {
