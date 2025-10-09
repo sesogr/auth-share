@@ -13,7 +13,7 @@ import { IdNameMap } from "../src/classes/IdNameMap.ts";
 Deno.test("Group Repository", async (t) => {
   await t.step("findbyid", async () => {
     const { groupList, groupRepository, serviceRepository }: GroupRepoTestsuit =
-      buildUp();
+      await buildUp();
     const testGroup = await groupRepository.findById(groupList[0].getId());
     assertEquals(groupList[0].getId(), testGroup.getId());
     assertEquals(serviceRepository.viewInvitedGroups.calls.length, 1);
@@ -25,13 +25,13 @@ type GroupRepoTestsuit = {
   serviceRepository: SpyObject<ServiceAggregateView>;
 };
 
-function buildUp(): GroupRepoTestsuit {
+async function buildUp(): Promise<GroupRepoTestsuit> {
   const groupList: Group[] = FakeObjectGen.generateFakeGroups();
   const serviceRepository = createServiceRepository(groupList);
   const groupRepository = new InMemGroupRepository(
     serviceRepository,
   );
-  groupList.forEach((e) => groupRepository.save(e));
+  await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
   return { groupList, groupRepository, serviceRepository };
 }
 

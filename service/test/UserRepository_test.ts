@@ -19,7 +19,7 @@ Deno.test("UserRepository", async (t) => {
       serviceRepository,
       groupRepository,
       fakeUserList,
-    }: UserRepoTestSuit = buildUp();
+    }: UserRepoTestSuit = await buildUp();
 
     const userId: string = mockUserIdList[0];
     const expectedId: string = mockUserIdList[0];
@@ -34,7 +34,7 @@ Deno.test("UserRepository", async (t) => {
   });
 
   await t.step("Test for method findByName()", async () => {
-    const { fakeUserList, userRepository }: UserRepoTestSuit = buildUp();
+    const { fakeUserList, userRepository }: UserRepoTestSuit = await buildUp();
     //changing index of the fakeUserList > 9 => Test failed
     const userName: string = fakeUserList[9].getDisplayName();
     const toCheck: string = (await userRepository.findByName(userName))
@@ -44,23 +44,25 @@ Deno.test("UserRepository", async (t) => {
   });
 
   await t.step("Test for method findAll()", async () => {
-    const { userRepository, mockUserIdList }: UserRepoTestSuit = buildUp();
+    const { userRepository, mockUserIdList }: UserRepoTestSuit =
+      await buildUp();
     const userList: User[] = await userRepository.findAll();
     const userIdList: string[] = userList.map((e) => e.getId());
     assertEquals(userIdList, mockUserIdList);
   });
 
-  await t.step("Test for method removeById", () => {
-    const { mockUserIdList, userRepository }: UserRepoTestSuit = buildUp();
+  await t.step("Test for method removeById", async () => {
+    const { mockUserIdList, userRepository }: UserRepoTestSuit =
+      await buildUp();
     const deletedId = mockUserIdList[0];
     userRepository.removeById(deletedId);
-    assertThrows(async () => {
-      await userRepository.findById(deletedId);
+    assertThrows(() => {
+      userRepository.findById(deletedId);
     }, NotFoundError);
   });
 });
 
-function buildUp(): UserRepoTestSuit {
+async function buildUp(): Promise<UserRepoTestSuit> {
   const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const serviceRepository: SpyObject<ServiceAggregateView> =
@@ -72,7 +74,9 @@ function buildUp(): UserRepoTestSuit {
     serviceRepository,
     groupRepository,
   );
-  fakeUserList.forEach((e) => userRepository.save(e));
+  await Promise.all(
+    fakeUserList.map(async (e) => await userRepository.save(e)),
+  );
   return {
     mockUserIdList,
     userRepository,

@@ -9,7 +9,7 @@ import { UserCredential } from "../src/classes/UserCredential.ts";
 Deno.test("ServiceRepository", async (t) => {
   await t.step("findById", async () => {
     const { serviceList, serviceRepository }: ServiceRepositoryTestsuit =
-      buildUp();
+      await buildUp();
     const testService = await serviceRepository.findById(
       serviceList[0].getId(),
     );
@@ -17,7 +17,7 @@ Deno.test("ServiceRepository", async (t) => {
   });
   await t.step("InMemServiceRepository - save", async () => {
     const { serviceList, serviceRepository }: ServiceRepositoryTestsuit =
-      buildUp();
+      await buildUp();
 
     // Test the save method
     // const newService = Service.createService(
@@ -51,9 +51,11 @@ type ServiceRepositoryTestsuit = {
   serviceRepository: ServiceRepository;
 };
 
-function buildUp(): ServiceRepositoryTestsuit {
+async function buildUp(): Promise<ServiceRepositoryTestsuit> {
   const serviceList: Service[] = FakeObjectGen.generateFakeServices();
   const serviceRepository: ServiceRepository = new InMemServiceRepository();
-  serviceList.forEach((e) => serviceRepository.save(e));
+  await Promise.all(
+    serviceList.map(async (e) => await serviceRepository.save(e)),
+  );
   return { serviceList, serviceRepository };
 }

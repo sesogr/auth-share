@@ -31,38 +31,32 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
   }
 
   findAll(): Promise<T[]> {
-    return new Promise(() => {
-      const itemListe = this.inMemList.slice().map((e) => this.hydrate(e));
-      if (itemListe.length === 0) {
-        throw new NotFoundError("No items found");
-      }
-      return itemListe;
-    });
+    return Promise.all(
+      this.inMemList.slice().map((e) => this.hydrate(e)),
+    );
   }
   add(item: T): Promise<void> {
-    return new Promise(() => {
-      if (this.inMemList.some((i) => i.getId() === item.getId())) {
-        throw new ItemAlreadyExistsError(
-          `Item with id=${item.getId()} already exists`,
-        );
-      }
-      if (
-        this.inMemList.some((i) => i.getDisplayName() === item.getDisplayName())
-      ) {
-        throw new ItemAlreadyExistsError(
-          `Item with name=${item.getDisplayName()} already exists`,
-        );
-      }
-      this.inMemList.push(item);
-    });
+    if (this.inMemList.some((i) => i.getId() === item.getId())) {
+      throw new ItemAlreadyExistsError(
+        `Item with id=${item.getId()} already exists`,
+      );
+    }
+    if (
+      this.inMemList.some((i) => i.getDisplayName() === item.getDisplayName())
+    ) {
+      throw new ItemAlreadyExistsError(
+        `Item with name=${item.getDisplayName()} already exists`,
+      );
+    }
+    this.inMemList.push(item);
+    return Promise.resolve();
   }
 
   removeById(id: string): Promise<void> {
-    return new Promise(() => {
-      const before = this.inMemList.length;
-      this.inMemList = this.inMemList.filter((i) => i.getId() !== id);
-      if (this.inMemList.length >= before) throw Error("id not removed");
-    });
+    const before = this.inMemList.length;
+    this.inMemList = this.inMemList.filter((i) => i.getId() !== id);
+    if (this.inMemList.length >= before) throw Error("id not removed");
+    return Promise.resolve();
   }
   // findOwnedByUserName(userName: string): T[] {
   //   const ownedService = this.inMemList.filter((i) =>
