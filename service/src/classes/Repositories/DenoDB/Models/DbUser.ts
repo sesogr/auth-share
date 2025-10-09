@@ -28,7 +28,7 @@ export class DbUser extends Model {
   static async receivedInvitations() {
     const id = (await this.first()).id?.toString() ?? "";
     return DbInvitation.where("receiverReference", id).get() as Promise<
-      DbInvitation
+      DbInvitation[]
     >;
   }
   displayname!: string;
