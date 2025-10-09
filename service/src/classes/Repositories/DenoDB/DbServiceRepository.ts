@@ -85,33 +85,51 @@ export class DbServiceRepository implements ServiceRepository {
 
   async hydrate(searchedId: string): Promise<Service> {
     const item = DbService.where("id", searchedId);
-    const service = await item.first();
+    const service = await item.first() as DbService;
     if (!service) throw new NotFoundError("Item not Found: " + searchedId);
-    const id = service.id?.toString() ?? "";
-    const servicename = service.servicename?.toString() ?? "";
-    let credentials: Model | ServiceCredential = await item.credentials();
+    const id = service.id.toString();
+    const servicename = service.servicename.toString();
+    let credentials: ServiceCredential | DbServiceCredential = await item
+      .credentials();
     credentials = new ServiceCredential(
-      credentials.username?.toString(),
-      credentials.password?.toString(),
+      credentials.username.toString(),
+      credentials.password.toString(),
     );
-    const userserviceData = this.asArray(
-      await DbUserService.where("service_id", id).get(),
-    );
-
+    const userserviceData = await item.authorizedUsers();
     const authorizedUsers: AllowedUserServiceMap[] = await Promise.all(
       userserviceData.map(
         this.createMapCallbackallowedLists(id, servicename, "user"),
       ),
     ) as AllowedUserServiceMap[];
-    const groupserviceData = this.asArray(
-      await DbGroupService.where("service_id", id).get(),
-    );
+    const groupserviceData = await item.authorizedGroups();
     const authorizedGroups: AllowedGroupServiceMap[] = await Promise.all(
       groupserviceData.map(
         this.createMapCallbackallowedLists(id, servicename, "group"),
       ),
     ) as AllowedGroupServiceMap[];
-    const sentInvites: Invitation[] = []; //TODO
+    const InvitationData = item.Invitation();
+
+    const sentInvites: Invitation[] = await Promise.all(
+      (await InvitationData).map(async (e) => {
+        const senderId = e.senderReference?.toString() ?? "";
+        const objId = e.objReference?.toString() ?? "";
+        const receiverId = e.receiverReference?.toString() ?? "";
+        return new Invitation(
+          new IdNameMap(
+            senderId,
+            await DbIdDisplayname.displayname(senderId),
+          ),
+          new IdNameMap(
+            objId,
+            await DbIdDisplayname.displayname(objId),
+          ),
+          new IdNameMap(
+            receiverId,
+            await DbIdDisplayname.displayname(receiverId),
+          ),
+        );
+      }),
+    );
     return new Service(
       credentials,
       servicename,
@@ -120,12 +138,6 @@ export class DbServiceRepository implements ServiceRepository {
       authorizedUsers,
       authorizedGroups,
     );
-  }
-  private asArray(data: Model | Model[]): Model[] {
-    if (!Array.isArray(data)) {
-      throw new RuntimeError();
-    }
-    return data;
   }
   private createMapCallbackallowedLists(
     serviceId: string,
