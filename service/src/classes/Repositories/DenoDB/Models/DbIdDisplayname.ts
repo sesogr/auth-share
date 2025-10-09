@@ -7,6 +7,11 @@ export class DbIdDisplayname extends Model {
     id: DataTypes.STRING,
     displayname: DataTypes.STRING,
   };
+  static async displayname(id: string) {
+    const displayname = await this.where("id", id).select("displayname")
+      .first();
+    return displayname.displayname?.toString() ?? "";
+  }
   id!: string;
   displayname!: string;
 }
