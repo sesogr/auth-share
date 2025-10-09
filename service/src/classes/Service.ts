@@ -5,7 +5,7 @@ import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
-
+import crypto from "node:crypto";
 export class Service extends Entity {
   public get authorizedGroups(): AllowedGroupServiceMap[] {
     return [...this._authorizedGroups];

@@ -7,6 +7,7 @@ import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { ConvertedUser } from "../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
+import crypto from "@crypto";
 export class User extends Entity {
   constructor(
     private credentials: UserCredential,

@@ -9,7 +9,8 @@
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
     "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6",
     "@std/testing/mock": "jsr:@std/testing/mock",
-    "@denodb": "https://deno.land/x/denodb@v1.4.0/mod.ts"
+    "@denodb": "https://deno.land/x/denodb@v1.4.0/mod.ts",
+    "@crypto": "node:crypto"
   },
   "scopes": {
     "https://raw.githubusercontent.com/Zhomart/dex/": {

@@ -4,7 +4,7 @@ import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { Entity } from "./Entity.ts";
 import { Invitation } from "./Invitation.ts";
-
+import crypto from "@crypto";
 export class Group extends Entity {
   public get allowedUser(): AllowedUserGroupMap[] {
     return this._allowedUser;
