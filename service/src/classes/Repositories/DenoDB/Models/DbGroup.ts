@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "@denodb";
 import { DbIdDisplayname } from "./DbIdDisplayname.ts";
+import { DbInvitation } from "./DbInvitation.ts";
 export class DbGroup extends Model {
   static override table = "Groups";
   static override timestamps = true;
@@ -11,7 +12,18 @@ export class DbGroup extends Model {
   static displayname() {
     return this.hasOne(DbIdDisplayname) as Promise<DbIdDisplayname>;
   }
-
+  static async receivedInvitations() {
+    const id = (await this.first()).id?.toString() ?? "";
+    return DbInvitation.where("receiverReference", id).get() as Promise<
+      DbInvitation[]
+    >;
+  }
+  static async sentInvitations() {
+    const id = (await this.first()).id?.toString() ?? "";
+    return DbInvitation.where("objReference", id).get() as Promise<
+      DbInvitation[]
+    >;
+  }
   groupname!: string;
   owner!: string;
   id!: string;

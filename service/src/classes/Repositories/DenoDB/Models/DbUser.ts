@@ -3,6 +3,7 @@ import { DbUserCredential } from "./DbUserCredentials.ts";
 import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 import { DbUserService } from "./DbUserService.ts";
 import { DbUserGroup } from "./DbUserGroup.ts";
+import { DbInvitation } from "./DbInvitation.ts";
 
 export class DbUser extends Model {
   static override table = "Users";
@@ -24,7 +25,12 @@ export class DbUser extends Model {
   static authorizedGroups() {
     return this.hasMany(DbUserGroup) as Promise<Model[]>;
   }
-
+  static async receivedInvitations() {
+    const id = (await this.first()).id?.toString() ?? "";
+    return DbInvitation.where("receiverReference", id).get() as Promise<
+      DbInvitation
+    >;
+  }
   displayname!: string;
   id!: string;
   credentials() {

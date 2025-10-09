@@ -1,6 +1,8 @@
 import { DataTypes, Model, Relationships } from "@denodb";
 import { DbServiceCredential } from "./DbServiceCredentials.ts";
 import { DbIdDisplayname } from "./DbIdDisplayname.ts";
+import { DbUserService } from "./DbUserService.ts";
+import { DbInvitation } from "./DbInvitation.ts";
 export class DbService extends Model {
   static override table = "Services";
   static override timestamps = true;
@@ -9,10 +11,22 @@ export class DbService extends Model {
     id: { type: DataTypes.UUID, primaryKey: true },
   };
   static displayname() {
-    return this.hasOne(DbIdDisplayname);
+    return this.hasOne(DbIdDisplayname) as Promise<DbIdDisplayname>;
   }
   static credentials() {
-    return this.hasOne(DbServiceCredential);
+    return this.hasOne(DbServiceCredential) as Promise<DbServiceCredential>;
+  }
+  static authorizedUsers() {
+    return this.hasMany(DbUserService) as Promise<Model[]>;
+  }
+  static authorizedGroups() {
+    return this.hasMany(DbUserService) as Promise<Model[]>;
+  }
+  static async Invitation() {
+    const id = (await this.first()).id?.toString() ?? "";
+    return DbInvitation.where("objReference", id).get() as Promise<
+      DbInvitation[]
+    >;
   }
   servicename!: string;
   id!: string;
