@@ -55,17 +55,17 @@ export class DbUserRepository implements UserRepository {
   }
   async hydrate(searchedId: string): Promise<User> {
     //For now the only thing i saw to make the code thinner
-    const sql = DbUser.where("id", searchedId);
+    const sqlItem = DbUser.where("id", searchedId);
 
-    const dbItem = await sql.first();
+    const dbItem = await sqlItem.first();
     if (!dbItem) {
       throw new Error("User not found");
     }
-    const username = (await sql.credentials()).username;
+    const username = (await sqlItem.credentials()).username;
     if (!username) {
       throw new Error("User has no credentials");
     }
-    const password = (await sql.credentials()).password;
+    const password = (await sqlItem.credentials()).password;
     if (!password) {
       throw new Error("User has no credentials");
     }
@@ -74,7 +74,7 @@ export class DbUserRepository implements UserRepository {
       password.toString(),
     );
     const displayname = dbItem.displayname;
-    const userServiceData = await sql.authorizedServices();
+    const userServiceData = await sqlItem.authorizedServices();
     //am i get this right?
     //const userServiceData = await DbUser.where("id", searchedId).hasMany(DbUserService) as Promise<Model[]>;
 
@@ -142,7 +142,30 @@ export class DbUserRepository implements UserRepository {
         },
       ),
     );
-    const invitations: Invitation[] = [];
+    const invitationData = await sqlItem.receivedInvitations();
+
+    //is there a difference between sentInvites and this invitations?
+    const invitations: Invitation[] = await Promise.all(
+      invitationData.map(async (e) => {
+        const senderId = e.senderReference?.toString() ?? "";
+        const objId = e.objReference?.toString() ?? "";
+        const receiverId = e.receiverReference?.toString() ?? "";
+        return new Invitation(
+          new IdNameMap(
+            senderId,
+            await DbIdDisplayname.displayname(senderId),
+          ),
+          new IdNameMap(
+            objId,
+            await DbIdDisplayname.displayname(objId),
+          ),
+          new IdNameMap(
+            receiverId,
+            await DbIdDisplayname.displayname(receiverId),
+          ),
+        );
+      }),
+    );
     const user: User = new User(
       credentials,
       displayname?.toString() ?? "",

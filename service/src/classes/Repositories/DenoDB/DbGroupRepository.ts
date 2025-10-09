@@ -8,6 +8,7 @@ import { IdNameMap } from "../../IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { Invitation } from "../../Invitation.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
+import { Model } from "@denodb";
 
 export class DbGroupRepository implements GroupRepository {
   async findByName(name: string): Promise<Group> {
@@ -15,8 +16,10 @@ export class DbGroupRepository implements GroupRepository {
     return this.hydrate(searchedName.id?.toString() ?? "");
   }
   async hydrate(searchedId: string): Promise<Group> {
-    const groupData = await DbGroup.where("id", searchedId).first();
+    const sqlItem = DbGroup.where("id", searchedId);
+    const groupData = await sqlItem.first();
     const groupname = groupData.groupname?.toString() ?? "";
+    //callbackfunction
     const groupOwnerData = await DbIdDisplayname.where(
       "id",
       groupData.owner?.toString() ?? "",
@@ -26,71 +29,109 @@ export class DbGroupRepository implements GroupRepository {
       groupOwnerData.displayname?.toString() ?? "",
     );
     //
-    const groupServiceData = await DbGroup.where("id", searchedId)
-      .knownServices();
+    const groupServiceData = await sqlItem.knownServices();
 
     const serviceList: AllowedGroupServiceMap[] = await Promise.all(
       groupServiceData.map(
-        async (e) => {
-          if (!e.service_id) {
-            throw new Error("Expected for typesafety");
-          }
-          const serviceModel = await DbIdDisplayname.where(
-            "id",
-            e.service_id.toString(),
-          )
-            .select(
-              "displayname",
-            ).first();
-          const serviceName = serviceModel.displayname;
-          return new AllowedGroupServiceMap(
-            new IdNameMap(searchedId, groupname.toString() ?? ""),
-            new IdNameMap(
-              e.service_id.toString(),
-              serviceName?.toString() ?? "",
-            ),
-          );
-        },
+        this.createMapCallbackallowedLists(searchedId, groupname, "service"),
       ),
+    ) as AllowedGroupServiceMap[];
+
+    const sentInvitationData = sqlItem.sentInvitations();
+
+    const sentUserInvites: Invitation[] = await Promise.all(
+      (await sentInvitationData).map(async (e) => {
+        const senderId = e.senderReference?.toString() ?? "";
+        const objId = e.objReference?.toString() ?? "";
+        const receiverId = e.receiverReference?.toString() ?? "";
+        return new Invitation(
+          new IdNameMap(
+            senderId,
+            await DbIdDisplayname.displayname(senderId),
+          ),
+          new IdNameMap(
+            objId,
+            await DbIdDisplayname.displayname(objId),
+          ),
+          new IdNameMap(
+            receiverId,
+            await DbIdDisplayname.displayname(receiverId),
+          ),
+        );
+      }),
+    );
+    const recivedInvitationData = sqlItem.receivedInvitations();
+    //recivedInvitations
+    const serviceInvitations: Invitation[] = await Promise.all(
+      (await recivedInvitationData).map(async (e) => {
+        const senderId = e.senderReference?.toString() ?? "";
+        const objId = e.objReference?.toString() ?? "";
+        const receiverId = e.receiverReference?.toString() ?? "";
+        return new Invitation(
+          new IdNameMap(
+            senderId,
+            await DbIdDisplayname.displayname(senderId),
+          ),
+          new IdNameMap(
+            objId,
+            await DbIdDisplayname.displayname(objId),
+          ),
+          new IdNameMap(
+            receiverId,
+            await DbIdDisplayname.displayname(receiverId),
+          ),
+        );
+      }),
     );
     //SQL Query
-    const userGroupData = await DbGroup.where("dbuser_id", searchedId)
-      .authorizedUsers();
+    const userGroupData = await sqlItem.authorizedUsers();
     const allowedUser: AllowedUserGroupMap[] = await Promise.all(
       userGroupData.map(
-        async (e) => {
-          const userShortModel = await DbIdDisplayname.where(
-            "id",
-            e.user_id?.toString() ?? "",
-          )
-            .select(
-              "displayname",
-            ).first();
-          const userName = userShortModel.displayname;
-          return new AllowedUserGroupMap(
-            new IdNameMap(searchedId, groupname?.toString() ?? ""),
-            new IdNameMap(
-              e.user_id?.toString() ?? "",
-              userName?.toString() ?? "",
-            ),
-            e.is_owner?.valueOf() as boolean ?? false,
-          );
-        },
+        this.createMapCallbackallowedLists(searchedId, groupname, "user"),
       ),
-    );
-    const sentInvitations: Invitation[] = [];
-    const serviceInvitations: Invitation[] = [];
+    ) as AllowedUserGroupMap[];
     const group: Group = new Group(
       groupname,
       owner,
       searchedId,
       serviceList,
-      sentInvitations,
+      sentUserInvites,
       serviceInvitations,
       allowedUser,
     );
     return group;
   }
+  private createMapCallbackallowedLists(
+    searchedId: string,
+    groupname: string,
+    type: "service" | "user",
+  ): (
+    value: Model,
+    index: number,
+    array: Model[],
+  ) => Promise<AllowedUserGroupMap | AllowedGroupServiceMap> {
+    return async (e) => {
+      const id = e[type + "_id"]!.toString();
+      const displayname = await DbIdDisplayname.displayname(
+        id,
+      );
+      if (type == "user") {
+        return new AllowedUserGroupMap(
+          new IdNameMap(id, displayname),
+          new IdNameMap(searchedId, groupname),
+          e.is_owner?.valueOf() as boolean ?? false,
+        );
+      }
+      if (type == "service") {
+        return new AllowedGroupServiceMap(
+          new IdNameMap(searchedId, groupname),
+          new IdNameMap(id, displayname),
+        );
+      }
+      throw new RuntimeError();
+    };
+  }
+
   async findOwnedByUserId(userId: string): Promise<Group[]> {
     const searchedList = await DbUserGroup.where({
       dbuser_id: userId,

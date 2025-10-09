@@ -107,10 +107,10 @@ export class DbServiceRepository implements ServiceRepository {
         this.createMapCallbackallowedLists(id, servicename, "group"),
       ),
     ) as AllowedGroupServiceMap[];
-    const InvitationData = item.Invitation();
+    const invitationData = item.Invitation();
 
-    const sentInvites: Invitation[] = await Promise.all(
-      (await InvitationData).map(async (e) => {
+    const sentGroupInvites: Invitation[] = await Promise.all(
+      (await invitationData).map(async (e) => {
         const senderId = e.senderReference?.toString() ?? "";
         const objId = e.objReference?.toString() ?? "";
         const receiverId = e.receiverReference?.toString() ?? "";
@@ -134,7 +134,7 @@ export class DbServiceRepository implements ServiceRepository {
       credentials,
       servicename,
       id,
-      sentInvites,
+      sentGroupInvites,
       authorizedUsers,
       authorizedGroups,
     );
