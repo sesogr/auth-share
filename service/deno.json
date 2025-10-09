@@ -4,11 +4,11 @@
     "denodb": "deno run --allow-all --watch test/DenoDbTests/DenoDB.ts"
   },
   "imports": {
-    "@hono/hono": "jsr:@hono/hono@^4.9.5",
-    "@hono/hono/cors": "jsr:@hono/hono@^4.9.5/cors",
+    "@hono/hono": "jsr:@hono/hono@^4.9.10",
+    "@hono/hono/cors": "jsr:@hono/hono@^4.9.10/cors",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
     "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6",
-    "@std/testing/mock": "jsr:@std/testing/mock",
+    "@std/testing/mock": "jsr:@std/testing@1.0.16/mock",
     "@denodb": "https://deno.land/x/denodb@v1.4.0/mod.ts",
     "@crypto": "node:crypto"
   },
