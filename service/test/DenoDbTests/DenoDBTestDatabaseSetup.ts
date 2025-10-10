@@ -64,7 +64,7 @@ async function buildUpUserRepo() {
     }
   }));
   Deno.writeTextFile(
-    "./testuser.json",
+    "./service/test/testuser.json",
     JSON.stringify(fakeUserList),
   );
   return { mockUserIdList, fakeUserList };
@@ -86,7 +86,7 @@ async function buildUpGroupRepo(userList: ShortEntity[]) {
   const groupRepository = new DbGroupRepository();
   await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
   Deno.writeTextFile(
-    "./fakegroup.json",
+    "./service/test/fakegroup.json",
     JSON.stringify(groupList),
   );
   return { groupList, groupRepository };
