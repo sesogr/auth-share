@@ -3,17 +3,18 @@ import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { User } from "../classes/User.ts";
 import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
+import { AllOptional } from "../types/AllOptional.ts";
 
 export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
-  async read(c: Context) {
+  async read(c: AllOptional<Context>) {
     const user = await this.userRepository.findById("testID1"); //To do with meaningfull
-    return c.json(
+    return c.json!(
       user.toJson(),
     );
   }
-  async changePassword(c: Context) {
-    const requestData = await c.req.json();
+  async changePassword(c: AllOptional<Context>) {
+    const requestData = await c.req!.json!();
     const newPassword: string = requestData.password;
     //TODO we need the loggedin User here!!
     const myself: User = (await this.userRepository.findAll())[0];
@@ -21,11 +22,11 @@ export class UserController {
       new UserCredential(myself.getCredentials().username, newPassword),
     );
     this.userRepository.save(myself);
-    return c.body(null, 204);
+    return c.body!(null, 204);
   }
-  async create(c: Context) {
-    c.res.headers.set("Access-Control-Allow-Origin", "*");
-    const requestData: ConvertedUser = await c.req.json();
+  async create(c: AllOptional<Context>) {
+    c.res!.headers!.set!("Access-Control-Allow-Origin", "*");
+    const requestData: ConvertedUser = await c.req!.json!();
 
     const newUser = new User(
       new UserCredential(
@@ -37,6 +38,6 @@ export class UserController {
     );
     await this.userRepository.save(newUser);
 
-    return c.body(null, 201);
+    return c.body!(null, 201);
   }
 }
