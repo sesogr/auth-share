@@ -19,14 +19,9 @@ import {
 import {
   DbUserService,
 } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
-import { Service } from "../../src/classes/Service.ts";
-import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts";
-import { DbGroupRepository } from "../../src/classes/Repositories/DenoDB/DbGroupRepository.ts";
-import { Group } from "../../src/classes/Group.ts";
-import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbServiceRepository.ts";
-import { ShortEntity } from "../../src/interfaceTypes/ShortEntity.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
+import fakeUser from "../../../testuser.json" with { type: "json" };
+import { UserCredential } from "../../src/classes/UserCredential.ts";
 const connector = new MySQLConnector({
   database: "authshare",
   host: "localhost",
@@ -49,20 +44,23 @@ db.link([
   DbIdDisplayname,
 ]);
 
-await db.sync({ drop: true });
-
-const { fakeUserList } = await buildUpUserRepo().then(async (f) => {
-  await buildUpServRepo(f.fakeUserList.map((e) => e.convertToShort()));
-  await buildUpGroupRepo(f.fakeUserList.map((e) => e.convertToShort()));
-  return f;
-});
-
 Deno.test("DbUserRepository: hydrate", async () => {
   // Methode aufrufen und erwartetes Ergebnis überprüfen
   const userRepository: UserRepository & {
     hydrate: (id: string) => Promise<User>;
   } = new DbUserRepository();
-  const fakeuser = fakeUserList[0];
+
+  const fakeuser: User = new User(
+    new UserCredential(
+      fakeUser[0].credentials._username,
+      fakeUser[0].credentials._password,
+    ),
+    fakeUser[0].displayname,
+    fakeUser[0].id,
+    fakeUser[0].callableService,
+    fakeUser[0].userGroupInvitations,
+    fakeUser[0].joinedGroups,
+  );
   const user = await userRepository.hydrate(fakeuser.getId());
   assertInstanceOf(user, User);
   assertEquals(user.getId(), fakeuser.getId());
@@ -75,37 +73,3 @@ Deno.test("DbUserRepository: hydrate", async () => {
   );
   assertEquals(user.listJoinedGroups()[0], fakeuser.listJoinedGroups()[0]);
 });
-
-async function buildUpUserRepo() {
-  const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
-  const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
-  const userRepository: UserRepository = new DbUserRepository();
-  await Promise.all(fakeUserList.map((e) => userRepository.save(e))).then((e) =>
-    console.log(e + "doneuser")
-  ).catch((
-    e,
-  ) => console.log(e));
-  return {
-    mockUserIdList,
-    userRepository,
-    fakeUserList,
-  };
-}
-async function buildUpServRepo(userList: ShortEntity[]) {
-  const serviceList: Service[] = FakeObjectGen.generateFakeServices(userList);
-  const serviceRepository: ServiceRepository = new DbServiceRepository();
-  await Promise.all(serviceList.map((e) => serviceRepository.save(e))).then((
-    e,
-  ) => console.log(e + "doneserv")).catch((
-    e,
-  ) => console.log(e));
-  return { serviceList, serviceRepository };
-}
-async function buildUpGroupRepo(userList: ShortEntity[]) {
-  const groupList: Group[] = FakeObjectGen.generateFakeGroups(userList);
-  const groupRepository = new DbGroupRepository();
-  await Promise.all(groupList.map((e) => groupRepository.save(e))).then((e) =>
-    console.log(e + "donegroup")
-  ).catch((e) => console.log(e));
-  return { groupList, groupRepository };
-}
