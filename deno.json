@@ -8,15 +8,15 @@
     "deno-check": "deno task check-web && deno task check-service"
   },
   "imports": {
-    "@std/testing": "jsr:@std/testing@^1.0.15",
-    "react-router-dom": "npm:react-router-dom",
-    "react-dom/client": "npm:react-dom/client",
-    "react": "npm:react",
-    "vite/client": "npm:vite/client",
-    "@vitejs/plugin-react": "npm:@vitejs/plugin-react",
-    "vite": "npm:vite",
-    "@hono/hono": "jsr:@hono/hono@^4.9.5",
-    "@hono/hono/cors": "jsr:@hono/hono@^4.9.5/cors",
+    "@std/testing": "jsr:@std/testing@^1.0.16",
+    "react-router-dom": "npm:react-router-dom@7.9.4",
+    "react-dom/client": "npm:react-dom@19.2.0/client",
+    "react": "npm:react@19.2.0",
+    "vite/client": "npm:vite@7.1.9/client",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@5.0.4",
+    "vite": "npm:vite@7.1.9",
+    "@hono/hono": "jsr:@hono/hono@^4.9.10",
+    "@hono/hono/cors": "jsr:@hono/hono@^4.9.10/cors",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
     "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6"
   }

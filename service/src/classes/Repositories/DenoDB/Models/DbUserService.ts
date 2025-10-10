@@ -1,14 +1,22 @@
 import { DataTypes, Model, Relationships } from "@denodb";
 import { DbService } from "./DbService.ts";
 import { DbUser } from "./DbUser.ts";
-export const DbUserService: typeof Model = Relationships.manyToMany(
-  DbUser,
-  DbService,
-);
-DbUserService.fields = {
-  ...DbUserService.fields,
-  isOwner: DataTypes.BOOLEAN,
-};
+
+let DbUserService: typeof Model;
+
+export function setupUserService() {
+  DbUserService = Relationships.manyToMany(
+    DbUser,
+    DbService,
+  );
+  DbUserService.fields = {
+    ...DbUserService.fields,
+    isOwner: DataTypes.BOOLEAN,
+  };
+  return DbUserService;
+}
+
+export { DbUserService };
 
 // const us = Relationships.manyToMany(User, Service);
 // us.fields = {

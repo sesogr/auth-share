@@ -1,19 +1,24 @@
-import { assertEquals } from "https://deno.land/std@0.104.0/testing/asserts.ts";
-import { assertInstanceOf } from "https://deno.land/std@0.224.0/assert/assert_instance_of.ts";
 import { DbUserRepository } from "../../src/classes/Repositories/DenoDB/DbUserRepository.ts";
+import { assertEquals, assertInstanceOf } from "@std/assert";
 import { User } from "../../src/classes/User.ts";
 import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
 import { Database, MySQLConnector } from "@denodb";
 import { DbGroup } from "../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
-import { DbGroupService } from "../../src/classes/Repositories/DenoDB/Models/DbGroupService.ts";
+import {
+  DbGroupService,
+} from "../../src/classes/Repositories/DenoDB/Models/DbGroupService.ts";
 import { DbIdDisplayname } from "../../src/classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
 import { DbInvitation } from "../../src/classes/Repositories/DenoDB/Models/DbInvitation.ts";
 import { DbService } from "../../src/classes/Repositories/DenoDB/Models/DbService.ts";
 import { DbServiceCredential } from "../../src/classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
 import { DbUser } from "../../src/classes/Repositories/DenoDB/Models/DbUser.ts";
 import { DbUserCredential } from "../../src/classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
-import { DbUserGroup } from "../../src/classes/Repositories/DenoDB/Models/DbUserGroup.ts";
-import { DbUserService } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
+import {
+  DbUserGroup,
+} from "../../src/classes/Repositories/DenoDB/Models/DbUserGroup.ts";
+import {
+  DbUserService,
+} from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
 import { Service } from "../../src/classes/Service.ts";
 import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts";
@@ -21,7 +26,7 @@ import { DbGroupRepository } from "../../src/classes/Repositories/DenoDB/DbGroup
 import { Group } from "../../src/classes/Group.ts";
 import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbServiceRepository.ts";
 import { ShortEntity } from "../../src/interfaceTypes/ShortEntity.ts";
-
+import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 const connector = new MySQLConnector({
   database: Deno.env.get("DB_NAME")!,
   host: Deno.env.get("DB_HOST")!,
@@ -29,7 +34,7 @@ const connector = new MySQLConnector({
   password: Deno.env.get("DB_PASSWORD")!,
 });
 const db = new Database(connector);
-
+setupManyToMany();
 db.link([
   DbUser,
   DbService,

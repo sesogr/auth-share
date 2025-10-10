@@ -1,11 +1,14 @@
-import { DataTypes, Relationships } from "@denodb";
+import { DataTypes, Model, Relationships } from "@denodb";
 import { DbGroup } from "./DbGroup.ts";
 import { DbUser } from "./DbUser.ts";
-export const DbUserGroup = Relationships.manyToMany(
-  DbUser,
-  DbGroup,
-);
-DbUserGroup.fields = {
-  ...DbUserGroup.fields,
-  isOwner: DataTypes.BOOLEAN,
-};
+export let DbUserGroup: typeof Model;
+export function setupUserGroup() {
+  DbUserGroup = Relationships.manyToMany(
+    DbUser,
+    DbGroup,
+  );
+  DbUserGroup.fields = {
+    ...DbUserGroup.fields,
+    isOwner: DataTypes.BOOLEAN,
+  };
+}
