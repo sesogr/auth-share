@@ -18,6 +18,12 @@ import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceAggregateView } from "./interfaceTypes/ServiceAggregateView.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
+import { DbIdDisplayname } from "./classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
+import { DbInvitation } from "./classes/Repositories/DenoDB/Models/DbInvitation.ts";
+import { DbServiceCredential } from "./classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
+import { DbUserCredential } from "./classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
+import { DbUserService } from "./classes/Repositories/DenoDB/Models/DbUserService.ts";
+import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 
 const db = new Database(
   new MySQLConnector({
@@ -27,7 +33,19 @@ const db = new Database(
     password: Deno.env.get("DB_PASSWORD")!,
   }),
 );
-db.link([DbGroup, DbUser, DbUserGroup, DbGroupService, DbService]);
+setupManyToMany();
+db.link([
+  DbUser,
+  DbService,
+  DbGroup,
+  DbUserService,
+  DbUserCredential,
+  DbServiceCredential,
+  DbUserGroup,
+  DbGroupService,
+  DbInvitation,
+  DbIdDisplayname,
+]);
 //initialize repositories
 const serviceRepository: ServiceAggregateView & ServiceRepository =
   new InMemServiceRepository();
