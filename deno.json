@@ -9,6 +9,7 @@
   },
   "imports": {
     "@std/testing": "jsr:@std/testing@^1.0.16",
+    "@denodb": "https://deno.land/x/denodb@v1.4.0/mod.ts",
     "react-router-dom": "npm:react-router-dom@7.9.4",
     "react-dom/client": "npm:react-dom@19.2.0/client",
     "react": "npm:react@19.2.0",
@@ -19,5 +20,14 @@
     "@hono/hono/cors": "jsr:@hono/hono@^4.9.10/cors",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
     "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6"
+  },
+  "scopes": {
+    "https://raw.githubusercontent.com/Zhomart/dex/": {
+      "https://deno.land/std/node/events.ts": "node:events",
+      "https://deno.land/std/node/assert.ts": "node:assert",
+      "https://deno.land/std/node/url.ts": "node:url",
+      "https://deno.land/std/node/stream.ts": "node:stream",
+      "https://deno.land/std/node/util.ts": "node:util"
+    }
   }
 }
