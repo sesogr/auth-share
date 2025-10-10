@@ -9,6 +9,7 @@ import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { Invitation } from "../../Invitation.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { Model } from "@denodb";
+import { NotFoundError } from "../../../errors/NotFoundError.ts";
 
 export class DbGroupRepository implements GroupRepository {
   async findByName(name: string): Promise<Group> {
@@ -16,9 +17,10 @@ export class DbGroupRepository implements GroupRepository {
     return this.hydrate(searchedName.id?.toString() ?? "");
   }
   async hydrate(searchedId: string): Promise<Group> {
-    const sqlItem = DbGroup.where("id", searchedId);
-    const groupData = await sqlItem.first();
-    const groupname = groupData.groupname?.toString() ?? "";
+    const groupData = await (DbGroup.where("id", searchedId))
+      .first() as DbGroup;
+    if (!groupData) throw new NotFoundError(searchedId + " notfound");
+    const groupname = groupData.groupname.toString();
     //callbackfunction
     const groupOwnerData = await DbIdDisplayname.where(
       "id",
@@ -29,7 +31,8 @@ export class DbGroupRepository implements GroupRepository {
       groupOwnerData.displayname?.toString() ?? "",
     );
     //
-    const groupServiceData = await sqlItem.knownServices();
+    const groupServiceData = await (DbGroup.where("id", searchedId))
+      .knownServices();
 
     const serviceList: AllowedGroupServiceMap[] = await Promise.all(
       groupServiceData.map(
@@ -37,7 +40,8 @@ export class DbGroupRepository implements GroupRepository {
       ),
     ) as AllowedGroupServiceMap[];
 
-    const sentInvitationData = sqlItem.sentInvitations();
+    const sentInvitationData = (DbGroup.where("id", searchedId))
+      .sentInvitations();
 
     const sentUserInvites: Invitation[] = await Promise.all(
       (await sentInvitationData).map(async (e) => {
@@ -60,7 +64,8 @@ export class DbGroupRepository implements GroupRepository {
         );
       }),
     );
-    const recivedInvitationData = sqlItem.receivedInvitations();
+    const recivedInvitationData = (DbGroup.where("id", searchedId))
+      .receivedInvitations();
     //recivedInvitations
     const serviceInvitations: Invitation[] = await Promise.all(
       (await recivedInvitationData).map(async (e) => {
@@ -84,7 +89,8 @@ export class DbGroupRepository implements GroupRepository {
       }),
     );
     //SQL Query
-    const userGroupData = await sqlItem.authorizedUsers();
+    const userGroupData = await (DbGroup.where("id", searchedId))
+      .authorizedUsers();
     const allowedUser: AllowedUserGroupMap[] = await Promise.all(
       userGroupData.map(
         this.createMapCallbackallowedLists(searchedId, groupname, "user"),
@@ -111,7 +117,7 @@ export class DbGroupRepository implements GroupRepository {
     array: Model[],
   ) => Promise<AllowedUserGroupMap | AllowedGroupServiceMap> {
     return async (e) => {
-      const id = e[type + "_id"]!.toString();
+      const id = e["db" + type + "_id"]!.toString();
       const displayname = await DbIdDisplayname.displayname(
         id,
       );
@@ -147,8 +153,14 @@ export class DbGroupRepository implements GroupRepository {
     throw new RuntimeError();
   }
   async save(item: Group) {
-    if (!(await DbGroup.find(item.getId()))) {
-      this.add(item);
+    try {
+      await this.findById(item.getId());
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.add(item);
+        return;
+      }
+      throw error;
     }
   }
   async removeById(id: string): Promise<void> {

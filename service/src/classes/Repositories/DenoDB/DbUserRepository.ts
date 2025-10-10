@@ -9,6 +9,7 @@ import { IdNameMap } from "../../IdNameMap.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { Invitation } from "../../Invitation.ts";
+import { NotFoundError } from "../../../errors/NotFoundError.ts";
 
 export class DbUserRepository implements UserRepository {
   async findByName(name: string): Promise<User> {
@@ -36,36 +37,46 @@ export class DbUserRepository implements UserRepository {
     await DbUser.create({
       displayname: item.getDisplayName(),
       id: item.getId(),
-    });
-    await DbUserCredential.create({
-      dbuser_id: item.getId(),
-      username: item.getCredentials().username,
-      password: item.getCredentials().password,
-    });
-    await DbIdDisplayname.create({
-      id: item.getId(),
-      displayname: item.getDisplayName(),
-    });
+    }).then(() =>
+      DbUserCredential.create({
+        dbuser_id: item.getId(),
+        username: item.getCredentials().username,
+        password: item.getCredentials().password,
+      }).then(() =>
+        DbIdDisplayname.create({
+          id: item.getId(),
+          displayname: item.getDisplayName(),
+        })
+      ).catch(() => {
+        throw new Error();
+      })
+    );
   }
 
   async save(item: User) {
-    if (!(await DbUser.find(item.getId()))) {
-      this.add(item);
+    try {
+      await this.findById(item.getId());
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        return await this.add(item);
+      }
+      throw error;
     }
   }
   async hydrate(searchedId: string): Promise<User> {
     //For now the only thing i saw to make the code thinner
-    const sqlItem = DbUser.where("id", searchedId);
 
-    const dbItem = await sqlItem.first();
+    const dbItem = await (DbUser.where("id", searchedId)).first();
     if (!dbItem) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
-    const username = (await sqlItem.credentials()).username;
+    const username =
+      (await (DbUser.where("id", searchedId)).credentials()).username;
     if (!username) {
       throw new Error("User has no credentials");
     }
-    const password = (await sqlItem.credentials()).password;
+    const password =
+      (await (DbUser.where("id", searchedId)).credentials()).password;
     if (!password) {
       throw new Error("User has no credentials");
     }
@@ -74,7 +85,8 @@ export class DbUserRepository implements UserRepository {
       password.toString(),
     );
     const displayname = dbItem.displayname;
-    const userServiceData = await sqlItem.authorizedServices();
+    const userServiceData = await DbUser.where("id", searchedId)
+      .authorizedServices();
     //am i get this right?
     //const userServiceData = await DbUser.where("id", searchedId).hasMany(DbUserService) as Promise<Model[]>;
 
@@ -85,12 +97,12 @@ export class DbUserRepository implements UserRepository {
     const serviceList: AllowedUserServiceMap[] = await Promise.all(
       userServiceData.map(
         async (e) => {
-          if (!e.service_id) {
+          if (!e.dbservice_id) {
             throw new Error("Expected for typesafety");
           }
           let serviceModel = await DbIdDisplayname.where(
             "id",
-            e.service_id.toString(),
+            e.dbservice_id.toString(),
           )
             .select(
               "displayname",
@@ -103,7 +115,7 @@ export class DbUserRepository implements UserRepository {
           return new AllowedUserServiceMap(
             new IdNameMap(searchedId, displayname?.toString() ?? ""),
             new IdNameMap(
-              e.service_id.toString(),
+              e.dbservice_id.toString(),
               serviceName?.toString() ?? "",
             ),
             e.is_owner?.valueOf() as boolean ?? false,
@@ -121,7 +133,7 @@ export class DbUserRepository implements UserRepository {
         async (e) => {
           let groupModel = await DbIdDisplayname.where(
             "id",
-            e.group_id?.toString() ?? "",
+            e.dbgroup_id?.toString() ?? "",
           )
             .select(
               "displayname",
@@ -134,7 +146,7 @@ export class DbUserRepository implements UserRepository {
           return new AllowedUserGroupMap(
             new IdNameMap(searchedId, displayname?.toString() ?? ""),
             new IdNameMap(
-              e.group_id?.toString() ?? "",
+              e.dbgroup_id?.toString() ?? "",
               groupName?.toString() ?? "",
             ),
             e.is_owner?.valueOf() as boolean ?? false,
@@ -142,7 +154,8 @@ export class DbUserRepository implements UserRepository {
         },
       ),
     );
-    const invitationData = await sqlItem.receivedInvitations();
+    const invitationData = await (DbUser.where("id", searchedId))
+      .receivedInvitations();
 
     //is there a difference between sentInvites and this invitations?
     const invitations: Invitation[] = await Promise.all(

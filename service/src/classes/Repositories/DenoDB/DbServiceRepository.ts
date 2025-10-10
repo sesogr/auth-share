@@ -51,15 +51,15 @@ export class DbServiceRepository implements ServiceRepository {
     });
     for (const authorizedUsermap of item.authorizedUsers) {
       await DbUserService.create({
-        user_id: authorizedUsermap.userId,
-        service_id: authorizedUsermap.serviceId,
+        dbuser_id: authorizedUsermap.userId,
+        dbservice_id: authorizedUsermap.serviceId,
         is_owner: authorizedUsermap.isOwner,
       });
     }
     for (const authorizedGroupmap of item.authorizedGroups) {
       await DbGroupService.create({
-        group_id: authorizedGroupmap.groupId,
-        service_id: authorizedGroupmap.serviceId,
+        dbgroup_id: authorizedGroupmap.groupId,
+        dbservice_id: authorizedGroupmap.serviceId,
       });
     }
     for (const invites of item.sentInvitations) {
@@ -78,36 +78,45 @@ export class DbServiceRepository implements ServiceRepository {
     throw new Error("Method not implemented.");
   }
   async save(item: Service): Promise<void> {
-    if (!(await this.findById(item.getId()))) {
-      this.add(item);
+    try {
+      await this.findById(item.getId());
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.add(item);
+        return;
+      }
+      throw error;
     }
   }
 
   async hydrate(searchedId: string): Promise<Service> {
-    const item = DbService.where("id", searchedId);
-    const service = await item.first() as DbService;
+    const service = await (DbService.where("id", searchedId))
+      .first() as DbService;
     if (!service) throw new NotFoundError("Item not Found: " + searchedId);
     const id = service.id.toString();
     const servicename = service.servicename.toString();
-    let credentials: ServiceCredential | DbServiceCredential = await item
-      .credentials();
+    let credentials: ServiceCredential | DbServiceCredential =
+      await (DbService.where("id", searchedId))
+        .credentials();
     credentials = new ServiceCredential(
       credentials.username.toString(),
       credentials.password.toString(),
     );
-    const userserviceData = await item.authorizedUsers();
+    const userserviceData = await (DbService.where("id", searchedId))
+      .authorizedUsers();
     const authorizedUsers: AllowedUserServiceMap[] = await Promise.all(
       userserviceData.map(
         this.createMapCallbackallowedLists(id, servicename, "user"),
       ),
     ) as AllowedUserServiceMap[];
-    const groupserviceData = await item.authorizedGroups();
+    const groupserviceData = await (DbService.where("id", searchedId))
+      .authorizedGroups();
     const authorizedGroups: AllowedGroupServiceMap[] = await Promise.all(
       groupserviceData.map(
         this.createMapCallbackallowedLists(id, servicename, "group"),
       ),
     ) as AllowedGroupServiceMap[];
-    const invitationData = item.Invitation();
+    const invitationData = (DbService.where("id", searchedId)).Invitation();
 
     const sentGroupInvites: Invitation[] = await Promise.all(
       (await invitationData).map(async (e) => {
@@ -149,8 +158,8 @@ export class DbServiceRepository implements ServiceRepository {
     array: Model[],
   ) => Promise<AllowedUserServiceMap | AllowedGroupServiceMap> {
     return async (e) => {
-      if (!e[type + "_id"]) throw new NotFoundError("group_id");
-      const id = e[type + "_id"]!.toString();
+      if (!e["db" + type + "_id"]) throw new NotFoundError("group_id");
+      const id = e["db" + type + "_id"]!.toString();
 
       const displayname = await DbIdDisplayname.where(
         "id",
