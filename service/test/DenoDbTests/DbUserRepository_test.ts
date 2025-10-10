@@ -28,10 +28,11 @@ import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbSer
 import { ShortEntity } from "../../src/interfaceTypes/ShortEntity.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 const connector = new MySQLConnector({
-  database: Deno.env.get("DB_NAME")!,
-  host: Deno.env.get("DB_HOST")!,
-  username: Deno.env.get("DB_USER")!,
-  password: Deno.env.get("DB_PASSWORD")!,
+  database: "authshare",
+  host: "localhost",
+  username: "authshare",
+  password: "5ES2#7PhHZplRm",
+  port: 13006,
 });
 const db = new Database(connector);
 setupManyToMany();
@@ -50,45 +51,61 @@ db.link([
 
 await db.sync({ drop: true });
 
-const { fakeUserList } = buildUpUserRepo();
-buildUpServRepo(fakeUserList.map((e) => e.convertToShort()));
-buildUpGroupRepo(fakeUserList.map((e) => e.convertToShort()));
+const { fakeUserList } = await buildUpUserRepo().then(async (f) => {
+  await buildUpServRepo(f.fakeUserList.map((e) => e.convertToShort()));
+  await buildUpGroupRepo(f.fakeUserList.map((e) => e.convertToShort()));
+  return f;
+});
 
 Deno.test("DbUserRepository: hydrate", async () => {
   // Methode aufrufen und erwartetes Ergebnis überprüfen
   const userRepository: UserRepository & {
     hydrate: (id: string) => Promise<User>;
   } = new DbUserRepository();
-  const user = await userRepository.hydrate("testID1");
+  const fakeuser = fakeUserList[0];
+  const user = await userRepository.hydrate(fakeuser.getId());
   assertInstanceOf(user, User);
-  assertEquals(user.getId(), "testID1");
-  assertEquals(user.getDisplayName(), "Hans Meiser");
-  assertEquals(user.listServices().length, 1);
-  assertEquals(user.listServices()[0], "MyService");
-  assertEquals(user.listJoinedGroups().length, 1);
-  assertEquals(user.listJoinedGroups()[0], "TestGroup1");
+  assertEquals(user.getId(), fakeuser.getId());
+  assertEquals(user.getDisplayName(), fakeuser.getDisplayName());
+  assertEquals(user.listServices().length, fakeuser.listServices().length);
+  assertEquals(user.listServices()[0], fakeuser.listServices()[0]);
+  assertEquals(
+    user.listJoinedGroups().length,
+    fakeuser.listJoinedGroups().length,
+  );
+  assertEquals(user.listJoinedGroups()[0], fakeuser.listJoinedGroups()[0]);
 });
 
-function buildUpUserRepo() {
+async function buildUpUserRepo() {
   const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const userRepository: UserRepository = new DbUserRepository();
-  fakeUserList.forEach((e) => userRepository.save(e));
+  await Promise.all(fakeUserList.map((e) => userRepository.save(e))).then((e) =>
+    console.log(e + "doneuser")
+  ).catch((
+    e,
+  ) => console.log(e));
   return {
     mockUserIdList,
     userRepository,
     fakeUserList,
   };
 }
-function buildUpServRepo(userList: ShortEntity[]) {
+async function buildUpServRepo(userList: ShortEntity[]) {
   const serviceList: Service[] = FakeObjectGen.generateFakeServices(userList);
   const serviceRepository: ServiceRepository = new DbServiceRepository();
-  serviceList.forEach((e) => serviceRepository.save(e));
+  await Promise.all(serviceList.map((e) => serviceRepository.save(e))).then((
+    e,
+  ) => console.log(e + "doneserv")).catch((
+    e,
+  ) => console.log(e));
   return { serviceList, serviceRepository };
 }
-function buildUpGroupRepo(userList: ShortEntity[]) {
+async function buildUpGroupRepo(userList: ShortEntity[]) {
   const groupList: Group[] = FakeObjectGen.generateFakeGroups(userList);
   const groupRepository = new DbGroupRepository();
-  groupList.forEach((e) => groupRepository.save(e));
+  await Promise.all(groupList.map((e) => groupRepository.save(e))).then((e) =>
+    console.log(e + "donegroup")
+  ).catch((e) => console.log(e));
   return { groupList, groupRepository };
 }
