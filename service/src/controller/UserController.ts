@@ -7,8 +7,23 @@ import { AllOptional } from "../types/AllOptional.ts";
 
 export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
+
+  async listMyServices(
+    c: AllOptional<Context>,
+  ) {
+    const user = await this.userRepository.findById(
+      "f1504da5-8890-41a7-9023-8c3aef2f885a",
+    ); //To do with meaningfull
+    user.listServices();
+    return c.json!(
+      user.toJson(),
+    );
+  }
+
   async read(c: AllOptional<Context>) {
-    const user = await this.userRepository.findById("testID1"); //To do with meaningfull
+    const user = await this.userRepository.findById(
+      "f1504da5-8890-41a7-9023-8c3aef2f885a",
+    ); //To do with meaningfull
     return c.json!(
       user.toJson(),
     );

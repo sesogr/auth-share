@@ -20,10 +20,11 @@ export class DbServiceRepository implements ServiceRepository {
   }
   async findOwnedByUserId(userId: string): Promise<Service[]> {
     const userServiceData: DbService[] = await DbUserService.where(
-      "user_id",
+      "dbuser_id",
       userId,
     )
       .hasMany(DbService) as DbService[];
+    console.log(userServiceData);
     return Promise.all(
       userServiceData.map((e: DbService) => this.hydrate(e.id)),
     );
