@@ -32,4 +32,8 @@ export class ServiceCredential extends ValueClass {
   override copy(): ServiceCredential {
     return new ServiceCredential(this.username, this.password);
   }
+  static fromString(string: string) {
+    const [username, password] = string.split(":");
+    return new ServiceCredential(username, password);
+  }
 }
