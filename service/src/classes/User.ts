@@ -10,7 +10,7 @@ import { Entity } from "./Entity.ts";
 export class User extends Entity {
   constructor(
     private credentials: UserCredential,
-    private displayName: string = "",
+    private username: string = "",
     protected override readonly id: string = crypto.randomUUID(),
     //callableService includes owned and used Services of an User
     private callableService: AllowedUserServiceMap[] = [],
@@ -18,7 +18,7 @@ export class User extends Entity {
     //..includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
   ) {
-    super(id, displayName);
+    super(id, username);
   }
 
   override getId(): string {
@@ -28,7 +28,7 @@ export class User extends Entity {
     return this.credentials;
   }
   override getDisplayName(): string {
-    return this.displayName;
+    return this.username;
   }
   listServices(owned = false): string[] {
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
@@ -90,7 +90,7 @@ export class User extends Entity {
   private toConvertedUser(): ConvertedUser {
     return {
       credentials: this.credentials.toString(),
-      displayname: this.displayName,
+      displayname: this.username,
       owned: this.listServices(true),
       callable: this.listServices(),
       userGroupInvitations: this.userGroupInvitations.map((e) => e.toString()),
