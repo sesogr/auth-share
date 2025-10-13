@@ -5,7 +5,8 @@
     "check-service": "cd service && deno check",
     "hooks:install": "deno run --allow-read=deno.json,.git/hooks/ --allow-write=.git/hooks/ jsr:@hongminhee/deno-task-hooks",
     "hooks:pre-commit": "deno task check",
-    "deno-check": "deno task check-web && deno task check-service"
+    "deno-check": "deno task check-web && deno task check-service",
+    "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts"
   },
   "imports": {
     "@std/testing": "jsr:@std/testing@^1.0.16",
