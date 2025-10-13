@@ -12,12 +12,18 @@ export class Entity implements DisplayableEntity {
   getId(): string {
     return this.id;
   }
-  convertToShort(): ShortEntity {
+  convertToShort(): ShortEntity { //hier eine IdNameMap macht probleme?
     return {
       displayname: this.getDisplayName(),
       id: this.getId(),
       equals(that: ShortEntity) {
         return this.displayname === that.displayname && this.id === that.id;
+      },
+      "with": () => {
+        throw new Error("unimplemented");
+      },
+      "copy": () => {
+        throw new Error("unimplemented");
       },
     };
   }
