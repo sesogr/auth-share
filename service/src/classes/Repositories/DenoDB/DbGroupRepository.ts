@@ -117,7 +117,7 @@ export class DbGroupRepository implements GroupRepository {
     array: Model[],
   ) => Promise<AllowedUserGroupMap | AllowedGroupServiceMap> {
     return async (e) => {
-      const id = e["db" + type + "_id"]!.toString();
+      const id = e["db" + type + "Id"]!.toString();
       const displayname = await DbIdDisplayname.displayname(
         id,
       );

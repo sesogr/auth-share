@@ -10,6 +10,8 @@ import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { Invitation } from "../../Invitation.ts";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
+import { Model } from "@denodb";
+import { RuntimeError } from "../../../errors/RuntimeError.ts";
 
 export class DbUserRepository implements UserRepository {
   async findByName(name: string): Promise<User> {
@@ -84,7 +86,9 @@ export class DbUserRepository implements UserRepository {
       username.toString(),
       password.toString(),
     );
-    const displayname = dbItem.displayname;
+    let displayname = dbItem.displayname;
+    if (!displayname) throw new NotFoundError(`${displayname} not found`);
+    displayname = displayname.toString();
     const userServiceData = await DbUser.where("id", searchedId)
       .authorizedServices();
     //am i get this right?
@@ -96,33 +100,9 @@ export class DbUserRepository implements UserRepository {
     // }
     const serviceList: AllowedUserServiceMap[] = await Promise.all(
       userServiceData.map(
-        async (e) => {
-          if (!e.dbservice_id) {
-            throw new Error("Expected for typesafety");
-          }
-          let serviceModel = await DbIdDisplayname.where(
-            "id",
-            e.dbservice_id.toString(),
-          )
-            .select(
-              "displayname",
-            ).get();
-          if (!Array.isArray(serviceModel)) {
-            throw new Error("Expected for typesafety");
-          }
-          serviceModel = serviceModel[0];
-          const serviceName = serviceModel.displayname;
-          return new AllowedUserServiceMap(
-            new IdNameMap(searchedId, displayname?.toString() ?? ""),
-            new IdNameMap(
-              e.dbservice_id.toString(),
-              serviceName?.toString() ?? "",
-            ),
-            e.is_owner?.valueOf() as boolean ?? false,
-          );
-        },
+        this.createMapCallback(searchedId, displayname, "service"),
       ),
-    );
+    ) as AllowedUserServiceMap[];
     const userGroupData = await DbUserGroup.where("dbuser_id", searchedId)
       .get();
     if (!Array.isArray(userGroupData)) {
@@ -130,30 +110,9 @@ export class DbUserRepository implements UserRepository {
     }
     const joinedGroups: AllowedUserGroupMap[] = await Promise.all(
       userGroupData.map(
-        async (e) => {
-          let groupModel = await DbIdDisplayname.where(
-            "id",
-            e.dbgroup_id?.toString() ?? "",
-          )
-            .select(
-              "displayname",
-            ).get();
-          if (!Array.isArray(groupModel)) {
-            throw new Error("Expected for typesafety");
-          }
-          groupModel = groupModel[0];
-          const groupName = groupModel.displayname;
-          return new AllowedUserGroupMap(
-            new IdNameMap(searchedId, displayname?.toString() ?? ""),
-            new IdNameMap(
-              e.dbgroup_id?.toString() ?? "",
-              groupName?.toString() ?? "",
-            ),
-            e.is_owner?.valueOf() as boolean ?? false,
-          );
-        },
+        this.createMapCallback(searchedId, displayname, "group"),
       ),
-    );
+    ) as AllowedUserGroupMap[];
     const invitationData = await (DbUser.where("id", searchedId))
       .receivedInvitations();
 
@@ -181,12 +140,54 @@ export class DbUserRepository implements UserRepository {
     );
     const user: User = new User(
       credentials,
-      displayname?.toString() ?? "",
+      displayname,
       searchedId,
       serviceList,
       invitations,
       joinedGroups,
     );
     return user;
+  }
+
+  private createMapCallback(
+    searchedId: string,
+    displayname: string,
+    type: "service" | "group",
+  ): (
+    value: Model,
+    index: number,
+    array: Model[],
+  ) => Promise<AllowedUserServiceMap | AllowedUserGroupMap> {
+    return async (e: Model) => {
+      if (!e["db" + type + "Id"]) {
+        throw new Error("Expected for typesafety");
+      }
+      const serviceModel = await DbIdDisplayname.where(
+        "id",
+        e["db" + type + "Id"]!.toString(),
+      ).first();
+      const targetName = serviceModel.displayname;
+      if (type == "service") {
+        return new AllowedUserServiceMap(
+          new IdNameMap(searchedId, displayname?.toString() ?? ""),
+          new IdNameMap(
+            e["db" + type + "Id"]!.toString(),
+            targetName?.toString() ?? "",
+          ),
+          e.isOwner?.valueOf() as boolean ?? false,
+        );
+      }
+      if (type == "group") {
+        return new AllowedUserGroupMap(
+          new IdNameMap(searchedId, displayname?.toString() ?? ""),
+          new IdNameMap(
+            e["db" + type + "Id"]!.toString(),
+            targetName?.toString() ?? "",
+          ),
+          e.isOwner?.valueOf() as boolean ?? false,
+        );
+      }
+      throw new RuntimeError();
+    };
   }
 }

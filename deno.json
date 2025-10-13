@@ -19,7 +19,8 @@
     "@hono/hono": "jsr:@hono/hono@^4.9.10",
     "@hono/hono/cors": "jsr:@hono/hono@^4.9.10/cors",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
-    "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6"
+    "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6",
+    "https://deno.land/std@0.224.0/crypto/_wasm/lib/deno_std_wasm_crypto.generated.d.mts": "data:text/typescript,export {}"
   },
   "scopes": {
     "https://raw.githubusercontent.com/Zhomart/dex/": {
