@@ -20,7 +20,7 @@ import {
   DbUserService,
 } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
-import fakeUser from "../../../testuser.json" with { type: "json" };
+import fakeUser from "../testuser.json" with { type: "json" };
 import { UserCredential } from "../../src/classes/UserCredential.ts";
 const connector = new MySQLConnector({
   database: "authshare",
