@@ -8,14 +8,11 @@ import { DbGroupService } from "./classes/Repositories/DenoDB/Models/DbGroupServ
 import { DbService } from "./classes/Repositories/DenoDB/Models/DbService.ts";
 import { DbUser } from "./classes/Repositories/DenoDB/Models/DbUser.ts";
 import { DbUserGroup } from "./classes/Repositories/DenoDB/Models/DbUserGroup.ts";
-import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
-import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
 import { UserController } from "./controller/UserController.ts";
 import { DataController } from "./controller/DataController.ts";
 import { RootController } from "./controller/RootController.ts";
 import { ServiceController } from "./controller/ServiceController.ts";
 import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
-import { ServiceAggregateView } from "./interfaceTypes/ServiceAggregateView.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
 import { DbIdDisplayname } from "./classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
@@ -24,6 +21,8 @@ import { DbServiceCredential } from "./classes/Repositories/DenoDB/Models/DbServ
 import { DbUserCredential } from "./classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
 import { DbUserService } from "./classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyToMany.ts";
+import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepository.ts";
+import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 
 const db = new Database(
   new MySQLConnector({
@@ -47,11 +46,8 @@ db.link([
   DbIdDisplayname,
 ]);
 //initialize repositories
-const serviceRepository: ServiceAggregateView & ServiceRepository =
-  new InMemServiceRepository();
-const groupRepository: GroupRepository = new InMemGroupRepository(
-  serviceRepository,
-);
+const serviceRepository: ServiceRepository = new DbServiceRepository();
+const groupRepository: GroupRepository = new DbGroupRepository();
 const userRepository: UserRepository = new DbUserRepository();
 // FakeObjectGen.generateFakeUsers().forEach(async (e) =>
 //   await userRepository.save(e)
@@ -71,15 +67,18 @@ app.use(
 );
 //Endpoints
 const rootController = new RootController("Trees");
-app.get("/", rootController.sayHelloFromTrees);
+app.get("/", rootController.sayHelloFromTrees.bind(rootController));
 
 const dataController = new DataController();
-app.get("/data", dataController.getData);
+app.get("/data", dataController.getData.bind(dataController));
 
 const userController = new UserController(userRepository);
-app.get("/user", userController.read);
+app.get("/user", userController.read.bind(userController));
 
-app.put("/user/me/password", userController.changePassword);
+app.put(
+  "/user/me/password",
+  userController.changePassword.bind(userController),
+);
 
 const serviceController = new ServiceController(
   serviceRepository,
@@ -87,12 +86,14 @@ const serviceController = new ServiceController(
 );
 app.get(
   "/user/owned",
-  serviceController.listMyServices, //TODO!!! Needs to be fixed!
+  serviceController.listMyServices.bind(serviceController), //TODO!!! Needs to be fixed!
 );
 
 app.put();
 
-app.post("/user", userController.create);
+app.post("/user", userController.create.bind(userController));
+
+app.post("/service/create", serviceController.add.bind(serviceController));
 
 //app.get("/group", groupController);
 
