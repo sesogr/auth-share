@@ -178,20 +178,22 @@ export class DbGroupRepository implements GroupRepository {
       }),
     );
   }
-  async add(item: Group): Promise<void> {
-    await DbGroup.create({
+  add(item: Group): Promise<void> {
+    DbGroup.create({
       groupname: item.getDisplayName(),
       owner: item.getOwner().id,
       id: item.getId(),
-    });
-    await DbUserGroup.create({
-      dbuser_id: item.getOwner().id,
-      dbgroup_id: item.getId(),
-      isOwner: true,
-    });
-    await DbIdDisplayname.create({
-      id: item.getId(),
-      displayname: item.getDisplayName(),
-    });
+    }).then(() =>
+      DbUserGroup.create({
+        dbuser_id: item.getOwner().id,
+        dbgroup_id: item.getId(),
+        isOwner: true,
+      })
+    ).then(() =>
+      DbIdDisplayname.create({
+        id: item.getId(),
+        displayname: item.getDisplayName(),
+      })
+    );
   }
 }

@@ -49,11 +49,15 @@ db.link([
 const serviceRepository: ServiceRepository = new DbServiceRepository();
 const groupRepository: GroupRepository = new DbGroupRepository();
 const userRepository: UserRepository = new DbUserRepository();
-// FakeObjectGen.generateFakeUsers().forEach(async (e) =>
-//   await userRepository.save(e)
+// Promise.all(FakeObjectGen.generateFakeUsers().map(async (e) =>
+//   await userRepository.save(e))
 // );
-FakeObjectGen.generateFakeGroups().forEach((e) => groupRepository.save(e));
-FakeObjectGen.generateFakeServices().forEach((e) => serviceRepository.save(e));
+Promise.all(
+  FakeObjectGen.generateFakeGroups().map((e) => groupRepository.save(e)),
+);
+Promise.all(
+  FakeObjectGen.generateFakeServices().map((e) => serviceRepository.save(e)),
+);
 // userRepository.findAll().forEach((e) => {
 //   serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
 // });

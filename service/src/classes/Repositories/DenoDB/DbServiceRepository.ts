@@ -42,38 +42,48 @@ export class DbServiceRepository implements ServiceRepository {
     throw new Error("Method not implemented.");
   }
   async add(item: Service): Promise<void> {
-    await DbService.create({
+    DbService.create({
       id: item.getId(),
       serviceName: item.getDisplayName(),
-    });
-    await DbServiceCredential.create({
-      username: item.credentials.split(":")[0],
-      password: item.credentials.split(":")[1],
-    });
-    for (const authorizedUsermap of item.authorizedUsers) {
-      await DbUserService.create({
-        dbuser_id: authorizedUsermap.userId,
-        dbservice_id: authorizedUsermap.serviceId,
-        is_owner: authorizedUsermap.isOwner,
-      });
-    }
-    for (const authorizedGroupmap of item.authorizedGroups) {
-      await DbGroupService.create({
-        dbgroup_id: authorizedGroupmap.groupId,
-        dbservice_id: authorizedGroupmap.serviceId,
-      });
-    }
-    for (const invites of item.sentInvitations) {
-      await DbInvitation.create({
-        senderReference: invites.senderId,
-        objReference: invites.objId,
-        receiverReference: invites.receiverId,
-      });
-    }
-    await DbIdDisplayname.create({
-      id: item.getId(),
-      displayname: item.getDisplayName(),
-    });
+    }).then(() =>
+      DbServiceCredential.create({
+        username: item.credentials.split(":")[0],
+        password: item.credentials.split(":")[1],
+      })
+    ).then(() =>
+      DbIdDisplayname.create({
+        id: item.getId(),
+        displayname: item.getDisplayName(),
+      })
+    );
+    await Promise.all(
+      item.authorizedUsers.map((authorizedUsermap) =>
+        DbUserService.create({
+          dbuser_id: authorizedUsermap.userId,
+          dbservice_id: authorizedUsermap.serviceId,
+          is_owner: authorizedUsermap.isOwner,
+        })
+      ),
+    );
+
+    await Promise.all(
+      item.authorizedGroups.map((authorizedGroupmap) =>
+        DbGroupService.create({
+          dbgroup_id: authorizedGroupmap.groupId,
+          dbservice_id: authorizedGroupmap.serviceId,
+        })
+      ),
+    );
+
+    await Promise.all(
+      item.sentInvitations.map((invites) =>
+        DbInvitation.create({
+          senderReference: invites.senderId,
+          objReference: invites.objId,
+          receiverReference: invites.receiverId,
+        })
+      ),
+    );
   }
   removeById(_id: string): Promise<void> {
     throw new Error("Method not implemented.");
