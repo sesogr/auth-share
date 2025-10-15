@@ -40,10 +40,15 @@ Deno.test("DbUserController", async (_t) => {
     new DbServiceRepository(),
     new DbUserRepository(),
   );
-  const serviceList = await serviceController.listMyServices({
+  const mockContext = {
     req: {},
     res: {},
-    json: (e) => console.log(e),
-  });
+    json: (e: object) => e,
+  };
+
+  //@ts-ignore mockContext
+  const serviceList = await serviceController.listMyServices(mockContext);
+  console.log(serviceList);
+  //@ts-ignore mocked result
   assertGreater(serviceList.length, 0);
 });
