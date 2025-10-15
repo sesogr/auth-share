@@ -49,8 +49,9 @@ export class DbUserRepository implements UserRepository {
           id: item.getId(),
           displayname: item.getDisplayName(),
         })
-      ).catch(() => {
-        throw new Error();
+      ).catch((e) => {
+        console.log(e);
+        throw e;
       })
     );
   }

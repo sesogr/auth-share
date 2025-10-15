@@ -19,14 +19,19 @@ export class DbServiceRepository implements ServiceRepository {
   constructor() {
   }
   async findOwnedByUserId(userId: string): Promise<Service[]> {
-    const userServiceData: DbService[] = await DbUserService.where(
+    const userServiceData: Model[] = await DbUserService.where(
       "dbuser_id",
       userId,
     )
-      .hasMany(DbService) as DbService[];
-    console.log(userServiceData);
+      .get() as Model[];
+
     return Promise.all(
-      userServiceData.map((e: DbService) => this.hydrate(e.id)),
+      userServiceData.map((e: Model) => {
+        if (!e.dbserviceId) {
+          throw new RuntimeError("No dbserviceId");
+        }
+        return this.hydrate(e.dbserviceId.toString());
+      }),
     );
   }
   findAuthorizedForId(_Id: string): Promise<Service[]> {
@@ -42,11 +47,12 @@ export class DbServiceRepository implements ServiceRepository {
     throw new Error("Method not implemented.");
   }
   async add(item: Service): Promise<void> {
-    DbService.create({
+    await DbService.create({
       id: item.getId(),
       serviceName: item.getDisplayName(),
     }).then(() =>
       DbServiceCredential.create({
+        dbservice_id: item.getId(),
         username: item.credentials.split(":")[0],
         password: item.credentials.split(":")[1],
       })
@@ -55,7 +61,10 @@ export class DbServiceRepository implements ServiceRepository {
         id: item.getId(),
         displayname: item.getDisplayName(),
       })
-    );
+    ).catch((e) => {
+      console.log(e);
+      throw e;
+    });
     await Promise.all(
       item.authorizedUsers.map((authorizedUsermap) =>
         DbUserService.create({
@@ -64,7 +73,10 @@ export class DbServiceRepository implements ServiceRepository {
           is_owner: authorizedUsermap.isOwner,
         })
       ),
-    );
+    ).catch((e) => {
+      console.log(e);
+      throw e;
+    });
 
     await Promise.all(
       item.authorizedGroups.map((authorizedGroupmap) =>
@@ -73,7 +85,10 @@ export class DbServiceRepository implements ServiceRepository {
           dbservice_id: authorizedGroupmap.serviceId,
         })
       ),
-    );
+    ).catch((e) => {
+      console.log(e);
+      throw e;
+    });
 
     await Promise.all(
       item.sentInvitations.map((invites) =>
@@ -83,7 +98,10 @@ export class DbServiceRepository implements ServiceRepository {
           receiverReference: invites.receiverId,
         })
       ),
-    );
+    ).catch((e) => {
+      console.log(e);
+      throw e;
+    });
   }
   removeById(_id: string): Promise<void> {
     throw new Error("Method not implemented.");
@@ -109,6 +127,10 @@ export class DbServiceRepository implements ServiceRepository {
     let credentials: ServiceCredential | DbServiceCredential =
       await (DbService.where("id", searchedId))
         .credentials();
+    if (!credentials) {
+      console.log(credentials);
+      throw new Error("Service has no credentials");
+    }
     credentials = new ServiceCredential(
       credentials.username.toString(),
       credentials.password.toString(),
@@ -169,7 +191,7 @@ export class DbServiceRepository implements ServiceRepository {
     array: Model[],
   ) => Promise<AllowedUserServiceMap | AllowedGroupServiceMap> {
     return async (e) => {
-      if (!e["db" + type + "Id"]) throw new NotFoundError("group_id");
+      if (!e["db" + type + "_id"]) throw new NotFoundError(type);
       const id = e["db" + type + "Id"]!.toString();
 
       const displayname = await DbIdDisplayname.where(

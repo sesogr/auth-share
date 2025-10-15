@@ -178,8 +178,8 @@ export class DbGroupRepository implements GroupRepository {
       }),
     );
   }
-  add(item: Group): Promise<void> {
-    DbGroup.create({
+  async add(item: Group): Promise<void> {
+    await DbGroup.create({
       groupname: item.getDisplayName(),
       owner: item.getOwner().id,
       id: item.getId(),
@@ -194,6 +194,9 @@ export class DbGroupRepository implements GroupRepository {
         id: item.getId(),
         displayname: item.getDisplayName(),
       })
-    );
+    ).catch((e) => {
+      console.log(e);
+      throw e;
+    });
   }
 }
