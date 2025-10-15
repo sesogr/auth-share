@@ -1,7 +1,6 @@
 import { Database, MySQLConnector } from "@denodb";
 import { Hono } from "@hono/hono";
 import { cors } from "@hono/hono/cors";
-import { FakeObjectGen } from "./FakeObjectGen.ts";
 import { DbUserRepository } from "./classes/Repositories/DenoDB/DbUserRepository.ts";
 import { DbGroup } from "./classes/Repositories/DenoDB/Models/DbGroup.ts";
 import { DbGroupService } from "./classes/Repositories/DenoDB/Models/DbGroupService.ts";
@@ -47,17 +46,17 @@ db.link([
 ]);
 //initialize repositories
 const serviceRepository: ServiceRepository = new DbServiceRepository();
-const groupRepository: GroupRepository = new DbGroupRepository();
+const _groupRepository: GroupRepository = new DbGroupRepository();
 const userRepository: UserRepository = new DbUserRepository();
 // Promise.all(FakeObjectGen.generateFakeUsers().map(async (e) =>
 //   await userRepository.save(e))
 // );
-Promise.all(
-  FakeObjectGen.generateFakeGroups().map((e) => groupRepository.save(e)),
-);
-Promise.all(
-  FakeObjectGen.generateFakeServices().map((e) => serviceRepository.save(e)),
-);
+// Promise.all(
+//   FakeObjectGen.generateFakeGroups().map((e) => groupRepository.save(e)),
+// );
+// Promise.all(
+//   FakeObjectGen.generateFakeServices().map((e) => serviceRepository.save(e)),
+// );
 // userRepository.findAll().forEach((e) => {
 //   serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
 // });
@@ -71,17 +70,30 @@ app.use(
 );
 //Endpoints
 const rootController = new RootController("Trees");
-app.get("/", rootController.sayHelloFromTrees.bind(rootController));
+app.get("/", (c) => {
+  return rootController.sayHelloFromTrees(c);
+});
 
 const dataController = new DataController();
-app.get("/data", dataController.getData.bind(dataController));
+app.get("/data", (c) => {
+  return dataController.getData(c);
+});
 
 const userController = new UserController(userRepository);
-app.get("/user", userController.read.bind(userController));
+app.get(
+  "/user",
+  (c) => {
+    return userController.read(c);
+  },
+);
 
 app.put(
   "/user/me/password",
-  userController.changePassword.bind(userController),
+  (c) => {
+    return userController.changePassword(
+      c,
+    );
+  },
 );
 
 const serviceController = new ServiceController(
@@ -90,14 +102,22 @@ const serviceController = new ServiceController(
 );
 app.get(
   "/user/owned",
-  serviceController.listMyServices.bind(serviceController), //TODO!!! Needs to be fixed!
+  (c) => {
+    return serviceController.listMyServices(
+      c,
+    );
+  }, //TODO!!! Needs to be fixed!
 );
 
 app.put();
 
-app.post("/user", userController.create.bind(userController));
+app.post("/user", (c) => {
+  return userController.create(c);
+});
 
-app.post("/service/create", serviceController.add.bind(serviceController));
+app.post("/service/create", (c) => {
+  return serviceController.add(c);
+});
 
 //app.get("/group", groupController);
 
