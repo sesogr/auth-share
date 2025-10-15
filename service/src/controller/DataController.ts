@@ -1,9 +1,8 @@
 import { Context } from "@hono/hono";
-import { AllOptional } from "../types/AllOptional.ts";
 export class DataController {
   constructor() {}
 
-  async getData(c: AllOptional<Context>) {
+  async getData(c: Context) {
     const url = "https://jsonplaceholder.typicode.com/posts"; // Ersetze dies durch deine URL
     try {
       const response = await fetch(url);

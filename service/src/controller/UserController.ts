@@ -3,13 +3,12 @@ import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { User } from "../classes/User.ts";
 import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
-import { AllOptional } from "../types/AllOptional.ts";
 
 export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
 
   async listMyServices(
-    c: AllOptional<Context>,
+    c: Context,
   ) {
     const user = await this.userRepository.findById(
       "f1504da5-8890-41a7-9023-8c3aef2f885a",
@@ -20,7 +19,7 @@ export class UserController {
     );
   }
 
-  async read(c: AllOptional<Context>) {
+  async read(c: Context) {
     const user = await this.userRepository.findById(
       "f1504da5-8890-41a7-9023-8c3aef2f885a",
     ); //To do with meaningfull
@@ -28,7 +27,7 @@ export class UserController {
       user.toJson(),
     );
   }
-  async changePassword(c: AllOptional<Context>) {
+  async changePassword(c: Context) {
     const requestData = await c.req!.json!();
     const newPassword: string = requestData.password;
     //TODO we need the loggedin User here!!
@@ -39,7 +38,7 @@ export class UserController {
     this.userRepository.save(myself);
     return c.body!(null, 204);
   }
-  async create(c: AllOptional<Context>) {
+  async create(c: Context) {
     c.res!.headers!.set!("Access-Control-Allow-Origin", "*");
     const requestData: ConvertedUser = await c.req!.json!();
 
