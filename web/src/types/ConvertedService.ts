@@ -5,6 +5,10 @@ export type ConvertedService =
   }
   | {
     [K in ServiceListProperties]: string[];
-  };
+  }
+    & {
+      serviceName: string;
+      credentials: string;
+    };
 
 type ServiceListProperties = "users" | "owners" | "groups" | "sentInvitations";
