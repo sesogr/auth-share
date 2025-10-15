@@ -9,6 +9,10 @@
   },
   "imports": {
     "@std/testing": "jsr:@std/testing@^1.0.15",
+    "@types/pg": "npm:@types/pg@^8.15.5",
+    "drizzle-kit": "npm:drizzle-kit@^0.31.5",
+    "drizzle-orm": "npm:drizzle-orm@^0.44.6",
+    "pg": "npm:pg@^8.16.3",
     "react-router-dom": "npm:react-router-dom",
     "react-dom/client": "npm:react-dom/client",
     "react": "npm:react",
