@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "@denodb";
-import { FieldAlias } from "https://deno.land/x/denodb@v1.4.0/lib/data-types.ts";
+import { FieldAlias } from "@denodb/datatypes";
 
 export class DbIdDisplayname extends Model {
   static override table = "IdDisplayname";
@@ -16,30 +16,12 @@ export class DbIdDisplayname extends Model {
   id!: string;
   displayname!: string;
 }
-// Relationships.belongsTo(DbIdDisplayname, DbUser, { foreignKey: "id" });
-// Relationships.belongsTo(DbIdDisplayname, DbService);
-// Relationships.belongsTo(DbIdDisplayname, DbGroup);
-
-export class DbUserHelper extends Model {
-  static override table = "IdDisplayname AS UserMap";
-  static override timestamps = true;
-  static override fields = {
-    id: DataTypes.STRING,
-    displayname: DataTypes.STRING,
-  };
-}
-
-export class DbServiceHelper extends Model {
-  static override table = "IdDisplayname AS ServiceMap";
-  static override timestamps = true;
-  static override fields = {
-    id: DataTypes.STRING,
-    displayname: DataTypes.STRING,
-  };
+class DbAliasHelper extends DbIdDisplayname {
+  protected static alias = "";
   static override field(field: string): string;
   static override field(field: string, nameAs: string): FieldAlias;
   static override field(field: string, nameAs?: string): string | FieldAlias {
-    const newLocal = `ServiceMap.${field}`;
+    const newLocal = `${this.alias}.${field}`;
     if (!Object.keys(this.fields).includes(field)) {
       throw new Error("Field does not Exist!");
     }
@@ -51,24 +33,31 @@ export class DbServiceHelper extends Model {
   }
 }
 
-export class DbGroupHelper extends Model {
-  static override table = "IdDisplayname AS GroupMap";
-  static override timestamps = true;
-  static override fields = {
-    id: DataTypes.STRING,
-    displayname: DataTypes.STRING,
-  };
-  static override field(field: string): string;
-  static override field(field: string, nameAs: string): FieldAlias;
-  static override field(field: string, nameAs?: string): string | FieldAlias {
-    const newLocal = `GroupMap.${field}`;
-    if (!Object.keys(this.fields).includes(field)) {
-      throw new Error("Field does not Exist!");
-    }
+export class DbUserHelper extends DbAliasHelper {
+  static override table = super.table + " AS UserMap";
+  static override alias = "UserMap";
+}
 
-    if (nameAs) {
-      return { [nameAs]: newLocal };
-    }
-    return newLocal;
-  }
+export class DbServiceHelper extends DbAliasHelper {
+  static override table = super.table + " AS ServiceMap";
+  static override alias = "ServiceMap";
+}
+
+export class DbGroupHelper extends DbAliasHelper {
+  static override table = super.table + " AS GroupMap";
+  static override alias = "GroupMap";
+}
+
+export class DbInvitationsObjHelper extends DbAliasHelper {
+  static override table = super.table + " AS InvitationObjMap";
+  static override alias = "InvitationObjMap";
+}
+
+export class DbInvitationsSenderHelper extends DbAliasHelper {
+  static override table = super.table + " AS InvitationSenderMap";
+  static override alias = "InvitationSenderMap";
+}
+export class DbInvitationsReceiverHelper extends DbAliasHelper {
+  static override table = super.table + " AS InvitationReceiverMap";
+  static override alias = "InvitationReceiverMap";
 }
