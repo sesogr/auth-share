@@ -9,6 +9,7 @@
     "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts"
   },
   "imports": {
+    "@denodb/datatypes": "https://deno.land/x/denodb@v1.4.0/lib/data-types.ts",
     "@std/testing": "jsr:@std/testing@^1.0.16",
     "@denodb": "https://deno.land/x/denodb@v1.4.0/mod.ts",
     "react-router-dom": "npm:react-router-dom@7.9.4",
