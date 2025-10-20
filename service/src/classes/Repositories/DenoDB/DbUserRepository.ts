@@ -19,6 +19,7 @@ import { DbUserService } from "./Models/DbUserService.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
 import { UserCredential } from "../../UserCredential.ts";
 import { Invitation } from "../../Invitation.ts";
+import { RuntimeError } from "../../../errors/RuntimeError.ts";
 
 export class DbUserRepository implements UserRepository {
   async findByName(name: string): Promise<User> {
@@ -168,29 +169,36 @@ export class DbUserRepository implements UserRepository {
         };
       }
 
-      const exists = tempData[searchedId].services.some((
-        s,
-      ) =>
-        s?.serviceId ===
-          record.serviceId /* && s.servicename === record.service */
-      );
-      if (!exists) {
+      const exists = (type: "service" | "group"): boolean => {
+        if (type == "service") {
+          return tempData[searchedId].services.some((
+            s,
+          ) =>
+            s!.serviceId ==
+              record.serviceId /* && s.servicename === record.service */
+          ) || record.serviceId == undefined;
+        } else if (type == "group") {
+          return tempData[searchedId].groups.some((g) =>
+            g!.groupId === record.groupId
+          ) || record.groupId == undefined;
+        }
+        throw new RuntimeError();
+      };
+      if (!exists("service")) {
         tempData[searchedId].services.push({
           serviceId: record.serviceId?.toString()!,
           servicename: record.service?.toString()!,
           is_owner: record.serviceOwner?.valueOf() as boolean,
         });
       }
-      const existingGoups = tempData[searchedId].groups.some((
-        s,
-      ) => s?.groupId === record.groupId);
-      if (!existingGoups) {
+      if (!exists("group")) {
         tempData[searchedId].groups.push({
           groupname: record.group?.toString()!,
           groupId: record.groupId?.toString()!,
           is_owner: record.groupOwner?.valueOf() as boolean,
         });
       }
+      if (record.invObjRef == undefined) continue;
       const invKey = record.invObjRef?.toString()! +
         record.invSendRef?.toString()!;
       if (!tempData[searchedId].invitations[invKey]) {

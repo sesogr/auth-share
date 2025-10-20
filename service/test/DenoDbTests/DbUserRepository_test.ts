@@ -27,7 +27,7 @@ import {
 } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 import fakeUser from "../testuser.json" with { type: "json" };
-import { UserCredential } from "../../src/classes/UserCredential.ts";
+import { RuntimeError } from "../../src/errors/RuntimeError.ts";
 const connector = new MySQLConnector({
   database: "authshare",
   host: "localhost",
@@ -222,29 +222,37 @@ Deno.test("Hydrate with GroupChange", async () => {
         invitations: {},
       };
     }
-    const exists = tempData[userId].services.some((
-      s,
-    ) =>
-      s?.serviceId ===
-        record.serviceId /* && s.servicename === record.service */
-    );
-    if (!exists) {
+    const exists = (type: "service" | "group"): boolean => {
+      if (type == "service") {
+        return tempData[userId].services.some((
+          s,
+        ) =>
+          s!.serviceId ==
+            record.serviceId /* && s.servicename === record.service */
+        ) || record.serviceId == undefined;
+      } else if (type == "group") {
+        return tempData[userId].groups.some((g) =>
+          g!.groupId === record.groupId
+        ) || record.groupId == undefined;
+      }
+      throw new RuntimeError();
+    };
+    if (!exists("service")) {
       tempData[userId].services.push({
         serviceId: record.serviceId?.toString()!,
         servicename: record.service?.toString()!,
         is_owner: record.serviceOwner?.valueOf() as boolean,
       });
     }
-    const existingGoups = tempData[userId].groups.some((
-      s,
-    ) => s?.groupId === record.groupId);
-    if (!existingGoups) {
+
+    if (!exists("group")) {
       tempData[userId].groups.push({
         groupname: record.group?.toString()!,
         groupId: record.groupId?.toString()!,
         is_owner: record.groupOwner?.valueOf() as boolean,
       });
     }
+    if (record.invObjRef == undefined) continue;
     const invKey = record.invObjRef?.toString()! +
       record.invSendRef?.toString()!;
     if (!tempData[userId].invitations[invKey]) {
@@ -261,4 +269,5 @@ Deno.test("Hydrate with GroupChange", async () => {
     }
   }
   console.log(tempData);
+  console.log(Object.keys(tempData[Object.keys(tempData)[0]].invitations));
 });
