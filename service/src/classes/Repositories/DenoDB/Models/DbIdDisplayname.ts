@@ -34,30 +34,30 @@ class DbAliasHelper extends DbIdDisplayname {
 }
 
 export class DbUserHelper extends DbAliasHelper {
-  static override table = super.table + " AS UserMap";
-  static override alias = "UserMap";
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
 }
 
 export class DbServiceHelper extends DbAliasHelper {
-  static override table = super.table + " AS ServiceMap";
-  static override alias = "ServiceMap";
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
 }
 
 export class DbGroupHelper extends DbAliasHelper {
-  static override table = super.table + " AS GroupMap";
-  static override alias = "GroupMap";
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
 }
 
 export class DbInvitationsObjHelper extends DbAliasHelper {
-  static override table = super.table + " AS InvitationObjMap";
-  static override alias = "InvitationObjMap";
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
 }
 
 export class DbInvitationsSenderHelper extends DbAliasHelper {
-  static override table = super.table + " AS InvitationSenderMap";
-  static override alias = "InvitationSenderMap";
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
 }
 export class DbInvitationsReceiverHelper extends DbAliasHelper {
-  static override table = super.table + " AS InvitationReceiverMap";
-  static override alias = "InvitationReceiverMap";
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
 }
