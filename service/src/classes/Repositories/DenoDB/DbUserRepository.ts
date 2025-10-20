@@ -1,17 +1,24 @@
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { User } from "../../User.ts";
-import { UserCredential } from "../../UserCredential.ts";
-import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
+import {
+  DbGroupHelper,
+  DbIdDisplayname,
+  DbInvitationsObjHelper,
+  DbInvitationsSenderHelper,
+  DbServiceHelper,
+} from "./Models/DbIdDisplayname.ts";
 import { DbUser } from "./Models/DbUser.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
-import { Invitation } from "../../Invitation.ts";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
 import { Model } from "@denodb";
-import { RuntimeError } from "../../../errors/RuntimeError.ts";
+import { DbUserService } from "./Models/DbUserService.ts";
+import { DbInvitation } from "./Models/DbInvitation.ts";
+import { UserCredential } from "../../UserCredential.ts";
+import { Invitation } from "../../Invitation.ts";
 
 export class DbUserRepository implements UserRepository {
   async findByName(name: string): Promise<User> {
@@ -66,78 +73,170 @@ export class DbUserRepository implements UserRepository {
       throw error;
     }
   }
+  //User_ID=searchedId
   async hydrate(searchedId: string): Promise<User> {
-    //For now the only thing i saw to make the code thinner
+    const queryData = await DbUser
+      .select(
+        DbUser.field("displayname", "username"),
+        DbUserCredential.field("username", "un_cred"),
+        DbUserCredential.field("password", "pw_cred"),
+        DbServiceHelper.field("displayname", "service"),
+        DbServiceHelper.field("id", "serviceID"),
+        DbUserService.field("is_owner", "serviceOwner"),
+        DbGroupHelper.field("displayname", "group"),
+        DbGroupHelper.field("id", "groupID"),
+        DbUserGroup.field("is_owner", "groupOwner"),
+        DbInvitationsObjHelper.field("displayname", "invObjRefName"),
+        DbInvitationsSenderHelper.field("displayname", "invSendRefName"),
+        DbInvitation.field("obj_reference", "invObjRef"),
+        DbInvitation.field("sender_reference", "invSendRef"),
+      )
+      .leftJoin(
+        DbUserGroup,
+        DbUserGroup.field("dbuser_id"),
+        DbUser.field("id"),
+      )
+      .leftJoin(
+        DbUserService,
+        DbUserService.field("dbuser_id"),
+        DbUser.field("id"),
+      )
+      .leftJoin(
+        DbUserCredential,
+        DbUserCredential.field("dbuser_id"),
+        DbUser.field("id"),
+      )
+      .leftJoin(
+        DbInvitation,
+        DbInvitation.field("receiver_reference"),
+        DbUser.field("id"),
+      )
+      .leftJoin(
+        DbInvitationsObjHelper,
+        DbInvitationsObjHelper.field("id"),
+        DbInvitation.field("obj_reference"),
+      )
+      .leftJoin(
+        DbInvitationsSenderHelper,
+        DbInvitationsSenderHelper.field("id"),
+        DbInvitation.field("sender_reference"),
+      )
+      .leftJoin(
+        DbServiceHelper,
+        DbServiceHelper.field("id"),
+        DbUserService.field("dbservice_id"),
+      )
+      .leftJoin(
+        DbGroupHelper,
+        DbGroupHelper.field("id"),
+        DbUserGroup.field("dbgroup_id"),
+      )
+      .where("Users_id", searchedId)
+      .get() as Model[];
 
-    const dbItem = await (DbUser.where("id", searchedId)).first();
-    if (!dbItem) {
-      throw new NotFoundError("User not found");
-    }
-    const username =
-      (await (DbUser.where("id", searchedId)).credentials()).username;
-    if (!username) {
-      throw new Error("User has no credentials");
-    }
-    const password =
-      (await (DbUser.where("id", searchedId)).credentials()).password;
-    if (!password) {
-      throw new Error("User has no credentials");
-    }
-    const credentials = new UserCredential(
-      username.toString(),
-      password.toString(),
-    );
-    let displayname = dbItem.displayname;
-    if (!displayname) throw new NotFoundError(`${displayname} not found`);
-    displayname = displayname.toString();
-    const userServiceData = await DbUser.where("id", searchedId)
-      .authorizedServices();
-    //am i get this right?
-    //const userServiceData = await DbUser.where("id", searchedId).hasMany(DbUserService) as Promise<Model[]>;
+    const tempData: {
+      [k in string]: {
+        credentials: {
+          un_cred: string;
+          pw_cred: string;
+        };
+        displayname: string;
+        services: [
+          { serviceId: string; servicename: string; is_owner: boolean }?,
+        ];
+        groups: [{ groupId: string; groupname: string; is_owner: boolean }?];
+        invitations: {
+          [l in string]: {
+            objRef: { id: string; displayname: string };
+            senderRef: { id: string; displayname: string };
+          };
+        };
+      };
+    } = {};
 
-    // if (!Array.isArray(userServiceData)) {
-    //   console.log(userServiceData);
-    //   throw new Error("Expected for typesafety");
-    // }
-    const serviceList: AllowedUserServiceMap[] = await Promise.all(
-      userServiceData.map(
-        this.createMapCallback(searchedId, displayname, "service"),
-      ),
-    ) as AllowedUserServiceMap[];
-    const userGroupData = await DbUserGroup.where("dbuser_id", searchedId)
-      .get();
-    if (!Array.isArray(userGroupData)) {
-      throw new Error("Expected for typesafety");
-    }
-    const joinedGroups: AllowedUserGroupMap[] = await Promise.all(
-      userGroupData.map(
-        this.createMapCallback(searchedId, displayname, "group"),
-      ),
-    ) as AllowedUserGroupMap[];
-    const invitationData = await (DbUser.where("id", searchedId))
-      .receivedInvitations();
+    for (const record of queryData) {
+      if (!tempData[searchedId]) {
+        tempData[searchedId] = {
+          credentials: {
+            un_cred: record.un_cred?.toString()!,
+            pw_cred: record.pw_cred?.toString()!,
+          },
+          displayname: record.username?.toString()!,
+          services: [],
+          groups: [],
+          invitations: {},
+        };
+      }
 
-    //is there a difference between sentInvites and this invitations?
-    const invitations: Invitation[] = await Promise.all(
-      invitationData.map(async (e) => {
-        const senderId = e.senderReference?.toString() ?? "";
-        const objId = e.objReference?.toString() ?? "";
-        const receiverId = e.receiverReference?.toString() ?? "";
-        return new Invitation(
-          new IdNameMap(
-            senderId,
-            await DbIdDisplayname.displayname(senderId),
-          ),
-          new IdNameMap(
-            objId,
-            await DbIdDisplayname.displayname(objId),
-          ),
-          new IdNameMap(
-            receiverId,
-            await DbIdDisplayname.displayname(receiverId),
-          ),
+      const exists = () =>
+        tempData[searchedId].services.some((
+          s,
+        ) =>
+          s?.serviceId ===
+            record.serviceId /* && s.servicename === record.service */
         );
-      }),
+      if (!exists) {
+        tempData[searchedId].services.push({
+          serviceId: record.serviceId?.toString()!,
+          servicename: record.service?.toString()!,
+          is_owner: record.serviceOwner?.valueOf() as boolean,
+        });
+      }
+      const existingGoups = () =>
+        tempData[searchedId].groups.some((
+          s,
+        ) => s?.groupId === record.groupId);
+      if (!existingGoups) {
+        tempData[searchedId].groups.push({
+          groupname: record.group?.toString()!,
+          groupId: record.groupId?.toString()!,
+          is_owner: record.groupOwner?.valueOf() as boolean,
+        });
+      }
+      const invKey = record.invObjRef?.toString()! +
+        record.invSendRef?.toString()!;
+      if (!tempData[searchedId].invitations[invKey]) {
+        tempData[searchedId].invitations[invKey] = {
+          "objRef": {
+            "displayname": record.invObjRefName?.toString()!,
+            "id": record.invObjRef?.toString()!,
+          },
+          "senderRef": {
+            "displayname": record.invSendRefName?.toString()!,
+            "id": record.invSendRef?.toString()!,
+          },
+        };
+      }
+    }
+    //Map
+    const temp = tempData[searchedId];
+    const credentials = new UserCredential(
+      temp.credentials.un_cred,
+      temp.credentials.pw_cred,
+    );
+    const displayname = temp.displayname;
+    const userRef = new IdNameMap(searchedId, displayname);
+    const serviceList: AllowedUserServiceMap[] = temp.services.map((e) =>
+      new AllowedUserServiceMap(
+        userRef,
+        new IdNameMap(e?.serviceId!, e?.servicename!),
+        e?.is_owner,
+      )
+    );
+    const invitations: Invitation[] = Object.keys(temp.invitations).map((e) => {
+      const currData = temp.invitations[e];
+      return new Invitation(
+        new IdNameMap(currData.senderRef.id, currData.senderRef.displayname),
+        new IdNameMap(currData.objRef.id, currData.objRef.displayname),
+        userRef,
+      );
+    });
+    const joinedGroups: AllowedUserGroupMap[] = temp.groups.map((e) =>
+      new AllowedUserGroupMap(
+        userRef,
+        new IdNameMap(e?.groupId!, e?.groupname!),
+        e?.is_owner,
+      )
     );
     const user: User = new User(
       credentials,
@@ -148,47 +247,5 @@ export class DbUserRepository implements UserRepository {
       joinedGroups,
     );
     return user;
-  }
-
-  private createMapCallback(
-    searchedId: string,
-    displayname: string,
-    type: "service" | "group",
-  ): (
-    value: Model,
-    index: number,
-    array: Model[],
-  ) => Promise<AllowedUserServiceMap | AllowedUserGroupMap> {
-    return async (e: Model) => {
-      if (!e["db" + type + "Id"]) {
-        throw new Error("Expected for typesafety");
-      }
-      const serviceModel = await DbIdDisplayname.where(
-        "id",
-        e["db" + type + "Id"]!.toString(),
-      ).first();
-      const targetName = serviceModel.displayname;
-      if (type == "service") {
-        return new AllowedUserServiceMap(
-          new IdNameMap(searchedId, displayname?.toString() ?? ""),
-          new IdNameMap(
-            e["db" + type + "Id"]!.toString(),
-            targetName?.toString() ?? "",
-          ),
-          e.isOwner?.valueOf() as boolean ?? false,
-        );
-      }
-      if (type == "group") {
-        return new AllowedUserGroupMap(
-          new IdNameMap(searchedId, displayname?.toString() ?? ""),
-          new IdNameMap(
-            e["db" + type + "Id"]!.toString(),
-            targetName?.toString() ?? "",
-          ),
-          e.isOwner?.valueOf() as boolean ?? false,
-        );
-      }
-      throw new RuntimeError();
-    };
   }
 }
