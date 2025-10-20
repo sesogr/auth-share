@@ -168,13 +168,12 @@ export class DbUserRepository implements UserRepository {
         };
       }
 
-      const exists = () =>
-        tempData[searchedId].services.some((
-          s,
-        ) =>
-          s?.serviceId ===
-            record.serviceId /* && s.servicename === record.service */
-        );
+      const exists = tempData[searchedId].services.some((
+        s,
+      ) =>
+        s?.serviceId ===
+          record.serviceId /* && s.servicename === record.service */
+      );
       if (!exists) {
         tempData[searchedId].services.push({
           serviceId: record.serviceId?.toString()!,
@@ -182,10 +181,9 @@ export class DbUserRepository implements UserRepository {
           is_owner: record.serviceOwner?.valueOf() as boolean,
         });
       }
-      const existingGoups = () =>
-        tempData[searchedId].groups.some((
-          s,
-        ) => s?.groupId === record.groupId);
+      const existingGoups = tempData[searchedId].groups.some((
+        s,
+      ) => s?.groupId === record.groupId);
       if (!existingGoups) {
         tempData[searchedId].groups.push({
           groupname: record.group?.toString()!,
