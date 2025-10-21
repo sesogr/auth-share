@@ -4,7 +4,7 @@ import { DbGroup } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import {
   DbIdDisplayname,
-  DbIdDisplaynameInvitations2Receiver,
+  DbIdDisplaynameInvitations2Sender,
   DbIdDisplaynameInvitationsObj,
   DbIdDisplaynameInvitationsReceiver,
   DbIdDisplaynameInvitationsSender,
@@ -163,9 +163,9 @@ export class DbGroupRepository implements GroupRepository {
         DbInvitationJoinOnReceived.field("objReference"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitations2Receiver,
-        DbIdDisplaynameInvitations2Receiver.field("id"),
-        DbInvitationJoinOnReceived.field("receiverReference"),
+        DbIdDisplaynameInvitations2Sender,
+        DbIdDisplaynameInvitations2Sender.field("id"),
+        DbInvitationJoinOnReceived.field("senderReference"),
       )
       .where("Group_id", searchedId)
       .get() as Model[];
