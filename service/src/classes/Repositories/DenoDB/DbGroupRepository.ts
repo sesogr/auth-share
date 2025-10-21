@@ -5,7 +5,7 @@ import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import {
   DbIdDisplayname,
   DbIdDisplaynameInvitations2Receiver,
-  DbIdDisplaynameInvitations2Sender,
+  DbIdDisplaynameInvitationsObj,
   DbIdDisplaynameInvitationsReceiver,
   DbIdDisplaynameInvitationsSender,
   DbIdDisplaynameService,
@@ -158,9 +158,9 @@ export class DbGroupRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitations2Sender,
-        DbIdDisplaynameInvitations2Sender.field("id"),
-        DbInvitationJoinOnReceived.field("senderReference"),
+        DbIdDisplaynameInvitationsObj,
+        DbIdDisplaynameInvitationsObj.field("id"),
+        DbInvitationJoinOnReceived.field("objReference"),
       )
       .leftJoin(
         DbIdDisplaynameInvitations2Receiver,
