@@ -2,7 +2,16 @@ import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
 import { Group } from "../../Group.ts";
 import { DbGroup } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
-import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
+import {
+  DbIdDisplayname,
+  DbIdDisplaynameReceiver,
+  DbInvitationsObjHelper,
+  DbInvitationsReceiverHelper,
+  DbInvitationsSenderHelper,
+  DbInvitationsSenderHelper2,
+  DbServiceHelper,
+  DbUserHelper,
+} from "./Models/DbIdDisplayname.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
@@ -10,6 +19,12 @@ import { Invitation } from "../../Invitation.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { Model } from "@denodb";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
+import { DbGroupService } from "./Models/DbGroupService.ts";
+import {
+  DbInvitationJoinOnObject,
+  DbInvitationJoinOnReceived,
+} from "./Models/DbInvitation.ts";
+import { ShortEntity } from "../../../interfaceTypes/ShortEntity.ts";
 
 export class DbGroupRepository implements GroupRepository {
   async findByName(name: string): Promise<Group> {
@@ -96,6 +111,108 @@ export class DbGroupRepository implements GroupRepository {
         this.createMapCallbackallowedLists(searchedId, groupname, "user"),
       ),
     ) as AllowedUserGroupMap[];
+
+    const _queryData = await DbGroup
+      .select(
+        DbGroup.field("groupname"),
+        DbGroup.field("owner"),
+        DbGroup.field("id"),
+        DbGroupService.field("serviceList"),
+        DbInvitationJoinOnObject.field("objReference"),
+        DbInvitationJoinOnReceived.field("receiverReference"),
+        DbUserGroup.field("dbuser_id"),
+        DbInvitationsObjHelper.field("displayname", "objInvitation"),
+        DbInvitationsReceiverHelper.field("displayname", "recInvitation"),
+      )
+      .leftJoin(
+        DbUserGroup,
+        DbUserGroup.field("dbgroup_id"),
+        DbGroup.field("id"),
+      )
+      .leftJoin(
+        DbUserHelper,
+        DbUserHelper.field("id"),
+        DbUserGroup.field("dbuser_id"),
+      )
+      .leftJoin(
+        DbGroupService,
+        DbGroupService.field("dbgroup_id"),
+        DbGroup.field("id"),
+      )
+      .leftJoin(
+        DbServiceHelper,
+        DbServiceHelper.field("id"),
+        DbGroupService.field("dbservice_id"),
+      )
+      .leftJoin(
+        DbInvitationJoinOnObject,
+        DbInvitationJoinOnObject.field("objReference"),
+        DbGroup.field("id"),
+      )
+      .leftJoin(
+        DbIdDisplaynameReceiver,
+        DbIdDisplaynameReceiver.field("id"),
+        DbInvitationJoinOnObject.field("receiverReference"),
+      )
+      .leftJoin(
+        DbInvitationsSenderHelper,
+        DbInvitationsSenderHelper.field("id"),
+        DbInvitationJoinOnObject.field("senderReference"),
+      )
+      .leftJoin(
+        DbInvitationJoinOnReceived,
+        DbInvitationJoinOnReceived.field("receiverReference"),
+        DbGroup.field("id"),
+      )
+      .leftJoin(
+        DbInvitationsReceiverHelper,
+        DbInvitationsReceiverHelper.field("id"),
+        DbInvitationJoinOnReceived.field("senderReference"),
+      )
+      .leftJoin(
+        DbInvitationsSenderHelper2,
+        DbInvitationsSenderHelper2.field("id"),
+        DbInvitationJoinOnReceived.field("receiverReference"),
+      )
+      .where("Group_id", searchedId)
+      .get() as Model[];
+
+    const _tempData: {
+      [k in string]: {
+        groupname: string;
+        //type idnamemap
+        owner: string;
+        //values of serviceList are objects or concatinated strings
+        serviceList: [{ serviceId: string; servicename: string }];
+        sentInvitations: {
+          [l in string]: {
+            receiverRef: { id: string; displayname: string };
+            senderRef: { id: string; displayname: string };
+          };
+        };
+        receivedInvitations: {
+          [m in string]: {
+            objRef: { id: string; displayname: string };
+            senderRef: { id: string; displayname: string };
+          };
+        };
+        allowedUser: [{ userRef: ShortEntity; groupRef: ShortEntity }];
+      };
+    } = {};
+
+    // for (const record of queryData) {
+    //   if (!tempData[searchedId]) {
+    //     tempData[searchedId] = {
+    //       groupname: record.groupname?.toString()!,
+    //       owner: record.owner?.valueOf()!,
+    //       serviceList: [],
+    //       sentInvitations: {},
+    //       receivedInvitations: {},
+    //       allowedUser: [],
+    //     };
+    //   }
+    // }
+    //hydration
     const group: Group = new Group(
       groupname,
       owner,
@@ -107,6 +224,7 @@ export class DbGroupRepository implements GroupRepository {
     );
     return group;
   }
+
   private createMapCallbackallowedLists(
     searchedId: string,
     groupname: string,

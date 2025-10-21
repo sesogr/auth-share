@@ -61,3 +61,11 @@ export class DbInvitationsReceiverHelper extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
+export class DbIdDisplaynameReceiver extends DbAliasHelper {
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
+}
+export class DbInvitationsSenderHelper2 extends DbAliasHelper {
+  static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
+}
