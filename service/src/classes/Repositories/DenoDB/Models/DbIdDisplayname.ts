@@ -33,39 +33,39 @@ class DbAliasHelper extends DbIdDisplayname {
   }
 }
 
-export class DbUserHelper extends DbAliasHelper {
+export class DbIdDisplaynameUser extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbServiceHelper extends DbAliasHelper {
+export class DbIdDisplaynameService extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbGroupHelper extends DbAliasHelper {
+export class DbIdDisplaynameGroups extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbInvitationsObjHelper extends DbAliasHelper {
+export class DbIdDisplaynameInvitationsObj extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbInvitationsSenderHelper extends DbAliasHelper {
+export class DbIdDisplaynameInvitationsSender extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
-export class DbInvitationsReceiverHelper extends DbAliasHelper {
+export class DbIdDisplaynameInvitationsReceiver extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
-export class DbIdDisplaynameReceiver extends DbAliasHelper {
+export class DbIdDisplaynameInvitations2Receiver extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }
-export class DbInvitationsSenderHelper2 extends DbAliasHelper {
+export class DbIdDisplaynameInvitations2Sender extends DbAliasHelper {
   static override alias = crypto.randomUUID();
   static override table = super.table + " AS " + this.alias;
 }

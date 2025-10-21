@@ -2,11 +2,11 @@ import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { User } from "../../User.ts";
 import {
-  DbGroupHelper,
   DbIdDisplayname,
-  DbInvitationsObjHelper,
-  DbInvitationsSenderHelper,
-  DbServiceHelper,
+  DbIdDisplaynameGroups,
+  DbIdDisplaynameInvitationsObj,
+  DbIdDisplaynameInvitationsSender,
+  DbIdDisplaynameService,
 } from "./Models/DbIdDisplayname.ts";
 import { DbUser } from "./Models/DbUser.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
@@ -81,14 +81,14 @@ export class DbUserRepository implements UserRepository {
         DbUser.field("displayname", "username"),
         DbUserCredential.field("username", "un_cred"),
         DbUserCredential.field("password", "pw_cred"),
-        DbServiceHelper.field("displayname", "service"),
-        DbServiceHelper.field("id", "serviceID"),
+        DbIdDisplaynameService.field("displayname", "service"),
+        DbIdDisplaynameService.field("id", "serviceID"),
         DbUserService.field("is_owner", "serviceOwner"),
-        DbGroupHelper.field("displayname", "group"),
-        DbGroupHelper.field("id", "groupID"),
+        DbIdDisplaynameGroups.field("displayname", "group"),
+        DbIdDisplaynameGroups.field("id", "groupID"),
         DbUserGroup.field("is_owner", "groupOwner"),
-        DbInvitationsObjHelper.field("displayname", "invObjRefName"),
-        DbInvitationsSenderHelper.field("displayname", "invSendRefName"),
+        DbIdDisplaynameInvitationsObj.field("displayname", "invObjRefName"),
+        DbIdDisplaynameInvitationsSender.field("displayname", "invSendRefName"),
         DbInvitation.field("obj_reference", "invObjRef"),
         DbInvitation.field("sender_reference", "invSendRef"),
       )
@@ -113,23 +113,23 @@ export class DbUserRepository implements UserRepository {
         DbUser.field("id"),
       )
       .leftJoin(
-        DbInvitationsObjHelper,
-        DbInvitationsObjHelper.field("id"),
+        DbIdDisplaynameInvitationsObj,
+        DbIdDisplaynameInvitationsObj.field("id"),
         DbInvitation.field("obj_reference"),
       )
       .leftJoin(
-        DbInvitationsSenderHelper,
-        DbInvitationsSenderHelper.field("id"),
+        DbIdDisplaynameInvitationsSender,
+        DbIdDisplaynameInvitationsSender.field("id"),
         DbInvitation.field("sender_reference"),
       )
       .leftJoin(
-        DbServiceHelper,
-        DbServiceHelper.field("id"),
+        DbIdDisplaynameService,
+        DbIdDisplaynameService.field("id"),
         DbUserService.field("dbservice_id"),
       )
       .leftJoin(
-        DbGroupHelper,
-        DbGroupHelper.field("id"),
+        DbIdDisplaynameGroups,
+        DbIdDisplaynameGroups.field("id"),
         DbUserGroup.field("dbgroup_id"),
       )
       .where("Users_id", searchedId)

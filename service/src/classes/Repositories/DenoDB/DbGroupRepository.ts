@@ -4,13 +4,12 @@ import { DbGroup } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import {
   DbIdDisplayname,
-  DbIdDisplaynameReceiver,
-  DbInvitationsObjHelper,
-  DbInvitationsReceiverHelper,
-  DbInvitationsSenderHelper,
-  DbInvitationsSenderHelper2,
-  DbServiceHelper,
-  DbUserHelper,
+  DbIdDisplaynameInvitations2Receiver,
+  DbIdDisplaynameInvitations2Sender,
+  DbIdDisplaynameInvitationsReceiver,
+  DbIdDisplaynameInvitationsSender,
+  DbIdDisplaynameService,
+  DbIdDisplaynameUser,
 } from "./Models/DbIdDisplayname.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
@@ -117,12 +116,6 @@ export class DbGroupRepository implements GroupRepository {
         DbGroup.field("groupname"),
         DbGroup.field("owner"),
         DbGroup.field("id"),
-        DbGroupService.field("serviceList"),
-        DbInvitationJoinOnObject.field("objReference"),
-        DbInvitationJoinOnReceived.field("receiverReference"),
-        DbUserGroup.field("dbuser_id"),
-        DbInvitationsObjHelper.field("displayname", "objInvitation"),
-        DbInvitationsReceiverHelper.field("displayname", "recInvitation"),
       )
       .leftJoin(
         DbUserGroup,
@@ -130,8 +123,8 @@ export class DbGroupRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbUserHelper,
-        DbUserHelper.field("id"),
+        DbIdDisplaynameUser,
+        DbIdDisplaynameUser.field("id"),
         DbUserGroup.field("dbuser_id"),
       )
       .leftJoin(
@@ -140,8 +133,8 @@ export class DbGroupRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbServiceHelper,
-        DbServiceHelper.field("id"),
+        DbIdDisplaynameService,
+        DbIdDisplaynameService.field("id"),
         DbGroupService.field("dbservice_id"),
       )
       .leftJoin(
@@ -150,13 +143,13 @@ export class DbGroupRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameReceiver,
-        DbIdDisplaynameReceiver.field("id"),
+        DbIdDisplaynameInvitationsReceiver,
+        DbIdDisplaynameInvitationsReceiver.field("id"),
         DbInvitationJoinOnObject.field("receiverReference"),
       )
       .leftJoin(
-        DbInvitationsSenderHelper,
-        DbInvitationsSenderHelper.field("id"),
+        DbIdDisplaynameInvitationsSender,
+        DbIdDisplaynameInvitationsSender.field("id"),
         DbInvitationJoinOnObject.field("senderReference"),
       )
       .leftJoin(
@@ -165,13 +158,13 @@ export class DbGroupRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbInvitationsReceiverHelper,
-        DbInvitationsReceiverHelper.field("id"),
+        DbIdDisplaynameInvitations2Sender,
+        DbIdDisplaynameInvitations2Sender.field("id"),
         DbInvitationJoinOnReceived.field("senderReference"),
       )
       .leftJoin(
-        DbInvitationsSenderHelper2,
-        DbInvitationsSenderHelper2.field("id"),
+        DbIdDisplaynameInvitations2Receiver,
+        DbIdDisplaynameInvitations2Receiver.field("id"),
         DbInvitationJoinOnReceived.field("receiverReference"),
       )
       .where("Group_id", searchedId)

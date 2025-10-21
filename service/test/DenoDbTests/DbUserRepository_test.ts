@@ -8,11 +8,11 @@ import {
   DbGroupService,
 } from "../../src/classes/Repositories/DenoDB/Models/DbGroupService.ts";
 import {
-  DbGroupHelper,
   DbIdDisplayname,
-  DbInvitationsObjHelper,
-  DbInvitationsSenderHelper,
-  DbServiceHelper,
+  DbIdDisplaynameGroups,
+  DbIdDisplaynameInvitationsObj,
+  DbIdDisplaynameInvitationsSender,
+  DbIdDisplaynameService,
 } from "../../src/classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
 import { DbInvitation } from "../../src/classes/Repositories/DenoDB/Models/DbInvitation.ts";
 import { DbService } from "../../src/classes/Repositories/DenoDB/Models/DbService.ts";
@@ -26,7 +26,7 @@ import {
   DbUserService,
 } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
-import fakeUser from "../testuser.json" with { type: "json" };
+//import fakeUser from "../testuser.json" with { type: "json" };
 import { RuntimeError } from "../../src/errors/RuntimeError.ts";
 const connector = new MySQLConnector({
   database: "authshare",
@@ -86,10 +86,10 @@ Deno.test("HYdrate with DenoDB", async () => {
       DbUser.field("displayname", "Username"),
       DbUserCredential.field("username", "uncred"),
       DbUserCredential.field("password", "pwcred"),
-      DbServiceHelper.field("displayname", "Service"),
-      DbServiceHelper.field("id", "ServiceID"),
-      DbGroupHelper.field("displayname", "Group"),
-      DbGroupHelper.field("id", "GroupID"),
+      DbIdDisplaynameService.field("displayname", "Service"),
+      DbIdDisplaynameService.field("id", "ServiceID"),
+      DbIdDisplaynameGroups.field("displayname", "Group"),
+      DbIdDisplaynameGroups.field("id", "GroupID"),
       DbInvitation.field("obj_reference", "InvObjRef"),
       DbInvitation.field("sender_reference", "InvSendRef"),
     )
@@ -114,13 +114,13 @@ Deno.test("HYdrate with DenoDB", async () => {
       DbUser.field("id"),
     )
     .leftJoin(
-      DbServiceHelper,
-      DbServiceHelper.field("id"),
+      DbIdDisplaynameService,
+      DbIdDisplaynameService.field("id"),
       DbUserService.field("dbservice_id"),
     )
     .leftJoin(
-      DbGroupHelper,
-      DbGroupHelper.field("id"),
+      DbIdDisplaynameGroups,
+      DbIdDisplaynameGroups.field("id"),
       DbUserGroup.field("dbgroup_id"),
     ).get();
 
@@ -135,14 +135,14 @@ Deno.test("Hydrate with GroupChange", async () => {
       DbUser.field("displayname", "username"),
       DbUserCredential.field("username", "un_cred"),
       DbUserCredential.field("password", "pw_cred"),
-      DbServiceHelper.field("displayname", "service"),
-      DbServiceHelper.field("id", "serviceID"),
+      DbIdDisplaynameService.field("displayname", "service"),
+      DbIdDisplaynameService.field("id", "serviceID"),
       DbUserService.field("is_owner", "serviceOwner"),
-      DbGroupHelper.field("displayname", "group"),
-      DbGroupHelper.field("id", "groupID"),
+      DbIdDisplaynameGroups.field("displayname", "group"),
+      DbIdDisplaynameGroups.field("id", "groupID"),
       DbUserGroup.field("is_owner", "groupOwner"),
-      DbInvitationsObjHelper.field("displayname", "invObjRefName"),
-      DbInvitationsSenderHelper.field("displayname", "invSendRefName"),
+      DbIdDisplaynameInvitationsObj.field("displayname", "invObjRefName"),
+      DbIdDisplaynameInvitationsSender.field("displayname", "invSendRefName"),
       DbInvitation.field("obj_reference", "invObjRef"),
       DbInvitation.field("sender_reference", "invSendRef"),
     )
@@ -167,23 +167,23 @@ Deno.test("Hydrate with GroupChange", async () => {
       DbUser.field("id"),
     )
     .leftJoin(
-      DbInvitationsObjHelper,
-      DbInvitationsObjHelper.field("id"),
+      DbIdDisplaynameInvitationsObj,
+      DbIdDisplaynameInvitationsObj.field("id"),
       DbInvitation.field("obj_reference"),
     )
     .leftJoin(
-      DbInvitationsSenderHelper,
-      DbInvitationsSenderHelper.field("id"),
+      DbIdDisplaynameInvitationsSender,
+      DbIdDisplaynameInvitationsSender.field("id"),
       DbInvitation.field("sender_reference"),
     )
     .leftJoin(
-      DbServiceHelper,
-      DbServiceHelper.field("id"),
+      DbIdDisplaynameService,
+      DbIdDisplaynameService.field("id"),
       DbUserService.field("dbservice_id"),
     )
     .leftJoin(
-      DbGroupHelper,
-      DbGroupHelper.field("id"),
+      DbIdDisplaynameGroups,
+      DbIdDisplaynameGroups.field("id"),
       DbUserGroup.field("dbgroup_id"),
     )
     .get() as Model[];
