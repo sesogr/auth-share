@@ -33,6 +33,7 @@ const Home: React.FC = () => {
   return (
     <div>
       <h1>Service List</h1>
+      <CreateService />
       <ul>
         {Array.isArray(serviceList) &&
           serviceList.map((e: ConvertedService) => {
