@@ -4,7 +4,13 @@ import { DbService } from "./Models/DbService.ts";
 import { ServiceCredential } from "../../ServiceCredential.ts";
 import { Model } from "@denodb";
 import { DbUserService } from "./Models/DbUserService.ts";
-import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
+import {
+  DbIdDisplayname,
+  DbIdDisplaynameGroups,
+  DbIdDisplaynameInvitationsReceiver,
+  DbIdDisplaynameInvitationsSender,
+  DbIdDisplaynameUser,
+} from "./Models/DbIdDisplayname.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
@@ -37,7 +43,10 @@ export class DbServiceRepository implements ServiceRepository {
   findAuthorizedForId(_Id: string): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
-  findById(id: string): Promise<Service> {
+  async findById(id: string): Promise<Service> {
+    if ((await DbService.where("id", id).first()) === undefined) {
+      throw new NotFoundError("Service not found");
+    }
     return this.hydrate(id);
   }
   findByName(_name: string): Promise<Service> {
@@ -108,7 +117,6 @@ export class DbServiceRepository implements ServiceRepository {
   }
   async save(item: Service): Promise<void> {
     try {
-      await this.findByName(item.getDisplayName());
       await this.findById(item.getId());
     } catch (error) {
       if (error instanceof NotFoundError) {
@@ -121,110 +129,194 @@ export class DbServiceRepository implements ServiceRepository {
   }
 
   async hydrate(searchedId: string): Promise<Service> {
-    const service = await (DbService.where("id", searchedId))
-      .first() as DbService;
-    if (!service) throw new NotFoundError("Item not Found: " + searchedId);
-    const id = service.id.toString();
-    const servicename = service.servicename.toString();
-    let credentials: ServiceCredential | DbServiceCredential =
-      await (DbService.where("id", searchedId))
-        .credentials();
-    if (!credentials) {
-      console.log(credentials);
-      throw new Error("Service has no credentials");
-    }
-    credentials = new ServiceCredential(
-      credentials.username.toString(),
-      credentials.password.toString(),
-    );
-    const userserviceData = await (DbService.where("id", searchedId))
-      .authorizedUsers();
-    const authorizedUsers: AllowedUserServiceMap[] = await Promise.all(
-      userserviceData.map(
-        this.createMapCallbackallowedLists(id, servicename, "user"),
-      ),
-    ) as AllowedUserServiceMap[];
-    const groupserviceData = await (DbService.where("id", searchedId))
-      .authorizedGroups();
-    const authorizedGroups: AllowedGroupServiceMap[] = await Promise.all(
-      groupserviceData.map(
-        this.createMapCallbackallowedLists(id, servicename, "group"),
-      ),
-    ) as AllowedGroupServiceMap[];
-    const invitationData = (DbService.where("id", searchedId)).Invitation();
+    const queryData = await DbService
+      .select(
+        DbIdDisplaynameUser.field("displayname", "allowedUserName"),
+        DbIdDisplaynameGroups.field("displayname", "allowedGroupName"),
+        DbServiceCredential.field("username", "un_cred"),
+        DbServiceCredential.field("password", "pw_cred"),
+        DbService.field("servicename", "servicename"),
+        DbService.field("id", searchedId),
+        DbIdDisplaynameInvitationsSender.field("id", "sender_id"),
+        DbIdDisplaynameInvitationsSender.field("displayname", "sender_name"),
+        DbIdDisplaynameInvitationsReceiver.field("id", "receiver_id"),
+        DbIdDisplaynameInvitationsReceiver.field(
+          "displayname",
+          "receiver_name",
+        ),
+        DbUserService.field("dbuser_id", "user_id"),
+        DbGroupService.field("dbgroup_id", "group_id"),
+      )
+      .leftJoin(
+        DbUserService,
+        DbUserService.field("dbservice_id"),
+        DbService.field("id"),
+      )
+      .leftJoin(
+        DbGroupService,
+        DbGroupService.field("dbservice_id"),
+        DbService.field("id"),
+      )
+      .leftJoin(
+        DbServiceCredential,
+        DbServiceCredential.field("dbservice_id"),
+        DbService.field("id"),
+      )
+      .leftJoin(
+        DbInvitation,
+        DbInvitation.field("obj_reference"),
+        DbService.field("id"),
+      )
+      .leftJoin(
+        DbIdDisplaynameInvitationsSender,
+        DbIdDisplaynameInvitationsSender.field("id"),
+        DbInvitation.field("sender_reference"),
+      )
+      .leftJoin(
+        DbIdDisplaynameInvitationsReceiver,
+        DbIdDisplaynameInvitationsReceiver.field("id"),
+        DbInvitation.field("receiver_reference"),
+      )
+      .leftJoin(
+        DbIdDisplaynameUser,
+        DbIdDisplaynameUser.field("id"),
+        DbUserService.field("dbuser_id"),
+      )
+      .leftJoin(
+        DbIdDisplaynameGroups,
+        DbIdDisplaynameGroups.field("id"),
+        DbGroupService.field("dbgroup_id"),
+      )
+      .where(DbService.field("id"), searchedId)
+      .get() as Model[];
 
-    const sentGroupInvites: Invitation[] = await Promise.all(
-      (await invitationData).map(async (e) => {
-        const senderId = e.senderReference?.toString() ?? "";
-        const objId = e.objReference?.toString() ?? "";
-        const receiverId = e.receiverReference?.toString() ?? "";
-        return new Invitation(
-          new IdNameMap(
-            senderId,
-            await DbIdDisplayname.displayname(senderId),
-          ),
-          new IdNameMap(
-            objId,
-            await DbIdDisplayname.displayname(objId),
-          ),
-          new IdNameMap(
-            receiverId,
-            await DbIdDisplayname.displayname(receiverId),
-          ),
-        );
-      }),
+    const tempData: {
+      [k in string]: {
+        credentials: {
+          un_cred: string;
+          pw_cred: string;
+        };
+        displayname: string;
+        sentGroupInvites: {
+          [l in string]: {
+            senderRef: { id: string; displayname: string };
+            receiverRef: { id: string; displayname: string };
+          };
+        };
+        authorizedUsers: [
+          { userId: string; username: string; is_owner: boolean }?,
+        ];
+        authorizedGroups: [
+          { groupId: string; groupname: string }?,
+        ];
+      };
+    } = {};
+
+    for (const record of queryData) {
+      if (!tempData[searchedId]) {
+        tempData[searchedId] = {
+          credentials: {
+            un_cred: record.un_cred?.toString()!,
+            pw_cred: record.pw_cred?.toString()!,
+          },
+          displayname: record.displayname?.toString()!,
+          sentGroupInvites: {},
+          authorizedUsers: [],
+          authorizedGroups: [],
+        };
+      }
+      const exists = (type: "authorizedUser" | "authorizedGroup"): boolean => {
+        if (type == "authorizedUser") {
+          return tempData[searchedId].authorizedUsers.some((u) =>
+            u?.userId === record.user_id?.toString()
+          ) || record.user_id == undefined;
+        } else if (type == "authorizedGroup") {
+          return tempData[searchedId].authorizedGroups.some((g) =>
+            g?.groupId === record.group_id?.toString()
+          ) || record.group_id == undefined;
+        }
+        throw new RuntimeError();
+      };
+      if (!exists("authorizedUser")) {
+        tempData[searchedId].authorizedUsers.push({
+          userId: record.user_id?.toString()!,
+          username: record.allowedUserName?.toString()!,
+          is_owner: record.is_owner?.valueOf() as boolean,
+        });
+      }
+      if (!exists("authorizedGroup")) {
+        tempData[searchedId].authorizedGroups.push({
+          groupId: record.group_id?.toString()!,
+          groupname: record.allowedGroupName?.toString()!,
+        });
+      }
+      if (record.obj_reference == undefined) continue;
+      //unique Key
+      const invKey = record.sender_id?.toString()! + //556656 5576878
+        record.receiver_id?.toString()!;
+      if (!tempData[searchedId].sentGroupInvites[invKey]) {
+        tempData[searchedId].sentGroupInvites[invKey] = {
+          "senderRef": {
+            "displayname": record.sender_name?.toString()!,
+            "id": record.sender_id?.toString()!,
+          },
+          "receiverRef": {
+            "displayname": record.receiver_name?.toString()!,
+            "id": record.receiver_id?.toString()!,
+          },
+        };
+      }
+    }
+    const temp = tempData[searchedId];
+    const credentials = new ServiceCredential(
+      temp.credentials.un_cred,
+      temp.credentials.pw_cred,
     );
+    const servicename = temp.displayname;
+    const serviceRef = new IdNameMap(
+      searchedId,
+      servicename,
+    );
+    const sentGroupInvites = Object.values(temp.sentGroupInvites).map((e) =>
+      new Invitation(
+        new IdNameMap(
+          e.senderRef.id,
+          e.senderRef.displayname,
+        ),
+        serviceRef,
+        new IdNameMap(
+          e.receiverRef.id,
+          e.receiverRef.displayname,
+        ),
+      )
+    );
+    const authorizedUsers = temp.authorizedUsers.map((e) =>
+      new AllowedUserServiceMap(
+        new IdNameMap(
+          e?.userId!,
+          e?.username!,
+        ),
+        serviceRef,
+        e?.is_owner,
+      )
+    );
+    const authorizedGroups = temp.authorizedGroups.map((e) =>
+      new AllowedGroupServiceMap(
+        new IdNameMap(
+          e?.groupId!,
+          e?.groupname!,
+        ),
+        serviceRef,
+      )
+    );
+
     return new Service(
       credentials,
       servicename,
-      id,
+      searchedId,
       sentGroupInvites,
       authorizedUsers,
       authorizedGroups,
     );
-  }
-  private createMapCallbackallowedLists(
-    serviceId: string,
-    servicename: string,
-    type: "group" | "user",
-  ): (
-    value: Model,
-    index: number,
-    array: Model[],
-  ) => Promise<AllowedUserServiceMap | AllowedGroupServiceMap> {
-    return async (e) => {
-      if (!e["db" + type + "_id"]) throw new NotFoundError(type);
-      const id = e["db" + type + "Id"]!.toString();
-
-      const displayname = await DbIdDisplayname.where(
-        "id",
-        id.toString(),
-      ).first();
-      if (!displayname.displayname) {
-        throw new NotFoundError("userdisplayname");
-      }
-      if (type == "user") {
-        const newLocal = displayname.displayname;
-        return new AllowedUserServiceMap(
-          new IdNameMap(
-            id,
-            newLocal.toString(),
-          ),
-          new IdNameMap(serviceId, servicename),
-          e.is_owner?.valueOf() as boolean ?? false,
-        );
-      }
-
-      if (type == "group") {
-        return new AllowedGroupServiceMap(
-          new IdNameMap(
-            id,
-            displayname.displayname.toString(),
-          ),
-          new IdNameMap(serviceId, servicename),
-        );
-      }
-      throw new RuntimeError();
-    };
   }
 }

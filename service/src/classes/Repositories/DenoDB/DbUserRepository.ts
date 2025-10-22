@@ -214,7 +214,6 @@ export class DbUserRepository implements UserRepository {
         };
       }
     }
-    //Map
     const temp = tempData[searchedId];
     const credentials = new UserCredential(
       temp.credentials.un_cred,

@@ -23,7 +23,6 @@ import {
   DbInvitationJoinOnObject,
   DbInvitationJoinOnReceived,
 } from "./Models/DbInvitation.ts";
-import { ShortEntity } from "../../../interfaceTypes/ShortEntity.ts";
 
 export class DbGroupRepository implements GroupRepository {
   async findByName(name: string): Promise<Group> {
@@ -31,91 +30,32 @@ export class DbGroupRepository implements GroupRepository {
     return this.hydrate(searchedName.id?.toString() ?? "");
   }
   async hydrate(searchedId: string): Promise<Group> {
-    const groupData = await (DbGroup.where("id", searchedId))
-      .first() as DbGroup;
-    if (!groupData) throw new NotFoundError(searchedId + " notfound");
-    const groupname = groupData.groupname.toString();
-    //callbackfunction
-    const groupOwnerData = await DbIdDisplayname.where(
-      "id",
-      groupData.owner?.toString() ?? "",
-    ).first();
-    const owner = new IdNameMap(
-      groupOwnerData.id?.toString() ?? "",
-      groupOwnerData.displayname?.toString() ?? "",
-    );
-    //
-    const groupServiceData = await (DbGroup.where("id", searchedId))
-      .knownServices();
-
-    const serviceList: AllowedGroupServiceMap[] = await Promise.all(
-      groupServiceData.map(
-        this.createMapCallbackallowedLists(searchedId, groupname, "service"),
-      ),
-    ) as AllowedGroupServiceMap[];
-
-    const sentInvitationData = (DbGroup.where("id", searchedId))
-      .sentInvitations();
-
-    const sentUserInvites: Invitation[] = await Promise.all(
-      (await sentInvitationData).map(async (e) => {
-        const senderId = e.senderReference?.toString() ?? "";
-        const objId = e.objReference?.toString() ?? "";
-        const receiverId = e.receiverReference?.toString() ?? "";
-        return new Invitation(
-          new IdNameMap(
-            senderId,
-            await DbIdDisplayname.displayname(senderId),
-          ),
-          new IdNameMap(
-            objId,
-            await DbIdDisplayname.displayname(objId),
-          ),
-          new IdNameMap(
-            receiverId,
-            await DbIdDisplayname.displayname(receiverId),
-          ),
-        );
-      }),
-    );
-    const recivedInvitationData = (DbGroup.where("id", searchedId))
-      .receivedInvitations();
-    //recivedInvitations
-    const serviceInvitations: Invitation[] = await Promise.all(
-      (await recivedInvitationData).map(async (e) => {
-        const senderId = e.senderReference?.toString() ?? "";
-        const objId = e.objReference?.toString() ?? "";
-        const receiverId = e.receiverReference?.toString() ?? "";
-        return new Invitation(
-          new IdNameMap(
-            senderId,
-            await DbIdDisplayname.displayname(senderId),
-          ),
-          new IdNameMap(
-            objId,
-            await DbIdDisplayname.displayname(objId),
-          ),
-          new IdNameMap(
-            receiverId,
-            await DbIdDisplayname.displayname(receiverId),
-          ),
-        );
-      }),
-    );
-    //SQL Query
-    const userGroupData = await (DbGroup.where("id", searchedId))
-      .authorizedUsers();
-    const allowedUser: AllowedUserGroupMap[] = await Promise.all(
-      userGroupData.map(
-        this.createMapCallbackallowedLists(searchedId, groupname, "user"),
-      ),
-    ) as AllowedUserGroupMap[];
-
-    const _queryData = await DbGroup
+    const queryData = await DbGroup
       .select(
         DbGroup.field("groupname"),
         DbGroup.field("owner"),
         DbGroup.field("id"),
+        DbIdDisplaynameService.field("displayname", "allowedServiceName"),
+        DbIdDisplaynameService.field("id", "allowedServiceId"),
+        DbIdDisplaynameInvitationsReceiver.field(
+          "displayname",
+          "receiver_name",
+        ),
+        DbIdDisplaynameInvitationsReceiver.field("id", "receiver_id"),
+        DbIdDisplaynameInvitationsSender.field("displayname", "sender_name"),
+        DbIdDisplaynameInvitationsSender.field("id", "sender_id"),
+        DbIdDisplaynameInvitationsObj.field(
+          "displayname",
+          "invitedServiceName",
+        ),
+        DbIdDisplaynameInvitationsObj.field("id", "invitedServiceId"),
+        DbIdDisplaynameInvitations2Sender.field(
+          "displayname",
+          "invitedServiceSenderName",
+        ),
+        DbIdDisplaynameInvitations2Sender.field("id", "invitedServiceSenderId"),
+        DbIdDisplaynameUser.field("id", "allowedUserId"),
+        DbIdDisplaynameUser.field("displayname", "allowedUserName"),
       )
       .leftJoin(
         DbUserGroup,
@@ -167,16 +107,15 @@ export class DbGroupRepository implements GroupRepository {
         DbIdDisplaynameInvitations2Sender.field("id"),
         DbInvitationJoinOnReceived.field("senderReference"),
       )
-      .where("Group_id", searchedId)
+      .where(DbGroup.field("id"), searchedId)
       .get() as Model[];
 
-    const _tempData: {
+    const tempData: {
       [k in string]: {
         groupname: string;
-        //type idnamemap
-        owner: string;
-        //values of serviceList are objects or concatinated strings
-        serviceList: [{ serviceId: string; servicename: string }];
+        serviceList: [
+          { serviceId: string; servicename: string }?,
+        ];
         sentInvitations: {
           [l in string]: {
             receiverRef: { id: string; displayname: string };
@@ -189,30 +128,138 @@ export class DbGroupRepository implements GroupRepository {
             senderRef: { id: string; displayname: string };
           };
         };
-        allowedUser: [{ userRef: ShortEntity; groupRef: ShortEntity }];
+        allowedUser: [
+          { userId: string; username: string; isOwner: boolean }?,
+        ];
       };
     } = {};
 
-    // for (const record of queryData) {
-    //   if (!tempData[searchedId]) {
-    //     tempData[searchedId] = {
-    //       groupname: record.groupname?.toString()!,
-    //       owner: record.owner?.valueOf()!,
-    //       serviceList: [],
-    //       sentInvitations: {},
-    //       receivedInvitations: {},
-    //       allowedUser: [],
-    //     };
-    //   }
-    // }
+    for (const record of queryData) {
+      if (!tempData[searchedId]) {
+        tempData[searchedId] = {
+          groupname: record.groupname?.toString()!,
+          serviceList: [],
+          sentInvitations: {},
+          receivedInvitations: {},
+          allowedUser: [],
+        };
+      }
+      const exists = (type: "serviceList" | "allowedUser"): boolean => {
+        if (type == "serviceList") {
+          return tempData[searchedId].serviceList.some((
+            s,
+          ) =>
+            s!.serviceId ==
+              record.serviceId /* && s.servicename === record.service */
+          ) || record.serviceId == undefined;
+        } else if (type == "allowedUser") {
+          return tempData[searchedId].allowedUser.some((g) =>
+            g?.userId === record.allowedUserId?.toString()
+          ) || record.allowedUserId == undefined;
+        }
+        throw new RuntimeError();
+      };
+      if (!exists("serviceList")) {
+        tempData[searchedId].serviceList.push({
+          serviceId: record.allowedServiceId?.toString()!,
+          servicename: record.allowedServiceName?.toString()!,
+        });
+      }
+      if (!exists("allowedUser")) {
+        tempData[searchedId].allowedUser.push({
+          userId: record.allowedUserId?.toString()!,
+          username: record.allowedUserName?.toString()!,
+
+          isOwner: record.isOwner?.valueOf() as boolean,
+        });
+      }
+      if (
+        record.receiver_id && record.sender_id && record.sender_name &&
+        record.receiver_name
+      ) {
+        const invSenderKey = record.receiver_id.toString() +
+          record.sender_id.toString();
+        if (!tempData[searchedId].sentInvitations[invSenderKey]) {
+          tempData[searchedId].sentInvitations[invSenderKey] = {
+            "receiverRef": {
+              "id": record.receiver_id.toString(),
+              "displayname": record.receiver_name.toString(),
+            },
+            "senderRef": {
+              "id": record.sender_id.toString(),
+              "displayname": record.sender_name.toString(),
+            },
+          };
+        }
+      }
+      if (record.invitedServiceId) {
+        const invReceiverKey = record.invitedServiceId?.toString()! +
+          record.invitedServiceSenderId?.toString()!;
+        if (!tempData[searchedId].receivedInvitations[invReceiverKey]) {
+          tempData[searchedId].receivedInvitations[invReceiverKey] = {
+            "objRef": {
+              "id": record.invitedServiceId?.toString()!,
+              "displayname": record.invitedServiceName?.toString()!,
+            },
+            "senderRef": {
+              "id": record.invitedServiceSenderId?.toString()!,
+              "displayname": record.invitedServiceSenderName?.toString()!,
+            },
+          };
+        }
+      }
+    }
     //hydration
+    const temp = tempData[searchedId];
+    const groupname: string = temp.groupname;
+    const groupRef = new IdNameMap(searchedId, groupname);
+    const serviceList: AllowedGroupServiceMap[] = temp.serviceList.map((e) =>
+      new AllowedGroupServiceMap(
+        groupRef,
+        new IdNameMap(e?.serviceId!, e?.servicename!),
+      )
+    );
+    const sentInvitations: Invitation[] = Object.keys(
+      temp.sentInvitations,
+    ).map((e) => {
+      const currData = temp.sentInvitations[e];
+      //is the sequence important? new Invitation(sender, obj, receiver) --> below we have receiver, sender, obj
+      return new Invitation(
+        new IdNameMap(currData.senderRef.id, currData.senderRef.displayname),
+        groupRef,
+        new IdNameMap(
+          currData.receiverRef.id,
+          currData.receiverRef.displayname,
+        ),
+      );
+    });
+
+    const receivedInvitations: Invitation[] = Object.keys(
+      temp.receivedInvitations,
+    ).map((e) => {
+      const currData = temp.receivedInvitations[e];
+      return new Invitation(
+        new IdNameMap(currData.senderRef.id, currData.senderRef.displayname),
+        new IdNameMap(currData.objRef.id, currData.objRef.displayname),
+        groupRef,
+      );
+    });
+
+    const allowedUser: AllowedUserGroupMap[] = temp.allowedUser.map((e) =>
+      new AllowedUserGroupMap(
+        new IdNameMap(e?.userId!, e?.username!),
+        new IdNameMap(searchedId, groupname),
+        e?.isOwner!,
+      )
+    );
+    const owner = allowedUser.find((e) => e.isOwner)!.userRef;
     const group: Group = new Group(
       groupname,
       owner,
       searchedId,
       serviceList,
-      sentUserInvites,
-      serviceInvitations,
+      sentInvitations,
+      receivedInvitations,
       allowedUser,
     );
     return group;
