@@ -10,12 +10,14 @@ export class ServiceController {
     private readonly serviceRepository: ServiceRepository,
     private readonly userRepo: UserRepository,
   ) {}
+  private readonly ME = "01b21f7d-c6aa-4db7-a9dc-198271269c07"; //Todo with meaningfull?!
+
   async listMyServices(
     c: Context,
   ) {
     try {
       const serviceList = await this.serviceRepository.findOwnedByUserId(
-        "b8e8c369-4771-4deb-8f7b-3d0ee3624fa4", //Todo with meaningfull?!
+        this.ME,
       );
       const convertedList: ConvertedService[] = serviceList.map((e) =>
         e.toJson()
@@ -33,17 +35,21 @@ export class ServiceController {
         ServiceCredential.fromString(convertedService.credentials),
         convertedService.serviceName,
         (await this.userRepo.findById(
-          "b8e8c369-4771-4deb-8f7b-3d0ee3624fa4",
+          this.ME,
         )).convertToShort(),
       ); //Todo: new = new type(arguments);, convertedService.serviceName)
       await this.serviceRepository.save(service);
       return c.body!(null, 201);
     } catch (error) {
       console.log(error);
-      return c.json!({
-        error: "Fehler beim Speichern des Services",
-        details: error,
-      });
+      if (error instanceof Error) {
+        return c.json!({
+          error: "Fehler beim Speichern des Services",
+          message: error.message,
+          name: error.name,
+          cause: error.cause,
+        });
+      }
     }
   }
 }

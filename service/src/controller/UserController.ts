@@ -7,12 +7,14 @@ import { ConvertedUser } from "../types/types.ts";
 export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
 
+  private readonly ME = "01b21f7d-c6aa-4db7-a9dc-198271269c07"; //TODO with meaningfull
+
   async listMyServices(
     c: Context,
   ) {
     const user = await this.userRepository.findById(
-      "f1504da5-8890-41a7-9023-8c3aef2f885a",
-    ); //To do with meaningfull
+      this.ME,
+    );
     user.listServices();
     return c.json!(
       user.toJson(),
@@ -21,8 +23,8 @@ export class UserController {
 
   async read(c: Context) {
     const user = await this.userRepository.findById(
-      "f1504da5-8890-41a7-9023-8c3aef2f885a",
-    ); //To do with meaningfull
+      this.ME,
+    );
     return c.json!(
       user.toJson(),
     );
