@@ -132,7 +132,7 @@ export class DbUserRepository implements UserRepository {
         DbIdDisplaynameGroups.field("id"),
         DbUserGroup.field("dbgroup_id"),
       )
-      .where("Users_id", searchedId)
+      .where(DbUser.field("id"), searchedId)
       .get() as Model[];
 
     const tempData: {
@@ -159,8 +159,8 @@ export class DbUserRepository implements UserRepository {
       if (!tempData[searchedId]) {
         tempData[searchedId] = {
           credentials: {
-            un_cred: record.un_cred?.toString()!,
-            pw_cred: record.pw_cred?.toString()!,
+            un_cred: record.unCred?.toString()!,
+            pw_cred: record.pwCred?.toString()!,
           },
           displayname: record.username?.toString()!,
           services: [],

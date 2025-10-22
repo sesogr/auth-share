@@ -108,6 +108,7 @@ export class DbServiceRepository implements ServiceRepository {
   }
   async save(item: Service): Promise<void> {
     try {
+      await this.findByName(item.getDisplayName());
       await this.findById(item.getId());
     } catch (error) {
       if (error instanceof NotFoundError) {
@@ -116,6 +117,7 @@ export class DbServiceRepository implements ServiceRepository {
       }
       throw error;
     }
+    throw new Error("UnImplemented");
   }
 
   async hydrate(searchedId: string): Promise<Service> {
