@@ -14,7 +14,7 @@ const CreateService: React.FC = () => {
 
     const newServiceData: ConvertedService = {
       "serviceName": servicename,
-      "credentials": "username:password",
+      "credentials": `${username}:${password}`,
     };
     console.log(newServiceData);
     fetch(import.meta.env.VITE_APIURL + "/service/create", {
