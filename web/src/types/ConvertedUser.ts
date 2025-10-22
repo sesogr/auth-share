@@ -1,11 +1,11 @@
 export type ConvertedUser =
-  | {
+  & {
     id: string;
     credentials: string;
     displayname: string;
   }
-  | {
-    [k in UserListProperties]: string[];
+  & {
+    [k in UserListProperties]?: string[];
   };
 
 type UserListProperties =
