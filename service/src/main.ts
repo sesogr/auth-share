@@ -29,7 +29,6 @@ const db = new Database(
     host: Deno.env.get("DB_HOST")!,
     username: Deno.env.get("DB_USER")!,
     password: Deno.env.get("DB_PASSWORD")!,
-    port: Number(Deno.env.get("DB_PORT")) ?? undefined,
   }),
 );
 setupManyToMany();
