@@ -20,6 +20,7 @@ import { Model } from "@denodb";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
 import { DbGroupService } from "./Models/DbGroupService.ts";
 import {
+  DbInvitation,
   DbInvitationJoinOnObject,
   DbInvitationJoinOnReceived,
 } from "./Models/DbInvitation.ts";
@@ -337,24 +338,34 @@ export class DbGroupRepository implements GroupRepository {
     );
   }
   async add(item: Group): Promise<void> {
-    await DbGroup.create({
-      groupname: item.getDisplayName(),
-      owner: item.getOwner().id,
-      id: item.getId(),
-    }).then(() =>
-      DbUserGroup.create({
-        dbuser_id: item.getOwner().id,
-        dbgroup_id: item.getId(),
-        isOwner: true,
-      })
-    ).then(() =>
-      DbIdDisplayname.create({
+    try {
+      await DbGroup.create({
+        groupname: item.getDisplayName(),
+        owner: item.getOwner().id,
+        id: item.getId(),
+      });
+      await DbIdDisplayname.create({
         id: item.getId(),
         displayname: item.getDisplayName(),
-      })
-    ).catch((e) => {
-      console.log(e);
-      throw e;
-    });
+      });
+      await DbInvitation.create(
+        item.listSentInvitation().map((e) => {
+          return {
+            "obj_reference": e.objId,
+            "receiver_reference": e.receiverId,
+            "sender_reference": e.senderId,
+          };
+        }),
+      );
+      await DbUserGroup.create(item.allowedUser.map((e) => {
+        return {
+          dbuser_id: e.userId,
+          dbgroup_id: item.getId(),
+          isOwner: e.isOwner,
+        };
+      }));
+    } catch (error) {
+      throw error;
+    }
   }
 }

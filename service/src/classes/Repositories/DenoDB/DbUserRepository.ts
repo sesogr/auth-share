@@ -44,24 +44,23 @@ export class DbUserRepository implements UserRepository {
     }));
   }
   async add(item: User): Promise<void> {
-    await DbUser.create({
-      displayname: item.getDisplayName(),
-      id: item.getId(),
-    }).then(() =>
-      DbUserCredential.create({
+    try {
+      await DbUser.create({
+        displayname: item.getDisplayName(),
+        id: item.getId(),
+      });
+      await DbUserCredential.create({
         dbuser_id: item.getId(),
         username: item.getCredentials().username,
         password: item.getCredentials().password,
-      }).then(() =>
-        DbIdDisplayname.create({
-          id: item.getId(),
-          displayname: item.getDisplayName(),
-        })
-      ).catch((e) => {
-        console.log(e);
-        throw e;
-      })
-    );
+      });
+      await DbIdDisplayname.create({
+        id: item.getId(),
+        displayname: item.getDisplayName(),
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async save(item: User) {
