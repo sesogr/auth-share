@@ -64,7 +64,7 @@ export class DbServiceRepository implements ServiceRepository {
         dbservice_id: item.getId(),
         username: item.credentials.split(":")[0],
         password: item.credentials.split(":")[1],
-      })
+      }).then()
     ).then(() =>
       DbIdDisplayname.create({
         id: item.getId(),
@@ -136,7 +136,6 @@ export class DbServiceRepository implements ServiceRepository {
         DbServiceCredential.field("username", "un_cred"),
         DbServiceCredential.field("password", "pw_cred"),
         DbService.field("servicename", "servicename"),
-        DbService.field("id", searchedId),
         DbIdDisplaynameInvitationsSender.field("id", "sender_id"),
         DbIdDisplaynameInvitationsSender.field("displayname", "sender_name"),
         DbIdDisplaynameInvitationsReceiver.field("id", "receiver_id"),
@@ -189,7 +188,6 @@ export class DbServiceRepository implements ServiceRepository {
       )
       .where(DbService.field("id"), searchedId)
       .get() as Model[];
-
     const tempData: {
       [k in string]: {
         credentials: {
@@ -216,10 +214,10 @@ export class DbServiceRepository implements ServiceRepository {
       if (!tempData[searchedId]) {
         tempData[searchedId] = {
           credentials: {
-            un_cred: record.un_cred?.toString()!,
-            pw_cred: record.pw_cred?.toString()!,
+            un_cred: record.unCred?.toString()!,
+            pw_cred: record.pwCred?.toString()!,
           },
-          displayname: record.displayname?.toString()!,
+          displayname: record.servicename?.toString()!,
           sentGroupInvites: {},
           authorizedUsers: [],
           authorizedGroups: [],
