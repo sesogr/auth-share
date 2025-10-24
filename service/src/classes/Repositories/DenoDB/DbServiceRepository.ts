@@ -79,23 +79,27 @@ export class DbServiceRepository implements ServiceRepository {
           };
         }),
       );
-      await DbGroupService.create(
-        item.authorizedGroups.map((authorizedGroupmap) => {
-          return {
-            dbgroup_id: authorizedGroupmap.groupId,
-            dbservice_id: authorizedGroupmap.serviceId,
-          };
-        }),
-      );
-      await DbInvitation.create(
-        item.sentInvitations.map((invites) => {
-          return {
-            senderReference: invites.senderId,
-            objReference: invites.objId,
-            receiverReference: invites.receiverId,
-          };
-        }),
-      );
+      if (item.authorizedGroups.length != 0) {
+        await DbGroupService.create(
+          item.authorizedGroups.map((authorizedGroupmap) => {
+            return {
+              dbgroup_id: authorizedGroupmap.groupId,
+              dbservice_id: authorizedGroupmap.serviceId,
+            };
+          }),
+        );
+      }
+      if (item.sentInvitations.length != 0) {
+        await DbInvitation.create(
+          item.sentInvitations.map((invites) => {
+            return {
+              senderReference: invites.senderId,
+              objReference: invites.objId,
+              receiverReference: invites.receiverId,
+            };
+          }),
+        );
+      }
     } catch (error) {
       throw error;
     }
@@ -131,8 +135,9 @@ export class DbServiceRepository implements ServiceRepository {
           "displayname",
           "receiver_name",
         ),
-        DbUserService.field("dbuser_id", "user_id"),
-        DbGroupService.field("dbgroup_id", "group_id"),
+        DbUserService.field("dbuser_id", "userId"),
+        DbUserService.field("is_owner", "isOwner"),
+        DbGroupService.field("dbgroup_id", "groupId"),
       )
       .leftJoin(
         DbUserService,
@@ -214,25 +219,25 @@ export class DbServiceRepository implements ServiceRepository {
       const exists = (type: "authorizedUser" | "authorizedGroup"): boolean => {
         if (type == "authorizedUser") {
           return tempData[searchedId].authorizedUsers.some((u) =>
-            u?.userId === record.user_id?.toString()
-          ) || record.user_id == undefined;
+            u?.userId === record.userId?.toString()
+          ) || record.userId == undefined;
         } else if (type == "authorizedGroup") {
           return tempData[searchedId].authorizedGroups.some((g) =>
-            g?.groupId === record.group_id?.toString()
-          ) || record.group_id == undefined;
+            g?.groupId === record.groupId?.toString()
+          ) || record.groupId == undefined;
         }
         throw new RuntimeError();
       };
       if (!exists("authorizedUser")) {
         tempData[searchedId].authorizedUsers.push({
-          userId: record.user_id?.toString()!,
+          userId: record.userId?.toString()!,
           username: record.allowedUserName?.toString()!,
-          is_owner: record.is_owner?.valueOf() as boolean,
+          is_owner: record.isOwner?.valueOf() as boolean,
         });
       }
       if (!exists("authorizedGroup")) {
         tempData[searchedId].authorizedGroups.push({
-          groupId: record.group_id?.toString()!,
+          groupId: record.groupId?.toString()!,
           groupname: record.allowedGroupName?.toString()!,
         });
       }

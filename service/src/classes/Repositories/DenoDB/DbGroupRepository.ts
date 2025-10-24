@@ -3,7 +3,6 @@ import { Group } from "../../Group.ts";
 import { DbGroup } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import {
-  DbIdDisplayname,
   DbIdDisplaynameInvitations2Sender,
   DbIdDisplaynameInvitationsObj,
   DbIdDisplaynameInvitationsReceiver,
@@ -266,37 +265,6 @@ export class DbGroupRepository implements GroupRepository {
     return group;
   }
 
-  private createMapCallbackallowedLists(
-    searchedId: string,
-    groupname: string,
-    type: "service" | "user",
-  ): (
-    value: Model,
-    index: number,
-    array: Model[],
-  ) => Promise<AllowedUserGroupMap | AllowedGroupServiceMap> {
-    return async (e) => {
-      const id = e["db" + type + "Id"]!.toString();
-      const displayname = await DbIdDisplayname.displayname(
-        id,
-      );
-      if (type == "user") {
-        return new AllowedUserGroupMap(
-          new IdNameMap(id, displayname),
-          new IdNameMap(searchedId, groupname),
-          e.is_owner?.valueOf() as boolean ?? false,
-        );
-      }
-      if (type == "service") {
-        return new AllowedGroupServiceMap(
-          new IdNameMap(searchedId, groupname),
-          new IdNameMap(id, displayname),
-        );
-      }
-      throw new RuntimeError();
-    };
-  }
-
   async findOwnedByUserId(userId: string): Promise<Group[]> {
     const searchedList = await DbUserGroup.where({
       dbuser_id: userId,
@@ -312,20 +280,26 @@ export class DbGroupRepository implements GroupRepository {
     throw new RuntimeError();
   }
   async save(item: Group) {
-    try {
-      await this.findById(item.getId());
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        this.add(item);
-        return;
-      }
-      throw error;
+    //first call of existId --> assertEquals(stubExistId.calls[0].arg[0] in Deno.Test)
+    const result = await this.existId(item.getId());
+    if (result !== true) {
+      this.add(item);
+    }
+  }
+  async existId(id: string): Promise<boolean> {
+    if ((await DbGroup.where("id", id).first())) {
+      return true;
+    } else {
+      return false;
     }
   }
   async removeById(id: string): Promise<void> {
     await DbGroup.where("id", id).delete();
   }
-  findById(id: string): Promise<Group> {
+  async findById(id: string): Promise<Group> {
+    if (!(await this.existId(id))) {
+      throw new NotFoundError("Service not found");
+    }
     return this.hydrate(id);
   }
   async findAll(): Promise<Group[]> {
