@@ -3,6 +3,7 @@ import { Group } from "../../Group.ts";
 import { DbGroup } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import {
+  DbIdDisplayname,
   DbIdDisplaynameInvitations2Sender,
   DbIdDisplaynameInvitationsObj,
   DbIdDisplaynameInvitationsReceiver,
@@ -322,15 +323,17 @@ export class DbGroupRepository implements GroupRepository {
         id: item.getId(),
         displayname: item.getDisplayName(),
       });
-      await DbInvitation.create(
-        item.listSentInvitation().map((e) => {
-          return {
-            "obj_reference": e.objId,
-            "receiver_reference": e.receiverId,
-            "sender_reference": e.senderId,
-          };
-        }),
-      );
+      if (item.listSentInvitation().length) {
+        await DbInvitation.create(
+          item.listSentInvitation().map((e) => {
+            return {
+              "obj_reference": e.objId,
+              "receiver_reference": e.receiverId,
+              "sender_reference": e.senderId,
+            };
+          }),
+        );
+      }
       await DbUserGroup.create(item.allowedUser.map((e) => {
         return {
           dbuser_id: e.userId,
