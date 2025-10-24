@@ -20,6 +20,8 @@ import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
 import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts";
 import { ShortEntity } from "../../src/interfaceTypes/ShortEntity.ts";
 import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
+import { threadCpuUsage } from "node:process";
+import { setMaxIdleHTTPParsers } from "node:http";
 
 const connector = new MySQLConnector({
   database: "authshare",
@@ -45,11 +47,10 @@ db.link([
 
 await db.sync({ drop: true });
 
-const { fakeUserList } = await buildUpUserRepo();
-
-await buildUpGroupRepo(fakeUserList.map((e) => e.convertToShort()));
-await buildUpServRepo(fakeUserList.map((e) => e.convertToShort()));
-
+await buildUpUserRepo().then(async (f) => {
+  await buildUpGroupRepo(f.fakeUserList.map((e) => e.convertToShort()));
+  await buildUpServRepo(f.fakeUserList.map((e) => e.convertToShort()));
+});
 async function buildUpUserRepo() {
   const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
