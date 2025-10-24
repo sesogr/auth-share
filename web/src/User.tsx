@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { ConvertedUser } from "./types/types.ts";
 import { useParams } from "react-router-dom";
+import { Descriptions } from "antd";
 
 const User: React.FC = () => {
   const [user, setUserList] = useState<ConvertedUser>();
@@ -23,7 +24,21 @@ const User: React.FC = () => {
   if (!user) return <div>Lade...</div>;
   return (
     <div>
-      <h1>My Site: {displayname}</h1>
+      <Descriptions
+        title={<h1>My Site: {displayname}</h1>}
+        items={[
+          {
+            key: "username",
+            label: "Username",
+            children: user?.credentials.replace(/:.*/, ""),
+          },
+          {
+            key: "password",
+            label: "Password",
+            children: user?.credentials.replace(/^[^:]+:/, ""),
+          },
+        ]}
+      />
       <div>
         <ul>
           <li>

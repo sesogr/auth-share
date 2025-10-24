@@ -33,7 +33,7 @@ db.link([
   DbInvitation,
   DbIdDisplayname,
 ]);
-Deno.test("ABC", async (t) => {
+Deno.test("ABC", async (_t) => {
   const repo = new DbServiceRepository();
   const userList = await repo.findOwnedByUserId(
     "15ed8f0d-f3c3-4e6c-84dc-c2c0824741be",
