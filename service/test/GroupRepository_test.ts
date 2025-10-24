@@ -75,13 +75,13 @@ type GroupRepoTestsuit = {
   serviceRepository: SpyObject<ServiceAggregateView>;
 };
 
-function buildUp(): GroupRepoTestsuit {
+async function buildUp(): Promise<GroupRepoTestsuit> {
   const groupList: Group[] = FakeObjectGen.generateFakeGroups();
   const serviceRepository = createServiceRepository(groupList);
   const groupRepository = new InMemGroupRepository(
     serviceRepository,
   );
-  groupList.forEach((e) => groupRepository.save(e));
+  await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
   return { groupList, groupRepository, serviceRepository };
 }
 

@@ -1,5 +1,6 @@
 export type ConvertedUser =
   & {
+    id?: string;
     credentials: string;
     displayname: string;
   }

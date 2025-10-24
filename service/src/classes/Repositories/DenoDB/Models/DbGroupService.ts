@@ -1,21 +1,12 @@
-import { Database, DataTypes, Model, MySQLConnector } from "@denodb";
-//Ausalgern in seperate Datei --> import dieser Datei?
-const connector = new MySQLConnector({
-  database: Deno.env.get("DB_NAME")!,
-  host: Deno.env.get("DB_HOST")!,
-  username: Deno.env.get("DB_USER")!,
-  password: Deno.env.get("DB_PASSWORD")!,
-});
-const db = new Database(connector);
+import { Model, Relationships } from "@denodb";
+import { DbGroup } from "./DbGroup.ts";
+import { DbService } from "./DbService.ts";
 
-class GroupService extends Model {
-  static override table = "GroupServices";
-  static override timestamps = true;
-  static override fields = {
-    groupRef: { type: DataTypes.INTEGER, primaryKey: true },
-    serviceRef: { type: DataTypes.INTEGER, primaryKey: true },
-  };
+export let DbGroupService: typeof Model;
+
+export function setupGroupService() {
+  DbGroupService = Relationships.manyToMany(
+    DbGroup,
+    DbService,
+  );
 }
-db.link([GroupService]);
-
-await db.sync({ drop: true });

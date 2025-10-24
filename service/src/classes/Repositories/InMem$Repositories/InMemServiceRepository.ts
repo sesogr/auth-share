@@ -16,7 +16,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     super();
   }
 
-  override save(service: Service): void {
+  override save(service: Service): Promise<void> {
     let serviceIndex = this.inMemList.findIndex((e) =>
       service.getId() === e.getId()
     );
@@ -28,6 +28,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     this.updateInvites(service.sentInvitations);
     this.updateAllowedUsers(service.authorizedUsers);
     this.updateAllowedGroups(service.authorizedGroups);
+    return Promise.resolve();
   }
   private updateInvites(invites: Invitation[]) {
     const missingInvites = invites.filter((e) =>
@@ -67,7 +68,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
       extraAllowedGroups.every((f) => !e.equals(f))
     );
   }
-  override hydrate(service: Service): Service {
+  override hydrate(service: Service): Promise<Service> {
     const credentials = new ServiceCredential(
       ...service.credentials.split(":"),
     );
@@ -90,16 +91,20 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
       authorizedUsers,
       authorizedGroups,
     );
-    return hydratedService;
+    return Promise.resolve(hydratedService);
   }
-  findOwnedByUserId(userId: string): Service[] {
-    return this.allowedUser.filter((currMap) =>
-      (currMap.userId === userId) && currMap.isOwner
-    ).map((currMap) => this.findById(currMap.serviceId));
+  findOwnedByUserId(userId: string): Promise<Service[]> {
+    return Promise.all(
+      this.allowedUser.filter((currMap) =>
+        (currMap.userId === userId) && currMap.isOwner
+      ).map((currMap) => this.findById(currMap.serviceId)),
+    );
   }
-  findAuthorizedForId(id: string): Service[] {
-    return this.allowedUser.filter((e) => e.userId === id).map((f) =>
-      this.findById(f.serviceId)
+  findAuthorizedForId(id: string): Promise<Service[]> {
+    return Promise.all(
+      this.allowedUser.filter((e) => e.userId === id).map((f) =>
+        this.findById(f.serviceId)
+      ),
     );
   }
   viewAllowedUser(): AllowedUserServiceMap[] {
@@ -111,7 +116,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   viewInvitedGroups(): Invitation[] {
     return [...this.invitations];
   }
-  override removeById(serviceId: string): void {
+  override removeById(serviceId: string): Promise<void> {
     try {
       super.removeById(serviceId);
     } catch (e) {
@@ -123,5 +128,6 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     this.allowedGroups = this.allowedGroups.filter((e) =>
       e.serviceId !== serviceId
     );
+    return Promise.resolve();
   }
 }

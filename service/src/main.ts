@@ -1,32 +1,65 @@
+import { Database, MySQLConnector } from "@denodb";
 import { Hono } from "@hono/hono";
 import { cors } from "@hono/hono/cors";
-import { rootController } from "./controller/rootController.ts";
-import { dataController } from "./controller/dataController.ts";
-import { serviceController } from "./controller/serviceController.ts";
+import { DbUserRepository } from "./classes/Repositories/DenoDB/DbUserRepository.ts";
+import { DbGroup } from "./classes/Repositories/DenoDB/Models/DbGroup.ts";
+import { DbGroupService } from "./classes/Repositories/DenoDB/Models/DbGroupService.ts";
+import { DbService } from "./classes/Repositories/DenoDB/Models/DbService.ts";
+import { DbUser } from "./classes/Repositories/DenoDB/Models/DbUser.ts";
+import { DbUserGroup } from "./classes/Repositories/DenoDB/Models/DbUserGroup.ts";
+import { UserController } from "./controller/UserController.ts";
+import { DataController } from "./controller/DataController.ts";
+import { RootController } from "./controller/RootController.ts";
+import { ServiceController } from "./controller/ServiceController.ts";
 import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
-import { InMemGroupRepository } from "./classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
-import { InMemServiceRepository } from "./classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
-import { InMemUserRepository } from "./classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
-import { FakeObjectGen } from "./FakeObjectGen.ts";
-import { userController as createUserController } from "./controller/userController.ts";
+import { DbIdDisplayname } from "./classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
+import { DbInvitation } from "./classes/Repositories/DenoDB/Models/DbInvitation.ts";
+import { DbServiceCredential } from "./classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
+import { DbUserCredential } from "./classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
+import { DbUserService } from "./classes/Repositories/DenoDB/Models/DbUserService.ts";
+import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyToMany.ts";
+import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepository.ts";
+import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 
+const db = new Database(
+  new MySQLConnector({
+    database: Deno.env.get("DB_NAME")!,
+    host: Deno.env.get("DB_HOST")!,
+    username: Deno.env.get("DB_USER")!,
+    password: Deno.env.get("DB_PASSWORD")!,
+  }),
+);
+setupManyToMany();
+db.link([
+  DbUser,
+  DbService,
+  DbGroup,
+  DbUserService,
+  DbUserCredential,
+  DbServiceCredential,
+  DbUserGroup,
+  DbGroupService,
+  DbInvitation,
+  DbIdDisplayname,
+]);
 //initialize repositories
-const serviceRepository: ServiceRepository = new InMemServiceRepository();
-const groupRepository: GroupRepository = new InMemGroupRepository(
-  serviceRepository,
-);
-const userRepository: UserRepository = new InMemUserRepository(
-  serviceRepository,
-  groupRepository,
-);
-FakeObjectGen.generateFakeUsers().forEach((e) => userRepository.save(e));
-FakeObjectGen.generateFakeGroups().forEach((e) => groupRepository.save(e));
-FakeObjectGen.generateFakeServices().forEach((e) => serviceRepository.save(e));
-userRepository.findAll().forEach((e) => {
-  serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
-});
+const serviceRepository: ServiceRepository = new DbServiceRepository();
+const _groupRepository: GroupRepository = new DbGroupRepository();
+const userRepository: UserRepository = new DbUserRepository();
+// Promise.all(FakeObjectGen.generateFakeUsers().map(async (e) =>
+//   await userRepository.save(e))
+// );
+// Promise.all(
+//   FakeObjectGen.generateFakeGroups().map((e) => groupRepository.save(e)),
+// );
+// Promise.all(
+//   FakeObjectGen.generateFakeServices().map((e) => serviceRepository.save(e)),
+// );
+// userRepository.findAll().forEach((e) => {
+//   serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
+// });
 export const app = new Hono();
 app.use(
   "*",
@@ -35,22 +68,56 @@ app.use(
     allowMethods: ["GET", "POST", "PUT", "DELETE"],
   }),
 );
+//Endpoints
+const rootController = new RootController("Trees");
+app.get("/", (c) => {
+  return rootController.sayHelloFromTrees(c);
+});
 
-app.get("/", rootController("Trees"));
+const dataController = new DataController();
+app.get("/data", (c) => {
+  return dataController.getData(c);
+});
 
-app.get("/data", dataController);
+const userController = new UserController(userRepository);
+app.get(
+  "/user",
+  (c) => {
+    return userController.read(c);
+  },
+);
 
-const userController = createUserController(userRepository);
-app.get("/user", userController.read);
+app.put(
+  "/user/me/password",
+  (c) => {
+    return userController.changePassword(
+      c,
+    );
+  },
+);
 
-app.put("/user/me/password", userController.changePassword);
-
+const serviceController = new ServiceController(
+  serviceRepository,
+  userRepository,
+);
 app.get(
   "/user/owned",
-  serviceController(serviceRepository, userRepository), //TODO!!! Needs to be fixed!
+  (c) => {
+    return serviceController.listMyServices(
+      c,
+    );
+  }, //TODO!!! Needs to be fixed!
 );
 
 app.put();
+
+app.post("/user", (c) => {
+  return userController.create(c);
+});
+
+app.post("/service/create", (c) => {
+  return serviceController.add(c);
+});
 
 //app.get("/group", groupController);
 

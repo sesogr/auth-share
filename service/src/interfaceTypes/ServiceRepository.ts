@@ -4,6 +4,6 @@ import type { Repository } from "./Repository.ts";
 export type ServiceRepository =
   & Repository<Service>
   & {
-    findOwnedByUserId(userId: string): Service[];
-    findAuthorizedForId(Id: string): Service[];
+    findOwnedByUserId(_userId: string): Promise<Service[]>;
+    findAuthorizedForId(_Id: string): Promise<Service[]>;
   };

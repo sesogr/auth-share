@@ -12,19 +12,19 @@ import { GroupAggregateView } from "../src/interfaceTypes/GroupAggregateView.ts"
 import { SpyObject } from "./HelperTypes.ts";
 import { IdNameMap } from "../src/classes/IdNameMap.ts";
 Deno.test("UserRepository", async (t) => {
-  await t.step("Test for method findById()", () => {
+  await t.step("Test for method findById()", async () => {
     const {
       mockUserIdList,
       userRepository,
       serviceRepository,
       groupRepository,
       fakeUserList,
-    }: UserRepoTestSuit = buildUp();
+    }: UserRepoTestSuit = await buildUp();
 
     const userId: string = mockUserIdList[0];
     const expectedId: string = mockUserIdList[0];
 
-    const user = userRepository.findById(userId);
+    const user = await userRepository.findById(userId);
     assertEquals(user.getId(), expectedId);
     assertEquals(serviceRepository.viewAllowedUser.calls.length, 1);
     assertEquals(groupRepository.viewAllowedUser.calls.length, 1);
@@ -33,25 +33,27 @@ Deno.test("UserRepository", async (t) => {
     assertEquals(user.listJoinedGroups(), ["0"]);
   });
 
-  await t.step("Test for method findByName()", () => {
-    const { fakeUserList, userRepository }: UserRepoTestSuit = buildUp();
+  await t.step("Test for method findByName()", async () => {
+    const { fakeUserList, userRepository }: UserRepoTestSuit = await buildUp();
     //changing index of the fakeUserList > 9 => Test failed
     const userName: string = fakeUserList[9].getDisplayName();
-    const toCheck: string = userRepository.findByName(userName)
+    const toCheck: string = (await userRepository.findByName(userName))
       .getDisplayName();
 
     assertEquals(toCheck, userName);
   });
 
-  await t.step("Test for method findAll()", () => {
-    const { userRepository, mockUserIdList }: UserRepoTestSuit = buildUp();
-    const userList: User[] = userRepository.findAll();
+  await t.step("Test for method findAll()", async () => {
+    const { userRepository, mockUserIdList }: UserRepoTestSuit =
+      await buildUp();
+    const userList: User[] = await userRepository.findAll();
     const userIdList: string[] = userList.map((e) => e.getId());
     assertEquals(userIdList, mockUserIdList);
   });
 
-  await t.step("Test for method removeById", () => {
-    const { mockUserIdList, userRepository }: UserRepoTestSuit = buildUp();
+  await t.step("Test for method removeById", async () => {
+    const { mockUserIdList, userRepository }: UserRepoTestSuit =
+      await buildUp();
     const deletedId = mockUserIdList[0];
     userRepository.removeById(deletedId);
     assertThrows(() => {
@@ -60,7 +62,7 @@ Deno.test("UserRepository", async (t) => {
   });
 });
 
-function buildUp(): UserRepoTestSuit {
+async function buildUp(): Promise<UserRepoTestSuit> {
   const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const serviceRepository: SpyObject<ServiceAggregateView> =
@@ -72,7 +74,9 @@ function buildUp(): UserRepoTestSuit {
     serviceRepository,
     groupRepository,
   );
-  fakeUserList.forEach((e) => userRepository.save(e));
+  await Promise.all(
+    fakeUserList.map(async (e) => await userRepository.save(e)),
+  );
   return {
     mockUserIdList,
     userRepository,

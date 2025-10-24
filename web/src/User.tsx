@@ -3,7 +3,7 @@ import type { ConvertedUser } from "./types/types.ts";
 import { useParams } from "react-router-dom";
 
 const User: React.FC = () => {
-  const [userList, setUserList] = useState<ConvertedUser[]>([]);
+  const [user, setUserList] = useState<ConvertedUser>();
   const [error, setError] = useState<string | null>(null);
   //Deconstruction
   //const parameter = useParams();
@@ -12,18 +12,15 @@ const User: React.FC = () => {
 
   useEffect(() => {
     fetch(import.meta.env.VITE_APIURL + "/user") // Port/Host anpassen
-      .then((res): Promise<ConvertedUser[]> => {
+      .then((res): Promise<ConvertedUser> => {
         if (!res.ok) throw new Error("Netzwerkfehler");
         return res.json();
       })
-      .then((data: ConvertedUser[]) => setUserList(data))
+      .then((data: ConvertedUser) => setUserList(data))
       .catch((err) => setError(err.message));
   }, []);
   if (error) return <div>Fehler: {error}</div>;
-  if (!userList) return <div>Lade...</div>;
-
-  const user = userList[0];
-
+  if (!user) return <div>Lade...</div>;
   return (
     <div>
       <h1>My Site: {displayname}</h1>
@@ -38,29 +35,29 @@ const User: React.FC = () => {
           <li>
             Owned:{" "}
             <ul>
-              {user?.owned.map((e, i) => <li key={i}>{e}</li>)}
+              {user.owned!.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
           </li>
           <li>
             Callable:{" "}
             <ul>
-              {user?.callable.map((e, i) => <li key={i}>{e}</li>)}
+              {user.callable!.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
           </li>
           <li>
             Groups:{" "}
             <ul>
-              {user?.groups.map((e, i) => <li key={i}>{e}</li>)}
+              {user.groups!.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
             <li>
               Group Invitations:
               <ul>
-                {user?.userGroupInvitations.map((e, i) => <li key={i}>{e}</li>)}
+                {user.userGroupInvitations!.map((e, i) => <li key={i}>{e}</li>)}
               </ul>
               <li>
                 Owned Groups:
                 <ul>
-                  {user?.ownedGroups.map((e, i) => <li key={i}>{e}</li>)}
+                  {user.ownedGroups!.map((e, i) => <li key={i}>{e}</li>)}
                 </ul>
               </li>
             </li>

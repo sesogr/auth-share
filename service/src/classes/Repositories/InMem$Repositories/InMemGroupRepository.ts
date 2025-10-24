@@ -24,7 +24,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
   viewInvitations(): Invitation[] {
     return [...this._invitationList];
   }
-  override save(group: Group): void {
+  override save(group: Group): Promise<void> {
     let groupIndex = this.inMemList.findIndex((e) =>
       group.getId() === e.getId()
     );
@@ -35,6 +35,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     this.inMemList[groupIndex] = group;
     this.updateAllowedUsers(group.allowedUser);
     this.updateInvites(group.listSentInvitation());
+    return Promise.resolve();
   }
   private updateAllowedUsers(allowedUser: AllowedUserGroupMap[]) {
     const missingAllowedUsers = allowedUser.filter((e) =>
@@ -60,8 +61,9 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
       !deletedInvites.some((f) => e.equals(f))
     );
   }
-  override hydrate(_item: Group): Group {
+  override hydrate(_item: Group): Promise<Group> {
     //get a db reference per parameter-->..-->return
+
     const groupDisplayName = _item.getDisplayName();
     const groupOwner = _item.getOwner();
     const groupId = _item.getId();
@@ -75,9 +77,10 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
       currElement: Invitation,
     ): boolean => currElement.objReference.id === groupId;
     const sentInvitationList = this._invitationList.filter(filterCallback2);
-    const serviceInvitations = this.serviceRepoView.viewInvitedGroups().filter(
-      filterCallback2,
-    );
+    const serviceInvitations = this.serviceRepoView.viewInvitedGroups()
+      .filter(
+        filterCallback2,
+      );
     const allowedUser = this._allowedUser.filter((currElement) =>
       currElement.groupId === groupId
     );
@@ -92,14 +95,16 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
       allowedUser,
     );
 
-    return group;
+    return Promise.resolve(group);
   }
   viewAllowedUser(): AllowedUserGroupMap[] {
     return [...this.allowedUser];
   }
-  findOwnedByUserId(userId: string): Group[] {
-    return this.allowedUser.filter((currMap) =>
-      (currMap.userId === userId) && currMap.isOwner
-    ).map((currMap) => this.findById(currMap.groupId));
+  findOwnedByUserId(userId: string): Promise<Group[]> {
+    return Promise.all(
+      this.allowedUser.filter((currMap) =>
+        (currMap.userId === userId) && currMap.isOwner
+      ).map((currMap) => this.findById(currMap.groupId)),
+    );
   }
 }

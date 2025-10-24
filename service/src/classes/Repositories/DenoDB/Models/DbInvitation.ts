@@ -1,25 +1,50 @@
-import { Database, DataTypes, Model, MySQLConnector } from "@denodb";
-//Ausalgern in seperate Datei --> import dieser Datei?
-const connector = new MySQLConnector({
-  database: Deno.env.get("DB_NAME")!,
-  host: Deno.env.get("DB_HOST")!,
-  username: Deno.env.get("DB_USER")!,
-  password: Deno.env.get("DB_PASSWORD")!,
-});
-const db = new Database(connector);
+import { DataTypes, Model } from "@denodb";
+import { FieldAlias } from "@denodb/datatypes";
 
-class Invitation extends Model {
+export class DbInvitation extends Model {
   static override table = "Invitations";
   static override timestamps = true; //needed?
   static override fields = {
     //id: { type: DataTypes.UUID, primaryKey: true }, could be make sense?
-    senderReference: DataTypes.JSON,
-    objReference: DataTypes.JSON,
-    receiverReference: DataTypes.JSON,
+    senderReference: DataTypes.STRING,
+    objReference: DataTypes.STRING,
+    receiverReference: DataTypes.STRING,
     //TODO add foreign key and primary key
     //Datentype.JSON? Reference to each List?
   };
 }
-db.link([Invitation]);
 
-await db.sync({ drop: true });
+class DbJoinHelper extends DbInvitation {
+  protected static alias = "";
+  static override field(field: string): string;
+  static override field(field: string, nameAs: string): FieldAlias;
+  static override field(field: string, nameAs?: string): string | FieldAlias {
+    const newLocal = `${this.alias}.${field}`;
+    if (!Object.keys(this.fields).includes(field)) {
+      throw new Error("Field does not Exist!");
+    }
+
+    if (nameAs) {
+      return { [nameAs]: newLocal };
+    }
+    return newLocal;
+  }
+}
+
+export class DbInvitationJoinOnSender extends DbJoinHelper {
+  protected static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
+}
+
+export class DbInvitationJoinOnReceived extends DbJoinHelper {
+  protected static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
+}
+
+export class DbInvitationJoinOnObject extends DbJoinHelper {
+  protected static override alias = crypto.randomUUID();
+  static override table = super.table + " AS " + this.alias;
+}
+// Relationships.hasMany(DbInvitation, DbUser);
+// Relationships.hasMany(DbInvitation, DbGroup);
+// Relationships.hasMany(DbInvitation, DbService);

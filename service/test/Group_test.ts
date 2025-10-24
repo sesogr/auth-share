@@ -23,19 +23,12 @@ Deno.test("Group Class", async (t) => {
     const group = createTestGroup();
     const groupname = group.getDisplayName();
     assertEquals(groupname, "Schachverein");
-    console.log(
-      "The groupname is " + groupname +
-        " and should be hopefully Schachverein!?",
-    );
   });
 
   await t.step("test the method getDisplayName on owner", () => {
     const _group = createTestGroup();
 
     const owner = userCredential.username;
-    console.log(
-      "The owner is " + owner + " and should be hopefully Hans Meiser!?",
-    );
     assertEquals(owner, "Hans Meiser");
   });
 
@@ -50,11 +43,6 @@ Deno.test("Group Class", async (t) => {
     const list = group.listServiceInvitation();
 
     const length = list.length;
-    console.log(
-      "The lenght of the List is ",
-      length,
-      " and should be 0, right?",
-    );
     assertEquals(length, 0);
   });
 

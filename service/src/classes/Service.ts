@@ -92,7 +92,10 @@ export class Service extends Entity {
   private convertToSerializeableObj(): ConvertedService {
     return {
       serviceName: this.getDisplayName(),
-      credentials: this.credentials,
+      credentials: {
+        username: this._credentials.username,
+        password: this._credentials.password,
+      },
       groups: this.listAuthorizedGroups(),
       users: this.listAuthorizedUsers(),
       owners: this.listAuthorizedUsers(true),

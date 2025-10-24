@@ -13,15 +13,15 @@ export class InMemUserRepository extends InMemoryRepository<User>
     super();
   }
 
-  override save(item: User): void {
+  override save(item: User): Promise<void> {
     const index = this.inMemList.findIndex((e) => e.getId() === item.getId());
     if (index < 0) {
       this.add(item);
-      return;
     }
     this.inMemList[index] = item;
+    return Promise.resolve();
   }
-  override hydrate(item: User): User {
+  override hydrate(item: User): Promise<User> {
     const id = item.getId();
     const displayname = item.getDisplayName();
     const credentials = item.getCredentials();
@@ -42,6 +42,6 @@ export class InMemUserRepository extends InMemoryRepository<User>
       invitations,
       joinedGroups,
     );
-    return user;
+    return Promise.resolve(user);
   }
 }

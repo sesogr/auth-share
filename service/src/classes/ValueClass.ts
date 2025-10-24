@@ -3,4 +3,6 @@ export abstract class ValueClass {
     return this.toString() === that.toString();
   }
   abstract toString(): string;
+  abstract with(_: object): ValueClass;
+  abstract copy(): ValueClass;
 }

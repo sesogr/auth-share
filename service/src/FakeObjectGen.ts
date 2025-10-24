@@ -41,18 +41,30 @@ export class FakeObjectGen {
     return fakeUserList;
   }
 
-  static generateFakeGroups(count: number = 10): Group[] {
+  static generateFakeGroups(
+    userList: ShortEntity[] = [],
+    count: number = 10,
+  ): Group[] {
     const fakeGroupList: Group[] = [];
     for (let i = 0; i < count; i++) {
-      const fakeUser = FakeObjectGen.createFakeGroup();
+      const randomInt = Math.round(Math.random() * (userList.length - 1));
+
+      const fakeUser = FakeObjectGen.createFakeGroup(
+        undefined,
+        userList[randomInt],
+      );
       fakeGroupList.push(fakeUser);
     }
     return fakeGroupList;
   }
-  static generateFakeServices(count: number = 10): Service[] {
+  static generateFakeServices(
+    userList: ShortEntity[] = [],
+    count: number = 10,
+  ): Service[] {
     const fakeServiceList: Service[] = [];
     for (let i = 0; i < count; i++) {
-      const fakeService = FakeObjectGen.createFakeService();
+      const randomInt = Math.round(Math.random() * (userList.length - 1));
+      const fakeService = FakeObjectGen.createFakeService(userList[randomInt]);
       fakeServiceList.push(fakeService);
     }
     return fakeServiceList;

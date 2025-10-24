@@ -1,54 +1,42 @@
-import {
-  Database,
-  DataTypes,
-  Model,
-  MySQLConnector,
-  Relationships,
-} from "@denodb";
-//Ausalgern in seperate Datei --> import dieser Datei?
-const connector = new MySQLConnector({
-  database: Deno.env.get("DB_NAME")!,
-  host: Deno.env.get("DB_HOST")!,
-  username: Deno.env.get("DB_USER")!,
-  password: Deno.env.get("DB_PASSWORD")!,
-});
-const db = new Database(connector);
+import { DataTypes, Model, Relationships } from "@denodb";
+import { DbUserCredential } from "./DbUserCredentials.ts";
+import { DbIdDisplayname } from "./DbIdDisplayname.ts";
+import { DbUserService } from "./DbUserService.ts";
+import { DbUserGroup } from "./DbUserGroup.ts";
+import { DbInvitation } from "./DbInvitation.ts";
 
-class User extends Model {
+export class DbUser extends Model {
   static override table = "Users";
   static override timestamps = true;
   static override fields = {
     displayname: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
-}
-class UserCredential extends Model {
-  static override table = "UserCredentials";
-  static override timestamps = true;
-  static override fields = {
-    _username: DataTypes.string(40),
-    _password: DataTypes.string(40),
-  };
-  static user() {
-    return this.hasOne(User);
+  static credentials() {
+    //hasOne returned a Model...but with
+    return this.hasOne(DbUserCredential) as Promise<DbUserCredential>;
+  }
+  static displayname() {
+    return this.hasOne(DbIdDisplayname) as Promise<DbIdDisplayname>;
+  }
+  static authorizedServices() {
+    return this.hasMany(DbUserService) as Promise<Model[]>;
+  }
+  static authorizedGroups() {
+    return this.hasMany(DbUserGroup) as Promise<Model[]>;
+  }
+  static async receivedInvitations() {
+    const id = (await this.first()).id?.toString() ?? "";
+    return DbInvitation.where("receiverReference", id).get() as Promise<
+      DbInvitation[]
+    >;
+  }
+  displayname!: string;
+  id!: string;
+  credentials() {
+    return DbUser.where("id", this.id).credentials();
   }
 }
 
-// After both models declarations
-//(FK,PK)?
-Relationships.belongsTo(UserCredential, User);
-db.link([User, UserCredential]);
-await db.sync({ drop: true });
-
-const _user = await User.create({
-  id: "testID1",
-  displayname: "testName1",
-});
-
-UserCredential.create({
-  userId: "testID1",
-  username: "testUsername1",
-  password: "testPassword1",
-});
-
-export { User, UserCredential };
+//(FK,PK)
+Relationships.belongsTo(DbUserCredential, DbUser);

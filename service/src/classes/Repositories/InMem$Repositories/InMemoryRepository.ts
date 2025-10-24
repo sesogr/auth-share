@@ -11,17 +11,17 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
   constructor(initial: T[] = []) {
     this.inMemList = initial.slice();
   }
-  abstract save(item: T): void;
-  abstract hydrate(item: T): T;
+  abstract save(item: T): Promise<void>;
+  abstract hydrate(item: T): Promise<T>;
 
-  findById(id: string): T {
+  findById(id: string): Promise<T> {
     const item = this.inMemList.find((i) => i.getId() === id);
     if (!item) throw new NotFoundError(`Item with id=${id} not found`);
     const hydratedItem = this.hydrate(item);
     return hydratedItem;
   }
 
-  findByName(name: string): T {
+  findByName(name: string): Promise<T> {
     const item = this.inMemList.find((i) => i.getDisplayName() === name);
     if (!item) {
       throw new NotFoundError(`Item with name=${name} not found`);
@@ -30,14 +30,12 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
     return hydratedItem;
   }
 
-  findAll(): T[] {
-    const itemListe = this.inMemList.slice().map((e) => this.hydrate(e));
-    if (itemListe.length === 0) {
-      throw new NotFoundError("No items found");
-    }
-    return itemListe;
+  findAll(): Promise<T[]> {
+    return Promise.all(
+      this.inMemList.slice().map((e) => this.hydrate(e)),
+    );
   }
-  add(item: T): void {
+  add(item: T): Promise<void> {
     if (this.inMemList.some((i) => i.getId() === item.getId())) {
       throw new ItemAlreadyExistsError(
         `Item with id=${item.getId()} already exists`,
@@ -51,12 +49,14 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
       );
     }
     this.inMemList.push(item);
+    return Promise.resolve();
   }
 
-  removeById(id: string): void {
+  removeById(id: string): Promise<void> {
     const before = this.inMemList.length;
     this.inMemList = this.inMemList.filter((i) => i.getId() !== id);
     if (this.inMemList.length >= before) throw Error("id not removed");
+    return Promise.resolve();
   }
   // findOwnedByUserName(userName: string): T[] {
   //   const ownedService = this.inMemList.filter((i) =>
