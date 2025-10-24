@@ -63,7 +63,7 @@ async function buildUpUserRepo() {
       console.log(error);
     }
   }));
-  Deno.writeTextFile(
+  await Deno.writeTextFile(
     "./service/test/testuser.json",
     JSON.stringify(fakeUserList),
   );
