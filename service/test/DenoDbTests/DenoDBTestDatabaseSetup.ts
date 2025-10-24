@@ -50,10 +50,10 @@ function sleep(time: number) {
 
 const { fakeUserList } = await buildUpUserRepo();
 
-sleep(500).then(async () => {
+sleep(2500).then(async () => {
   await buildUpGroupRepo(fakeUserList.map((e) => e.convertToShort()));
 });
-sleep(500).then(async () => {
+sleep(2500).then(async () => {
   await buildUpServRepo(fakeUserList.map((e) => e.convertToShort()));
 });
 async function buildUpUserRepo() {
@@ -62,7 +62,7 @@ async function buildUpUserRepo() {
   const userRepository: UserRepository = new DbUserRepository();
   await Promise.all(fakeUserList.map(async (e) => {
     try {
-      await userRepository.save(e);
+      await userRepository.add(e);
       console.log(e.getId());
       return;
     } catch (error) {

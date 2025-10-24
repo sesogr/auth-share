@@ -7,7 +7,7 @@ import { ConvertedUser } from "../types/types.ts";
 export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
 
-  private readonly ME = "15ed8f0d-f3c3-4e6c-84dc-c2c0824741be"; //TODO with meaningfull
+  private readonly ME = "df5755b6-67dd-4a8a-8dbf-249654e4df49"; //TODO with meaningfull
 
   async listMyServices(
     c: Context,

@@ -10,7 +10,7 @@ export class ServiceController {
     private readonly serviceRepository: ServiceRepository,
     private readonly userRepo: UserRepository,
   ) {}
-  private readonly ME = "15ed8f0d-f3c3-4e6c-84dc-c2c0824741be"; //Todo with meaningfull?!
+  private readonly ME = "df5755b6-67dd-4a8a-8dbf-249654e4df49"; //Todo with meaningfull?!
 
   async listMyServices(
     c: Context,
