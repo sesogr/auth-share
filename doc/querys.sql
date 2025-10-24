@@ -64,10 +64,10 @@ SELECT
 groupname,
 owner,
 `Groups`.id,
-Groups_Services.id AS group_service_id,
+Groups_Services.id AS serviceList,
 Invitations_Sent.sender_reference AS sentInvites,
 Invitations_Recv.receiver_reference AS receivedInvites,
-Users_Groups.dbgroup_id
+Users_Groups.dbuser_id
 FROM Groups
 LEFT JOIN Groups_Services ON Groups_Services.dbgroup_id = Groups.id
 LEFT JOIN Invitations AS Invitations_Sent ON Invitations_Sent.sender_reference = Groups.id

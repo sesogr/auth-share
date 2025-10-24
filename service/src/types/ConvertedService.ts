@@ -2,8 +2,8 @@ export type ConvertedService =
   & {
     serviceName: string;
     credentials: {
-      username: string
-      password: string
+      username: string;
+      password: string;
     };
   }
   & {
