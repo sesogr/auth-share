@@ -29,7 +29,7 @@ const Home: React.FC = () => {
       (currService: ConvertedService) => serviceName == currService.serviceName,
     )
     : undefined;
-
+  console.log(serviceList);
   return (
     <div>
       <h1>Service List</h1>
@@ -37,24 +37,39 @@ const Home: React.FC = () => {
       <ul>
         {Array.isArray(serviceList) &&
           serviceList.map((e: ConvertedService) => {
-            //should be the final path like "/serviceName/details or /serviceName/settings"??
             const urlPath = "/" + e.serviceName;
+            const urlLink = "https://" + e.serviceName;
+            //should be the final path like "/serviceName/details or /serviceName/settings"??
             return (
               <li>
                 {e.serviceName}
-                <button
-                  type="button"
-                  onClick={() => navigate(urlPath)}
-                  aria-label={`Launch the ${e.serviceName}`}
-                >
+                <a href={urlLink} target="_blank">
                   Launch
-                </button>
+                </a>
                 <button
                   type="button"
                   onClick={() => navigate(urlPath)}
                   aria-label={`Settings for ${e.serviceName}`}
                 >
                   Settings
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(e.credentials.password);
+                  }}
+                  aria-label={`Settings for ${e.serviceName}`}
+                >
+                  Password
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(e.credentials.username);
+                  }}
+                  aria-label={`Settings for ${e.serviceName}`}
+                >
+                  Username
                 </button>
               </li>
             );
