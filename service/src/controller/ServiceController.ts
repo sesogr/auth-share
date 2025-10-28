@@ -32,7 +32,10 @@ export class ServiceController {
     try {
       const convertedService: ConvertedService = await c.req!.json!();
       const service = Service.createService(
-        ServiceCredential.fromString(convertedService.credentials),
+        new ServiceCredential(
+          convertedService.credentials.username,
+          convertedService.credentials.password,
+        ),
         convertedService.serviceName,
         (await this.userRepo.findById(
           this.ME,
