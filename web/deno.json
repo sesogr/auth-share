@@ -6,6 +6,7 @@
     "vite/client": "npm:vite/client",
     "@vitejs/plugin-react": "npm:@vitejs/plugin-react",
     "vite": "npm:vite",
-    "antd": "npm:antd"
+    "antd": "npm:antd",
+    "@ant-design/icons": "npm:@ant-design/icons"
   }
 }
