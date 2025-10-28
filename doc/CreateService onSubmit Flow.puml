@@ -1,0 +1,89 @@
+@startuml CreateService onSubmit Flow
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam sequenceMessageAlign center
+
+actor User
+participant "CreateService\n(React)" as CreateService
+participant "fetch API" as Fetch
+participant "ServiceController\n(Backend)" as ServiceController
+participant "Service\n(Domain Model)" as Service
+participant "ServiceRepository\n(Interface)" as ServiceRepo
+participant "DbServiceRepository\n(DenoDB)" as DbServiceRepo
+database "MariaDB\nDatabase" as DB
+
+User -> CreateService: Klick auf Submit Button
+activate CreateService
+
+CreateService -> CreateService: Validierung der Formulardaten
+CreateService -> CreateService: Erstelle Request Body\n{name, displayname}
+
+CreateService -> Fetch: POST /services\n{name, displayname}
+activate Fetch
+
+Fetch -> ServiceController: POST /services
+activate ServiceController
+
+ServiceController -> Service: Service.create(name, displayname)
+activate Service
+
+Service -> Service: Validierung:\n- Name darf nicht leer sein\n- Name max. 100 Zeichen\n- Displayname max. 100 Zeichen
+
+alt Validierung erfolgreich
+    Service -> Service: Generiere UUID
+    Service -> Service: Erstelle Service Instanz
+    Service --> ServiceController: Service Objekt
+    deactivate Service
+    
+    ServiceController -> ServiceRepo: create(service)
+    activate ServiceRepo
+    
+    ServiceRepo -> DbServiceRepo: create(service)
+    activate DbServiceRepo
+    
+    DbServiceRepo -> DbServiceRepo: Konvertiere zu DbService Model
+    DbServiceRepo -> DB: INSERT INTO services\n(id, name, displayname)
+    activate DB
+    
+    alt Insert erfolgreich
+        DB --> DbServiceRepo: Success
+        deactivate DB
+        DbServiceRepo --> ServiceRepo: Service
+        deactivate DbServiceRepo
+        ServiceRepo --> ServiceController: Service
+        deactivate ServiceRepo
+        
+        ServiceController -> ServiceController: Konvertiere zu ConvertedService\n{id, name, displayname, groups: []}
+        ServiceController --> Fetch: 201 Created\n{ConvertedService}
+        deactivate ServiceController
+        
+        Fetch --> CreateService: Response {service}
+        deactivate Fetch
+        
+        CreateService -> CreateService: Erfolgsmeldung anzeigen
+        CreateService -> CreateService: Formular zurücksetzen
+        CreateService -> CreateService: Optional: Navigation zu /services/{id}
+        
+    else Insert fehlgeschlagen (Duplicate)
+        DB --> DbServiceRepo: Error: Duplicate Key
+        DbServiceRepo --> ServiceRepo: ItemAlreadyExistsError
+        ServiceRepo --> ServiceController: ItemAlreadyExistsError
+        ServiceController --> Fetch: 409 Conflict
+        Fetch --> CreateService: Error Response
+        CreateService -> CreateService: Fehlermeldung anzeigen\n"Service existiert bereits"
+    end
+    
+else Validierung fehlgeschlagen
+    Service --> ServiceController: NameTooLongError /\nValidation Error
+    deactivate Service
+    ServiceController --> Fetch: 400 Bad Request
+    deactivate ServiceController
+    Fetch --> CreateService: Error Response
+    deactivate Fetch
+    CreateService -> CreateService: Fehlermeldung anzeigen
+end
+
+CreateService --> User: UI Update
+deactivate CreateService
+
+@enduml
