@@ -1,7 +1,7 @@
-import type { ConvertedService } from "./types/ConvertedService.ts";
 import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Form, Input, Row, Space } from "antd";
+import type { SendingConvertedService } from "./types/ConvertedService.ts";
 
 const CreateService: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -25,7 +25,7 @@ const CreateService: React.FC = () => {
       `Name: ${servicename}, Username: ${username}, Password: ${password}`,
     );
 
-    const newServiceData: ConvertedService = {
+    const newServiceData: SendingConvertedService = {
       "serviceName": servicename,
       "serviceUrl": serviceUrl,
       "credentials": {

@@ -1,14 +1,16 @@
 //LIST Version
 import React, { useEffect, useState } from "react";
-import type { ConvertedService } from "./types/ConvertedService.ts";
 import { useParams } from "react-router-dom";
 import Service from "./Service.tsx";
 import { useNavigate } from "react-router-dom";
 import CreateService from "./CreateService.tsx";
 import { Button, Col, List, Row, Typography } from "antd";
+import type { ReceivedConvertedService } from "./types/ConvertedService.ts";
 
 const Home: React.FC = () => {
-  const [serviceList, setServiceList] = useState<ConvertedService[]>([]);
+  const [serviceList, setServiceList] = useState<ReceivedConvertedService[]>(
+    [],
+  );
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     fetch(import.meta.env.VITE_APIURL + "/user/owned")
-      .then((res): Promise<ConvertedService[]> => {
+      .then((res): Promise<ReceivedConvertedService[]> => {
         if (!res.ok) throw new Error("Netzwerkfehler");
         return res.json();
       })
@@ -48,7 +50,7 @@ const Home: React.FC = () => {
         bordered
         loading={loading}
         dataSource={serviceList}
-        renderItem={(item: ConvertedService) => {
+        renderItem={(item: ReceivedConvertedService) => {
           const urlLink = `https://${item.serviceName}`;
           const urlPath = `/${item.serviceName}`;
           return (

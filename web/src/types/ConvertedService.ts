@@ -3,6 +3,7 @@ import type { AllOptional } from "./AllOptional.ts";
 type ConvertedService =
   & {
     serviceName: string;
+    serviceUrl: string;
     credentials: {
       username: string;
       password: string;
