@@ -86,6 +86,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     const hydratedService: Service = new Service(
       credentials,
       serviceName,
+      service.serviceUrl,
       serviceId,
       sentInvitations,
       authorizedUsers,

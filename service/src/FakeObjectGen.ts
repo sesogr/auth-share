@@ -27,6 +27,8 @@ export class FakeObjectGen {
         faker.internet.userName(),
         faker.internet.password(7, true, /.*/, ""),
       ),
+      faker.company.companyName(),
+      //faker.internet.domainName() = serviceUrl
       faker.internet.domainName(),
       futureOwner,
     );

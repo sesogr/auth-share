@@ -8,6 +8,7 @@ export class DbService extends Model {
   static override timestamps = true;
   static override fields = {
     servicename: DataTypes.string(40),
+    serviceUrl: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
   static displayname() {

@@ -7,6 +7,12 @@ import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
 
 export class Service extends Entity {
+  public get serviceUrl(): string {
+    return this._serviceUrl;
+  }
+  public set serviceUrl(value: string) {
+    this._serviceUrl = value;
+  }
   public get authorizedGroups(): AllowedGroupServiceMap[] {
     return [...this._authorizedGroups];
   }
@@ -34,6 +40,7 @@ export class Service extends Entity {
   constructor(
     private _credentials: ServiceCredential,
     private serviceName: string = "",
+    private _serviceUrl: string = "",
     protected override readonly id: string = crypto.randomUUID(),
     private _sentInvitations: Invitation[] = [],
     //List for AuthorizedUsers
@@ -45,10 +52,11 @@ export class Service extends Entity {
   static createService(
     credentials: ServiceCredential,
     serviceName: string,
+    serviceUrl: string,
     owner: ShortEntity,
     id: string = crypto.randomUUID(),
   ) {
-    const service = new Service(credentials, serviceName, id);
+    const service = new Service(credentials, serviceName, serviceUrl, id);
     service._authorizedUsers.push(
       new AllowedUserServiceMap(owner, service.convertToShort(), true),
     );
@@ -71,16 +79,6 @@ export class Service extends Entity {
       currElement.groupname;
     return this.authorizedGroups.map(mapCallback);
   }
-  createService(
-    owner: ShortEntity,
-    credentials: ServiceCredential,
-    serviceName: string,
-  ): void {
-    const service = new Service(credentials, serviceName);
-    this.authorizedUsers.push(
-      new AllowedUserServiceMap(owner, service.convertToShort(), true),
-    );
-  }
   giveAuthorizationToUser(user: ShortEntity): void {
     this._authorizedUsers.push(
       new AllowedUserServiceMap(user, this.convertToShort()),
@@ -91,11 +89,12 @@ export class Service extends Entity {
   }
   private convertToSerializeableObj(): ConvertedService {
     return {
-      serviceName: this.getDisplayName(),
       credentials: {
         username: this._credentials.username,
         password: this._credentials.password,
       },
+      serviceName: this.getDisplayName(),
+      serviceUrl: this.serviceUrl,
       groups: this.listAuthorizedGroups(),
       users: this.listAuthorizedUsers(),
       owners: this.listAuthorizedUsers(true),

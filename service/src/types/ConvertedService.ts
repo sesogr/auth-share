@@ -1,10 +1,11 @@
 export type ConvertedService =
   & {
-    serviceName: string;
     credentials: {
       username: string;
       password: string;
     };
+    serviceName: string;
+    serviceUrl: string;
   }
   & {
     [K in ServiceListProperties]: string[];

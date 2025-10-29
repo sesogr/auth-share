@@ -60,6 +60,7 @@ export class DbServiceRepository implements ServiceRepository {
       await DbService.create({
         id: item.getId(),
         serviceName: item.getDisplayName(),
+        serviceUrl: item.serviceUrl,
       });
       await DbServiceCredential.create({
         dbservice_id: item.getId(),
@@ -128,6 +129,7 @@ export class DbServiceRepository implements ServiceRepository {
         DbServiceCredential.field("username", "un_cred"),
         DbServiceCredential.field("password", "pw_cred"),
         DbService.field("servicename", "servicename"),
+        DbService.field("service_url"),
         DbIdDisplaynameInvitationsSender.field("id", "sender_id"),
         DbIdDisplaynameInvitationsSender.field("displayname", "sender_name"),
         DbIdDisplaynameInvitationsReceiver.field("id", "receiver_id"),
@@ -188,6 +190,7 @@ export class DbServiceRepository implements ServiceRepository {
           pw_cred: string;
         };
         displayname: string;
+        serviceUrl: string;
         sentGroupInvites: {
           [l in string]: {
             senderRef: { id: string; displayname: string };
@@ -211,6 +214,7 @@ export class DbServiceRepository implements ServiceRepository {
             pw_cred: record.pwCred?.toString()!,
           },
           displayname: record.servicename?.toString()!,
+          serviceUrl: record.serviceUrl?.toString()!,
           sentGroupInvites: {},
           authorizedUsers: [],
           authorizedGroups: [],
@@ -264,6 +268,7 @@ export class DbServiceRepository implements ServiceRepository {
       temp.credentials.pw_cred,
     );
     const servicename = temp.displayname;
+    const serviceUrl = temp.serviceUrl;
     const serviceRef = new IdNameMap(
       searchedId,
       servicename,
@@ -304,6 +309,7 @@ export class DbServiceRepository implements ServiceRepository {
     return new Service(
       credentials,
       servicename,
+      serviceUrl,
       searchedId,
       sentGroupInvites,
       authorizedUsers,

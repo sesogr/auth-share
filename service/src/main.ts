@@ -23,6 +23,7 @@ import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyT
 import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepository.ts";
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 
+const ME = "0d7f0653-1bac-48d4-ad2b-f228759301c1";
 const db = new Database(
   new MySQLConnector({
     database: Deno.env.get("DB_NAME")!,
@@ -79,7 +80,7 @@ app.get("/data", (c) => {
   return dataController.getData(c);
 });
 
-const userController = new UserController(userRepository);
+const userController = new UserController(userRepository, ME);
 app.get(
   "/user",
   (c) => {
@@ -99,6 +100,7 @@ app.put(
 const serviceController = new ServiceController(
   serviceRepository,
   userRepository,
+  ME,
 );
 app.get(
   "/user/owned",

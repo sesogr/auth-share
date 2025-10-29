@@ -5,9 +5,10 @@ import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
 
 export class UserController {
-  constructor(private readonly userRepository: UserRepository) {}
-
-  private readonly ME = "df5755b6-67dd-4a8a-8dbf-249654e4df49"; //TODO with meaningfull
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly ME: string,
+  ) {}
 
   async listMyServices(
     c: Context,

@@ -5,7 +5,7 @@ import type { SendingConvertedService } from "./types/ConvertedService.ts";
 
 const CreateService: React.FC = () => {
   const [open, setOpen] = useState(false);
-
+  const [form] = Form.useForm();
   const showDrawer = () => {
     setOpen(true);
   };
@@ -13,17 +13,14 @@ const CreateService: React.FC = () => {
   const onClose = () => {
     setOpen(false);
   };
-  // deno-lint-ignore no-explicit-any
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-    const servicename = event.target.elements.servicename.value;
-    const serviceUrl = event.target.elements.serviceUrl.value;
-    const username = event.target.elements.username.value;
-    const password = event.target.elements.password.value;
+  const handleSubmit = (values: FormValues) => {
+    //[Log] {name: "hsdf", url: "dkfhg", ServiceLogin: "lakjs", ServicePassword: "123455"} (CreateService.tsx, line 32)
+    const servicename = values.name;
+    const serviceUrl = values.url;
+    const username = values.serviceLogin;
+    const password = values.servicePassword;
     // Handle form submission here, e.g. send data to server
-    console.log(
-      `Name: ${servicename}, Username: ${username}, Password: ${password}`,
-    );
+    console.log(values);
 
     const newServiceData: SendingConvertedService = {
       "serviceName": servicename,
@@ -72,6 +69,7 @@ const CreateService: React.FC = () => {
               name="submitbutton"
               type="primary"
               htmlType="submit"
+              onClick={() => form.submit()}
             >
               Submit
             </Button>
@@ -79,6 +77,7 @@ const CreateService: React.FC = () => {
         }
       >
         <Form
+          form={form}
           layout="vertical"
           onFinish={handleSubmit}
           //onFinishFailed={onFinishFailed}
@@ -114,7 +113,7 @@ const CreateService: React.FC = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="ServiceLogin"
+                name="serviceLogin"
                 label="ServiceLogin"
                 rules={[{
                   required: true,
@@ -126,7 +125,7 @@ const CreateService: React.FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="ServicePassword"
+                name="servicePassword"
                 label="ServicePassword"
                 rules={[{
                   required: true,
@@ -165,3 +164,9 @@ const CreateService: React.FC = () => {
 };
 
 export default CreateService;
+type FormValues = {
+  name: string;
+  url: string;
+  serviceLogin: string;
+  servicePassword: string;
+};
