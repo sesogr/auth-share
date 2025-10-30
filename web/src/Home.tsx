@@ -37,7 +37,7 @@ const Home: React.FC = () => {
     : undefined;
 
   return (
-    <div>
+    <div style={{ padding: 24 }}>
       <Row align="middle" style={{ marginBottom: 16 }}>
         <Col>
           <Typography.Title level={2}>Service List</Typography.Title>
