@@ -32,8 +32,18 @@ export class DbUserRepository implements UserRepository {
   async removeById(id: string): Promise<void> {
     await DbUser.where("id", id).delete();
   }
-  findById(id: string): Promise<User> {
+  async findById(id: string): Promise<User> {
+    if (!(await this.existId(id))) {
+      throw new NotFoundError("");
+    }
     return this.hydrate(id);
+  }
+  async existId(id: string): Promise<boolean> {
+    if ((await DbUser.where("id", id).first())) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async findAll() {
@@ -64,13 +74,9 @@ export class DbUserRepository implements UserRepository {
   }
 
   async save(item: User) {
-    try {
-      await this.findById(item.getId());
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        return await this.add(item);
-      }
-      throw error;
+    const result = await this.existId(item.getId());
+    if (result !== true) {
+      this.add(item);
     }
   }
   //User_ID=searchedId
