@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Drawer, Form, Input, Row, Space } from "antd";
+import { Button, Col, Drawer, Form, Input, message, Row, Space } from "antd";
 import type { SendingConvertedService } from "./types/ConvertedService.ts";
 
 const CreateService: React.FC = () => {
@@ -38,8 +38,12 @@ const CreateService: React.FC = () => {
       },
       body: JSON.stringify(newServiceData),
     })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((response) => response.status)
+      .then((data) => {
+        form.resetFields();
+        message.success("Service created");
+        return console.log(data);
+      })
       .catch((error) => {
         console.log(import.meta.env.VITE_APIURL);
         return console.error(error);
