@@ -45,6 +45,15 @@ db.link([
   DbInvitation,
   DbIdDisplayname,
 ]);
+try {
+  await db.sync();
+} catch (error) {
+  if (error instanceof Error) {
+    if (error.message != "Multiple primary key defined") {
+      throw error; //it throws the multiple keys always when the database is already filled with tables
+    }
+  }
+}
 //initialize repositories
 const serviceRepository: ServiceRepository = new DbServiceRepository();
 const _groupRepository: GroupRepository = new DbGroupRepository();
