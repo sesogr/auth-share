@@ -24,8 +24,12 @@ import {
   DbInvitationJoinOnObject,
   DbInvitationJoinOnReceived,
 } from "./Models/DbInvitation.ts";
+import { DbRepository } from "./DbRepository.ts";
 
-export class DbGroupRepository implements GroupRepository {
+export class DbGroupRepository extends DbRepository implements GroupRepository {
+  constructor() {
+    super(DbGroup, "groupname");
+  }
   async findByName(name: string): Promise<Group> {
     const searchedName = await DbGroup.where("groupname", name).first();
     return this.hydrate(searchedName.id?.toString() ?? "");
@@ -285,13 +289,6 @@ export class DbGroupRepository implements GroupRepository {
     const result = await this.existId(item.getId());
     if (result !== true) {
       this.add(item);
-    }
-  }
-  async existId(id: string): Promise<boolean> {
-    if ((await DbGroup.where("id", id).first())) {
-      return true;
-    } else {
-      return false;
     }
   }
   async removeById(id: string): Promise<void> {

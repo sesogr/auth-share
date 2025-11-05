@@ -20,9 +20,12 @@ import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { Invitation } from "../../Invitation.ts";
 import { DbServiceCredential } from "./Models/DbServiceCredentials.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
+import { DbRepository } from "./DbRepository.ts";
 
-export class DbServiceRepository implements ServiceRepository {
+export class DbServiceRepository extends DbRepository
+  implements ServiceRepository {
   constructor() {
+    super(DbService, "servicename");
   }
   async findOwnedByUserId(userId: string): Promise<Service[]> {
     const userServiceData: Model[] = await DbUserService.where(
@@ -109,16 +112,14 @@ export class DbServiceRepository implements ServiceRepository {
     throw new Error("Method not implemented.");
   }
   async save(item: Service): Promise<void> {
-    try {
-      await this.findById(item.getId());
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        this.add(item);
-        return;
-      }
-      throw error;
+    if (
+      !(await this.existId(item.getId())) &&
+      !(await this.existDisplayname(item.getDisplayName()))
+    ) {
+      this.add(item);
+    } else {
+      throw new Error("UnImplemented");
     }
-    throw new Error("UnImplemented");
   }
 
   async hydrate(searchedId: string): Promise<Service> {
