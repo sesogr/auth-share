@@ -48,15 +48,14 @@ Deno.test("DbGroupRepository - Save()", async (t) => {
   );
   await t.step("If Item already exist", async () => {
     const repo = new DbGroupRepository();
-    const stubExistId = stub(repo, "existId", async () => {
-      return await Promise.resolve(true);
+    const stubExistId = stub(repo, "existId", () => {
+      return Promise.resolve(true);
     });
-    const stubAdd = stub(repo, "add", async () => await Promise.resolve());
+    const stubAdd = stub(repo, "add", () => Promise.resolve());
     await repo.save(item);
 
-    console.log(item);
     assertEquals(stubExistId.calls[0].args[0], id);
-    console.log(id);
+
     //watched ()
     assertEquals(stubExistId.calls.length, 1);
     assertEquals(stubAdd.calls.length, 0);
@@ -67,10 +66,10 @@ Deno.test("DbGroupRepository - Save()", async (t) => {
 
   await t.step("If Item doesn't exist in Database", async () => {
     const repo = new DbGroupRepository();
-    const stubExistId = stub(repo, "existId", async () => {
-      return await Promise.resolve(false);
+    const stubExistId = stub(repo, "existId", () => {
+      return Promise.resolve(false);
     });
-    const stubAdd = stub(repo, "add", async () => await Promise.resolve());
+    const stubAdd = stub(repo, "add", () => Promise.resolve());
     await repo.save(item);
 
     assertEquals(stubExistId.calls.length, 1);
@@ -80,5 +79,17 @@ Deno.test("DbGroupRepository - Save()", async (t) => {
     stubAdd.restore();
   });
 
+  await db.close();
+});
+
+Deno.test("ExistId", async () => {
+  const repo = new DbGroupRepository();
+  const testGroupId = "62787485749";
+  //const stub2 = stub(DbGroup, "first", () => Promise.resolve(true));
+  //call for existID
+  const result = await repo.existId(testGroupId);
+
+  assertEquals(result, true);
+  ///assertEquals(stub2.calls.length, 1);
   await db.close();
 });

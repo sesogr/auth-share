@@ -31,10 +31,10 @@ export class UserController {
     );
   }
   async changePassword(c: Context) {
-    const requestData = await c.req.json();
-    const newPassword: string = requestData.password;
+    const requestData: ConvertedUser = await c.req.json();
+    const newPassword: string = requestData.credentials.split(":")[1];
     //TODO we need the loggedin User here!!
-    const myself: User = (await this.userRepository.findAll())[0];
+    const myself: User = await this.userRepository.findById(this.ME);
     myself.changeUserCredentials(
       new UserCredential(myself.getCredentials().username, newPassword),
     );

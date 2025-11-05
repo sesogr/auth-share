@@ -11,6 +11,9 @@ import { DbUserGroup } from "../../src/classes/Repositories/DenoDB/Models/DbUser
 import { DbUserService } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbServiceRepository.ts";
+import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
+import { stub } from "@std/testing/mock";
+import { assertEquals } from "@std/assert";
 
 const connector = new MySQLConnector({
   database: "authshare",
@@ -35,8 +38,33 @@ db.link([
 ]);
 Deno.test("ABC", async (_t) => {
   const repo = new DbServiceRepository();
-  const userList = await repo.findOwnedByUserId(
+  const ownedList = await repo.findOwnedByUserId(
     "15ed8f0d-f3c3-4e6c-84dc-c2c0824741be",
   );
-  console.log(userList);
+  console.log(ownedList);
+});
+
+Deno.test("DbServiceRepository - Save()", async (t) => {
+  const testService = FakeObjectGen.createFakeService();
+  const id = testService.getId();
+
+  await t.step("If Service already exist", async () => {
+    const repo = new DbServiceRepository();
+    const stubExistId = stub(repo, "existId", () => {
+      return Promise.resolve(true);
+    });
+    const stubExistDisplayname = stub(repo, "existDisplayname", () => {
+      return Promise.resolve(true);
+    });
+    const stubAdd = stub(repo, "add", () => {
+      return Promise.resolve();
+    });
+    await repo.save(testService);
+    assertEquals(stubExistId.calls[0].args[0], id);
+    assertEquals(
+      stubExistDisplayname.calls[0].args[0],
+      testService.getDisplayName(),
+    );
+    assertEquals(stubAdd.calls.length, 0);
+  });
 });
