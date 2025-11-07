@@ -113,12 +113,12 @@ export class DbServiceRepository extends DbRepository
   }
   async save(item: Service): Promise<void> {
     if (
-      !(await this.existId(item.getId())) &&
-      !(await this.existDisplayname(item.getDisplayName()))
+      (await this.existId(item.getId())) ||
+      (await this.existDisplayname(item.getDisplayName()))
     ) {
-      this.add(item);
+      return;
     } else {
-      throw new Error("UnImplemented");
+      this.add(item);
     }
   }
 
