@@ -26,8 +26,8 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     }
     this.inMemList[serviceIndex] = service;
     this.updateInvites(service.sentInvitations);
-    this.updateAllowedUsers(service.authorizedUsers);
-    this.updateAllowedGroups(service.authorizedGroups);
+    this.updateAllowedUsers(service.allowedUsers);
+    this.updateAllowedGroups(service.allowedGroups);
     return Promise.resolve();
   }
   private updateInvites(invites: Invitation[]) {
@@ -70,7 +70,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   }
   override hydrate(service: Service): Promise<Service> {
     const credentials = new ServiceCredential(
-      ...service.credentials.split(":"),
+      ...service.credentials.toString().split(":"),
     );
     const serviceName = service.getDisplayName();
     const serviceId = service.getId();

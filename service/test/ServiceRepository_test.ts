@@ -37,8 +37,8 @@ Deno.test("ServiceRepository", async (t) => {
     // Assert that the service was saved correctly
     const savedService = await serviceRepository.findById(currService.getId());
     assertEquals(
-      savedService.listAuthorizedUsers(),
-      currService.listAuthorizedUsers(),
+      savedService.listAllowedUsers(),
+      currService.listAllowedUsers(),
     );
     // must add test for removeAuthorization
     //test for steps ()

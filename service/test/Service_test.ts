@@ -14,14 +14,14 @@ const user2 = FakeObjectGen.createFakeUser();
 const service = Service.createService(serviceCredential, "sag", "", userShort);
 Deno.test("Service Class", async (t) => {
   await t.step("Service Creates with correct Owner", () => {
-    const owners: string[] = service.listAuthorizedUsers(true);
+    const owners: string[] = service.listAllowedUsers(true);
     assertArrayIncludes(owners, [userShort.displayname]);
   });
 
   await t.step("lists that should be empty are empty", () => {
     assertEquals(
-      service.listAuthorizedGroups().length +
-        service.listAuthorizedUsers().length - 1,
+      service.listAllowedGroups().length +
+        service.listAllowedUsers().length - 1,
       0,
     );
   });
@@ -30,7 +30,7 @@ Deno.test("Service Class", async (t) => {
     "Service Authorize new User successfully puts User into owners",
     () => {
       service.giveAuthorizationToUser(user2Short);
-      assertArrayIncludes(service.listAuthorizedUsers(), [
+      assertArrayIncludes(service.listAllowedUsers(), [
         user2Short.displayname,
       ]);
     },

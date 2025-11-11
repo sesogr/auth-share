@@ -13,17 +13,17 @@ export class Service extends Entity {
   public set serviceUrl(value: string) {
     this._serviceUrl = value;
   }
-  public get authorizedGroups(): AllowedGroupServiceMap[] {
-    return [...this._authorizedGroups];
+  public get allowedGroups(): AllowedGroupServiceMap[] {
+    return [...this._allowedGroups];
   }
-  public set authorizedGroups(value: AllowedGroupServiceMap[]) {
-    this._authorizedGroups = value;
+  public set allowedGroups(value: AllowedGroupServiceMap[]) {
+    this._allowedGroups = value;
   }
-  public get authorizedUsers(): AllowedUserServiceMap[] {
-    return [...this._authorizedUsers];
+  public get allowedUsers(): AllowedUserServiceMap[] {
+    return [...this._allowedUsers];
   }
-  public set authorizedUsers(value: AllowedUserServiceMap[]) {
-    this._authorizedUsers = value;
+  public set allowedUsers(value: AllowedUserServiceMap[]) {
+    this._allowedUsers = value;
   }
   public get sentInvitations(): Invitation[] {
     return [...this._sentInvitations];
@@ -31,8 +31,8 @@ export class Service extends Entity {
   public set sentInvitations(value: Invitation[]) {
     this._sentInvitations = value;
   }
-  public get credentials(): string {
-    return this._credentials.toString();
+  public get credentials(): ServiceCredential {
+    return this._credentials;
   }
   public set credentials(value: ServiceCredential) {
     this._credentials = value;
@@ -44,10 +44,15 @@ export class Service extends Entity {
     protected override readonly id: string = crypto.randomUUID(),
     private _sentInvitations: Invitation[] = [],
     //List for AuthorizedUsers
-    private _authorizedUsers: AllowedUserServiceMap[] = [],
-    private _authorizedGroups: AllowedGroupServiceMap[] = [],
+    private _allowedUsers: AllowedUserServiceMap[] = [],
+    private _allowedGroups: AllowedGroupServiceMap[] = [],
   ) {
     super(id, serviceName);
+  }
+  giveAuthorizationToGroup(group: ShortEntity): void {
+    this._allowedGroups.push(
+      new AllowedGroupServiceMap(group, this.convertToShort()),
+    );
   }
   static createService(
     credentials: ServiceCredential,
@@ -57,7 +62,7 @@ export class Service extends Entity {
     id: string = crypto.randomUUID(),
   ) {
     const service = new Service(credentials, serviceName, serviceUrl, id);
-    service._authorizedUsers.push(
+    service._allowedUsers.push(
       new AllowedUserServiceMap(owner, service.convertToShort(), true),
     );
     return service;
@@ -65,22 +70,22 @@ export class Service extends Entity {
   override getDisplayName(): string {
     return this.serviceName;
   }
-  listAuthorizedUsers(onlyOwners = false): string[] {
+  listAllowedUsers(onlyOwners = false): string[] {
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
       currentElement.username;
     if (onlyOwners) {
-      return this.authorizedUsers.filter((currElement) => currElement.isOwner)
+      return this.allowedUsers.filter((currElement) => currElement.isOwner)
         .map(mapCallback);
     }
-    return this.authorizedUsers.map(mapCallback);
+    return this.allowedUsers.map(mapCallback);
   }
-  listAuthorizedGroups(): string[] {
+  listAllowedGroups(): string[] {
     const mapCallback = (currElement: AllowedGroupServiceMap): string =>
       currElement.groupname;
-    return this.authorizedGroups.map(mapCallback);
+    return this.allowedGroups.map(mapCallback);
   }
   giveAuthorizationToUser(user: ShortEntity): void {
-    this._authorizedUsers.push(
+    this._allowedUsers.push(
       new AllowedUserServiceMap(user, this.convertToShort()),
     );
   }
@@ -95,9 +100,9 @@ export class Service extends Entity {
       },
       serviceName: this.getDisplayName(),
       serviceUrl: this.serviceUrl,
-      groups: this.listAuthorizedGroups(),
-      users: this.listAuthorizedUsers(),
-      owners: this.listAuthorizedUsers(true),
+      groups: this.listAllowedGroups(),
+      users: this.listAllowedUsers(),
+      owners: this.listAllowedUsers(true),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
     };
   }
