@@ -284,11 +284,14 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
     }
     throw new RuntimeError();
   }
+  async saveAll(item: Group[]) {
+    await Promise.all(item.map(async (e) => await this.save(e)));
+  }
   async save(item: Group) {
     //first call of existId --> assertEquals(stubExistId.calls[0].arg[0] in Deno.Test)
     const result = await this.existId(item.getId());
     if (result !== true) {
-      this.add(item);
+      await this.add(item);
     }
   }
   async removeById(id: string): Promise<void> {
@@ -333,6 +336,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       }
       await DbUserGroup.create(item.allowedUser.map((e) => {
         return {
+          id: e.toString(),
           dbuser_id: e.userId,
           dbgroup_id: item.getId(),
           isOwner: e.isOwner,
