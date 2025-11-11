@@ -47,6 +47,32 @@ await db.sync({ drop: true });
 function sleep(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
+const groupsWithService = async () => {
+  const fakeUser = FakeObjectGen.createFakeUser();
+  const fakeService = FakeObjectGen.createFakeService(
+    fakeUser.convertToShort(),
+  );
+
+  const fakeGroups: Group[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    const groups = FakeObjectGen.createFakeGroup(
+      undefined,
+      fakeUser.convertToShort(),
+    );
+    fakeService.giveAuthorizationToGroup(groups.convertToShort());
+
+    fakeGroups.push(groups);
+  }
+  const serviceRepo = new DbServiceRepository();
+  const groupRepo = new DbGroupRepository();
+  const userRepo = new DbUserRepository();
+
+  await userRepo.save(fakeUser);
+  await groupRepo.saveAll(fakeGroups);
+  await serviceRepo.save(fakeService);
+  await db.close();
+};
 
 const { fakeUserList } = await buildUpUserRepo();
 
@@ -56,6 +82,9 @@ sleep(2500).then(async () => {
 sleep(2500).then(async () => {
   await buildUpServRepo(fakeUserList.map((e) => e.convertToShort()));
 });
+
+await groupsWithService();
+
 async function buildUpUserRepo() {
   const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
