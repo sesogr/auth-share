@@ -71,6 +71,8 @@ Deno.test("DbServiceRepository - Save()", async (t) => {
     }
   };
   await t.step("If Service already exist", async () => {
+    restoreStubs();
+
     idReturn = true;
     displaynameReturn = true;
 
@@ -90,10 +92,9 @@ Deno.test("DbServiceRepository - Save()", async (t) => {
       );
     }
     assertEquals(stubAdd.calls.length, 0);
-
-    restoreStubs();
   });
   await t.step("If Service not exist", async () => {
+    restoreStubs();
     idReturn = false;
     displaynameReturn = false;
 
@@ -104,7 +105,5 @@ Deno.test("DbServiceRepository - Save()", async (t) => {
       testService.getDisplayName(),
     );
     assertEquals(stubAdd.calls.length, 1);
-
-    restoreStubs();
   });
 });
