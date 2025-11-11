@@ -1,4 +1,4 @@
-import { Model, Relationships } from "@denodb";
+import { DataTypes, Model, Relationships } from "@denodb";
 import { DbGroup } from "./DbGroup.ts";
 import { DbService } from "./DbService.ts";
 
@@ -9,4 +9,8 @@ export function setupGroupService() {
     DbGroup,
     DbService,
   );
+  DbGroupService.fields = {
+    ...DbGroupService.fields,
+    id: { primaryKey: true, type: DataTypes.STRING },
+  };
 }
