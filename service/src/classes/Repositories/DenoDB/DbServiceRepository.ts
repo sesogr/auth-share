@@ -58,6 +58,26 @@ export class DbServiceRepository extends DbRepository
   findAll(): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
+  async update(item: Service): Promise<void> {
+    await DbService.where("id", item.getId()).update({
+      servicename: item.getDisplayName(),
+      serviceUrl: item.serviceUrl,
+    });
+    await DbServiceCredential.where("dbservice_id", item.getId()).update({
+      username: item.credentials.username,
+      password: item.credentials.password,
+    });
+    await DbIdDisplayname.where("id", item.getId()).update({
+      displayname: item.getDisplayName(),
+    });
+    //.all gives all rows out
+    const _groupServiceModel = await DbGroupService.where(
+      "dbservice_id",
+      item.getId(),
+    ).all();
+
+    //hier gehts weiter!!!
+  }
   async add(item: Service): Promise<void> {
     try {
       await DbService.create({
@@ -67,28 +87,30 @@ export class DbServiceRepository extends DbRepository
       });
       await DbServiceCredential.create({
         dbservice_id: item.getId(),
-        username: item.credentials.split(":")[0],
-        password: item.credentials.split(":")[1],
+        username: item.credentials.username,
+        password: item.credentials.password,
       });
       await DbIdDisplayname.create({
         id: item.getId(),
         displayname: item.getDisplayName(),
       });
       await DbUserService.create(
-        item.authorizedUsers.map((authorizedUsermap) => {
+        item.allowedUsers.map((allowedUsermap) => {
           return {
-            dbuser_id: authorizedUsermap.userId,
-            dbservice_id: authorizedUsermap.serviceId,
-            is_owner: authorizedUsermap.isOwner,
+            id: allowedUsermap.toString(),
+            dbuser_id: allowedUsermap.userId,
+            dbservice_id: allowedUsermap.serviceId,
+            is_owner: allowedUsermap.isOwner,
           };
         }),
       );
-      if (item.authorizedGroups.length != 0) {
+      if (item.allowedGroups.length != 0) {
         await DbGroupService.create(
-          item.authorizedGroups.map((authorizedGroupmap) => {
+          item.allowedGroups.map((allowedGroupmap) => {
             return {
-              dbgroup_id: authorizedGroupmap.groupId,
-              dbservice_id: authorizedGroupmap.serviceId,
+              id: allowedGroupmap.toString(),
+              dbgroup_id: allowedGroupmap.groupId,
+              dbservice_id: allowedGroupmap.serviceId,
             };
           }),
         );
@@ -118,7 +140,7 @@ export class DbServiceRepository extends DbRepository
     ) {
       return;
     } else {
-      this.add(item);
+      await this.add(item);
     }
   }
 
