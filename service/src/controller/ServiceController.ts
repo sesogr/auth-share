@@ -38,9 +38,9 @@ export class ServiceController {
         ),
         convertedService.serviceName,
         convertedService.serviceUrl,
-        (await this.userRepo.findById(
+        await this.userRepo.findById(
           this.ME,
-        )).convertToShort(),
+        ),
       ); //Todo: new = new type(arguments);, convertedService.serviceName)
       await this.serviceRepository.save(service);
       return c.body!(null, 201);

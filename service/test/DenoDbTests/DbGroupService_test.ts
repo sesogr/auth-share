@@ -51,7 +51,7 @@ Deno.test("DenoDB Update", async () => {
   )
     .all();
   //newData
-  service.giveAuthorizationToGroup(groups[1].convertToShort());
+  service.giveAuthorizationToGroup(groups[1]);
   //Filter
   const toDelete = _groupServiceModel.filter((e) =>
     service.allowedGroups.every((f) => e.id != f.toString())

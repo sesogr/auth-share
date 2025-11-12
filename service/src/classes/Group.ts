@@ -4,6 +4,7 @@ import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { Entity } from "./Entity.ts";
 import { Invitation } from "./Invitation.ts";
+import { User } from "./User.ts";
 
 export class Group extends Entity {
   public get allowedUser(): AllowedUserGroupMap[] {
@@ -41,22 +42,26 @@ export class Group extends Entity {
   listSentInvitation(): Invitation[] {
     return [...this.sentInvitations];
   }
-  static createUserGroup(groupname: string, owner: ShortEntity): Group {
-    const newGroup = new Group(groupname, owner);
+  static createUserGroup(groupname: string, owner: User): Group {
+    const newGroup = new Group(groupname, owner.convertToShort());
     newGroup.allowedUser.push(
-      new AllowedUserGroupMap(owner, newGroup.convertToShort(), true),
+      new AllowedUserGroupMap(
+        owner.convertToShort(),
+        newGroup.convertToShort(),
+        true,
+      ),
     );
     return newGroup;
   }
   sendInvitation(
-    senderReference: ShortEntity,
-    receiverReference: ShortEntity,
+    senderReference: User,
+    receiverReference: User,
   ) {
     this.sentInvitations.push(
       new Invitation(
-        senderReference,
+        senderReference.convertToShort(),
         this.convertToShort(),
-        receiverReference,
+        receiverReference.convertToShort(),
       ),
     );
   }

@@ -1,10 +1,11 @@
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { ConvertedService } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
+import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
+import { User } from "./User.ts";
 
 export class Service extends Entity {
   public get serviceUrl(): string {
@@ -49,21 +50,25 @@ export class Service extends Entity {
   ) {
     super(id, serviceName);
   }
-  giveAuthorizationToGroup(group: ShortEntity): void {
+  giveAuthorizationToGroup(group: Group): void {
     this._allowedGroups.push(
-      new AllowedGroupServiceMap(group, this.convertToShort()),
+      new AllowedGroupServiceMap(group.convertToShort(), this.convertToShort()),
     );
   }
   static createService(
     credentials: ServiceCredential,
     serviceName: string,
     serviceUrl: string,
-    owner: ShortEntity,
+    owner: User,
     id: string = crypto.randomUUID(),
   ) {
     const service = new Service(credentials, serviceName, serviceUrl, id);
     service._allowedUsers.push(
-      new AllowedUserServiceMap(owner, service.convertToShort(), true),
+      new AllowedUserServiceMap(
+        owner.convertToShort(),
+        service.convertToShort(),
+        true,
+      ),
     );
     return service;
   }
@@ -84,9 +89,9 @@ export class Service extends Entity {
       currElement.groupname;
     return this.allowedGroups.map(mapCallback);
   }
-  giveAuthorizationToUser(user: ShortEntity): void {
+  giveAuthorizationToUser(user: User): void {
     this._allowedUsers.push(
-      new AllowedUserServiceMap(user, this.convertToShort()),
+      new AllowedUserServiceMap(user.convertToShort(), this.convertToShort()),
     );
   }
   toJsonString(): string {
@@ -110,11 +115,11 @@ export class Service extends Entity {
   toJson() {
     return this.convertToSerializeableObj();
   }
-  sendInvitation(receiver: ShortEntity, sender: ShortEntity) {
+  sendInvitation(receiver: Group, sender: User) {
     const invitation = new Invitation(
-      sender,
+      sender.convertToShort(),
       this.convertToShort(),
-      receiver,
+      receiver.convertToShort(),
     );
     this._sentInvitations.push(invitation);
   }

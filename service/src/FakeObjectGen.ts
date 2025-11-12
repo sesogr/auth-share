@@ -4,7 +4,6 @@ import { UserCredential } from "./classes/UserCredential.ts";
 import { Group } from "./classes/Group.ts";
 import { Service } from "./classes/Service.ts";
 import { ServiceCredential } from "./classes/ServiceCredential.ts";
-import { ShortEntity } from "./interfaceTypes/ShortEntity.ts";
 export class FakeObjectGen {
   static createFakeUser(
     userName = faker.internet.userName(),
@@ -15,12 +14,12 @@ export class FakeObjectGen {
   }
   static createFakeGroup(
     groupDisplayName = faker.internet.domainName(),
-    user: ShortEntity = FakeObjectGen.createFakeUser().convertToShort(),
+    user: User = FakeObjectGen.createFakeUser(),
   ) {
     return Group.createUserGroup(groupDisplayName, user);
   }
   static createFakeService(
-    futureOwner: ShortEntity = FakeObjectGen.createFakeUser().convertToShort(),
+    futureOwner: User = FakeObjectGen.createFakeUser(),
   ) {
     return Service.createService(
       new ServiceCredential(
@@ -44,7 +43,7 @@ export class FakeObjectGen {
   }
 
   static generateFakeGroups(
-    userList: ShortEntity[] = [],
+    userList: User[] = [],
     count: number = 10,
   ): Group[] {
     const fakeGroupList: Group[] = [];
@@ -60,7 +59,7 @@ export class FakeObjectGen {
     return fakeGroupList;
   }
   static generateFakeServices(
-    userList: ShortEntity[] = [],
+    userList: User[] = [],
     count: number = 10,
   ): Service[] {
     const fakeServiceList: Service[] = [];

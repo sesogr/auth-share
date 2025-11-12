@@ -18,7 +18,6 @@ import { Service } from "../../src/classes/Service.ts";
 import { User } from "../../src/classes/User.ts";
 import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
 import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts";
-import { ShortEntity } from "../../src/interfaceTypes/ShortEntity.ts";
 import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
 
 const connector = new MySQLConnector({
@@ -50,19 +49,19 @@ function sleep(time: number) {
 const groupsWithService = async () => {
   const fakeUser = FakeObjectGen.createFakeUser();
   const fakeService = FakeObjectGen.createFakeService(
-    fakeUser.convertToShort(),
+    fakeUser,
   );
 
   const fakeGroups: Group[] = [];
 
   for (let i = 0; i < 10; i++) {
-    const groups = FakeObjectGen.createFakeGroup(
+    const group = FakeObjectGen.createFakeGroup(
       undefined,
-      fakeUser.convertToShort(),
+      fakeUser,
     );
-    fakeService.giveAuthorizationToGroup(groups.convertToShort());
+    fakeService.giveAuthorizationToGroup(group);
 
-    fakeGroups.push(groups);
+    fakeGroups.push(group);
   }
   const serviceRepo = new DbServiceRepository();
   const groupRepo = new DbGroupRepository();
@@ -77,10 +76,10 @@ const groupsWithService = async () => {
 const { fakeUserList } = await buildUpUserRepo();
 
 sleep(2500).then(async () => {
-  await buildUpGroupRepo(fakeUserList.map((e) => e.convertToShort()));
+  await buildUpGroupRepo(fakeUserList);
 });
 sleep(2500).then(async () => {
-  await buildUpServRepo(fakeUserList.map((e) => e.convertToShort()));
+  await buildUpServRepo(fakeUserList);
 });
 
 await groupsWithService();
@@ -104,7 +103,7 @@ async function buildUpUserRepo() {
   );
   return { mockUserIdList, fakeUserList };
 }
-async function buildUpServRepo(userList: ShortEntity[]) {
+async function buildUpServRepo(userList: User[]) {
   const serviceList: Service[] = FakeObjectGen.generateFakeServices(userList);
   const serviceRepository: ServiceRepository = new DbServiceRepository();
   await Promise.all(
@@ -116,7 +115,7 @@ async function buildUpServRepo(userList: ShortEntity[]) {
   );
   return { serviceList, serviceRepository };
 }
-async function buildUpGroupRepo(userList: ShortEntity[]) {
+async function buildUpGroupRepo(userList: User[]) {
   const groupList: Group[] = FakeObjectGen.generateFakeGroups(userList);
   const groupRepository = new DbGroupRepository();
   await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
