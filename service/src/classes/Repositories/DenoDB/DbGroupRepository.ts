@@ -61,6 +61,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbIdDisplaynameInvitations2Sender.field("id", "invitedServiceSenderId"),
         DbIdDisplaynameUser.field("id", "allowedUserId"),
         DbIdDisplaynameUser.field("displayname", "allowedUserName"),
+        DbUserGroup.field("is_owner"),
       )
       .leftJoin(
         DbUserGroup,
@@ -84,33 +85,33 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       )
       .leftJoin(
         DbInvitationJoinOnObject,
-        DbInvitationJoinOnObject.field("objReference"),
+        DbInvitationJoinOnObject.field("obj_reference"),
         DbGroup.field("id"),
       )
       .leftJoin(
         DbIdDisplaynameInvitationsReceiver,
         DbIdDisplaynameInvitationsReceiver.field("id"),
-        DbInvitationJoinOnObject.field("receiverReference"),
+        DbInvitationJoinOnObject.field("receiver_reference"),
       )
       .leftJoin(
         DbIdDisplaynameInvitationsSender,
         DbIdDisplaynameInvitationsSender.field("id"),
-        DbInvitationJoinOnObject.field("senderReference"),
+        DbInvitationJoinOnObject.field("sender_reference"),
       )
       .leftJoin(
         DbInvitationJoinOnReceived,
-        DbInvitationJoinOnReceived.field("receiverReference"),
+        DbInvitationJoinOnReceived.field("receiver_reference"),
         DbGroup.field("id"),
       )
       .leftJoin(
         DbIdDisplaynameInvitationsObj,
         DbIdDisplaynameInvitationsObj.field("id"),
-        DbInvitationJoinOnReceived.field("objReference"),
+        DbInvitationJoinOnReceived.field("obj_reference"),
       )
       .leftJoin(
         DbIdDisplaynameInvitations2Sender,
         DbIdDisplaynameInvitations2Sender.field("id"),
-        DbInvitationJoinOnReceived.field("senderReference"),
+        DbInvitationJoinOnReceived.field("sender_reference"),
       )
       .where(DbGroup.field("id"), searchedId)
       .get() as Model[];
