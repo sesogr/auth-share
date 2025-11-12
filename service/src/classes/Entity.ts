@@ -13,7 +13,7 @@ export class Entity implements DisplayableEntity {
   getId(): string {
     return this.id;
   }
-  convertToShort(): ShortEntity { //hier eine IdNameMap macht probleme?
+  convertToShort(): ShortEntity {
     return new IdNameMap(
       this.getId(),
       this.getDisplayName(),
