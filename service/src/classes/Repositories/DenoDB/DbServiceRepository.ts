@@ -76,6 +76,23 @@ export class DbServiceRepository extends DbRepository
       item.getId(),
     ).all();
 
+    const groupRelationToDelete = _groupServiceModel.filter((e) =>
+      item.allowedGroups.every((f) => e.id != f.toString())
+    );
+    const groupRelationToSave = item.allowedGroups.filter((e) =>
+      _groupServiceModel.every((f) => e.toString() != f.id)
+    );
+    await Promise.all(groupRelationToDelete.map((e) => e.delete()));
+    await Promise.all(
+      groupRelationToSave.map((e) =>
+        DbGroupService.create({
+          id: e.toString(),
+          dbserviceId: e.serviceId,
+          dbgroupId: e.groupId,
+        })
+      ),
+    );
+
     //hier gehts weiter!!!
   }
   async add(item: Service): Promise<void> {

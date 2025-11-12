@@ -10,6 +10,8 @@ import { DbUserCredential } from "../../src/classes/Repositories/DenoDB/Models/D
 import { DbUserGroup } from "../../src/classes/Repositories/DenoDB/Models/DbUserGroup.ts";
 import { DbUserService } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
+import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbServiceRepository.ts";
+import { DbGroupRepository } from "../../src/classes/Repositories/DenoDB/DbGroupRepository.ts";
 
 const connector = new MySQLConnector({
   database: "authshare",
@@ -34,9 +36,42 @@ db.link([
 ]);
 //Test how DenoDB react
 Deno.test("DenoDB Update", async () => {
-  //get an item from servicerepository
+  const serviceRepo = new DbServiceRepository();
+  const groupRepo = new DbGroupRepository();
+  const groups = await groupRepo.findAll();
+
+  //get an item from servicerepository/database
+  const service = await serviceRepo.findById(
+    "8fcf4e8d-1014-4bc8-9044-74b00fdac529",
+  );
+  //oldData from DB
+  const _groupServiceModel = await DbGroupService.where(
+    "dbserviceId",
+    service.getId(),
+  )
+    .all();
+  //newData
+  service.giveAuthorizationToGroup(groups[1].convertToShort());
+  //Filter
+  const toDelete = _groupServiceModel.filter((e) =>
+    service.allowedGroups.every((f) => e.id != f.toString())
+  );
+  const toSave = service.allowedGroups.filter((e) =>
+    _groupServiceModel.every((f) => e.toString() != f.id)
+  );
+  await Promise.all(toDelete.map((e) => e.delete()));
+  await Promise.all(
+    toSave.map((e) =>
+      DbGroupService.create({
+        id: e.toString(),
+        dbserviceId: e.serviceId,
+        dbgroupId: e.groupId,
+      })
+    ),
+  );
+  //console.log(item.allowedGroups);
+  //console.log(item.allowedGroups);
   //change some inside allowedGroupMap
   //update should be dynamic, get old data and compare with new data
   // -> but how to get the old Data
-  //
 });
