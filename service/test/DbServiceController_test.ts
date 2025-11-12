@@ -14,6 +14,7 @@ import { DbUserGroup } from "../src/classes/Repositories/DenoDB/Models/DbUserGro
 import { DbUserService } from "../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 import { assertGreater } from "@std/assert";
+import { Context } from "@hono/hono";
 Deno.test("DbUserController", async (_t) => {
   const connector = new MySQLConnector({
     database: "authshare",
@@ -44,11 +45,11 @@ Deno.test("DbUserController", async (_t) => {
     req: {},
     res: {},
     json: (e: object) => e,
-  };
+  } as unknown as Context;
 
-  //@ts-ignore mockContext
-  const serviceList = await serviceController.listMyServices(mockContext);
+  const serviceList =
+    (await serviceController.listMyServices(mockContext)) as unknown as [];
+
   console.log(serviceList);
-  //@ts-ignore mocked result
   assertGreater(serviceList.length, 0);
 });
