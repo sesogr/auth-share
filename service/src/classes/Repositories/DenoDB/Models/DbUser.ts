@@ -12,6 +12,16 @@ export class DbUser extends Model {
     displayname: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
+  static override get(): Promise<DbUser | DbUser[]> {
+    return super.get() as Promise<DbUser | DbUser[]>;
+  }
+  static override first(): Promise<DbUser> {
+    return super.first() as Promise<DbUser>;
+  }
+  static override all(): Promise<DbUser[]> {
+    return super.all() as Promise<DbUser[]>;
+  }
+
   static credentials() {
     //hasOne returned a Model...but with
     return this.hasOne(DbUserCredential) as Promise<DbUserCredential>;

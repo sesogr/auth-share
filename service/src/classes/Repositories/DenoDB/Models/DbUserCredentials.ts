@@ -8,7 +8,15 @@ export class DbUserCredential extends Model {
     username: DataTypes.string(40),
     password: DataTypes.string(40),
   };
-
+  static override get(): Promise<DbUserCredential | DbUserCredential[]> {
+    return super.get() as Promise<DbUserCredential | DbUserCredential[]>;
+  }
+  static override first(): Promise<DbUserCredential> {
+    return super.first() as Promise<DbUserCredential>;
+  }
+  static override all(): Promise<DbUserCredential[]> {
+    return super.all() as Promise<DbUserCredential[]>;
+  }
   username!: string;
   password!: string;
   static user() {

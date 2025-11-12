@@ -12,6 +12,15 @@ export class DbInvitation extends Model {
     //TODO add foreign key and primary key
     //Datentype.JSON? Reference to each List?
   };
+  static override get(): Promise<DbInvitation | DbInvitation[]> {
+    return super.get() as Promise<DbInvitation | DbInvitation[]>;
+  }
+  static override first(): Promise<DbInvitation> {
+    return super.first() as Promise<DbInvitation>;
+  }
+  static override all(): Promise<DbInvitation[]> {
+    return super.all() as Promise<DbInvitation[]>;
+  }
 }
 
 class DbJoinHelper extends DbInvitation {

@@ -13,6 +13,15 @@ export class DbIdDisplayname extends Model {
       .first();
     return displayname.displayname?.toString() ?? "";
   }
+  static override get(): Promise<DbIdDisplayname | DbIdDisplayname[]> {
+    return super.get() as Promise<DbIdDisplayname | DbIdDisplayname[]>;
+  }
+  static override first(): Promise<DbIdDisplayname> {
+    return super.first() as Promise<DbIdDisplayname>;
+  }
+  static override all(): Promise<DbIdDisplayname[]> {
+    return super.all() as Promise<DbIdDisplayname[]>;
+  }
   id!: string;
   displayname!: string;
 }
@@ -22,6 +31,7 @@ class DbAliasHelper extends DbIdDisplayname {
   static override field(field: string, nameAs: string): FieldAlias;
   static override field(field: string, nameAs?: string): string | FieldAlias {
     const newLocal = `${this.alias}.${field}`;
+    field = field.replace(/_([a-z])/g, (_, ch) => ch.toUpperCase());
     if (!Object.keys(this.fields).includes(field)) {
       throw new Error("Field does not Exist!");
     }
