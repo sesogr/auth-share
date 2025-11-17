@@ -9,6 +9,7 @@ export function setupUserGroup() {
   );
   DbUserGroup.fields = {
     ...DbUserGroup.fields,
+    id: { primaryKey: true, type: DataTypes.STRING },
     isOwner: DataTypes.BOOLEAN,
   };
 }

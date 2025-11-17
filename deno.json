@@ -9,6 +9,7 @@
     "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts"
   },
   "imports": {
+    "@ant-design/icons": "npm:@ant-design/icons@^6.1.0",
     "@denodb/datatypes": "https://deno.land/x/denodb@v1.4.0/lib/data-types.ts",
     "@std/testing": "jsr:@std/testing@^1.0.16",
     "@denodb": "https://deno.land/x/denodb@v1.4.0/mod.ts",
@@ -18,6 +19,7 @@
     "vite/client": "npm:vite@7.1.9/client",
     "@vitejs/plugin-react": "npm:@vitejs/plugin-react@5.0.4",
     "vite": "npm:vite@7.1.9",
+    "antd": "npm:antd",
     "@hono/hono": "jsr:@hono/hono@^4.9.10",
     "@hono/hono/cors": "jsr:@hono/hono@^4.9.10/cors",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",

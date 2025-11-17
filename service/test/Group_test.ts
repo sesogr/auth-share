@@ -3,20 +3,19 @@ import { Group } from "../src/classes/Group.ts";
 import { User } from "../src/classes/User.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
 import { Invitation } from "../src/classes/Invitation.ts";
-import { IdNameMap } from "../src/classes/IdNameMap.ts";
+import { FakeObjectGen } from "../src/FakeObjectGen.ts";
 
 const userCredential = new UserCredential("Hans Meiser", "abcdef");
-const user = "asddh";
 
-const shortUser = new IdNameMap(user, "hallo");
+const user = FakeObjectGen.createFakeUser("asddh", "hallo");
 function createTestGroup(): Group {
-  return Group.createUserGroup("Schachverein", shortUser);
+  return Group.createUserGroup("Schachverein", user);
 }
 Deno.test("Group Class", async (t) => {
   await t.step("test the method createUserGroup", () => {
     const group = createTestGroup();
     const owner = group.getOwner();
-    assertEquals(owner, shortUser);
+    assertEquals(owner, user.convertToShort());
   });
 
   await t.step("test the method getDisplayName on groupname", () => {
@@ -66,8 +65,8 @@ Deno.test("Group Class", async (t) => {
       );
       group.listSentInvitation();
       group.sendInvitation(
-        user.convertToShort(),
-        testReceiver.convertToShort(),
+        user,
+        testReceiver,
       );
       const listSentInvitation = group.listSentInvitation();
       console.log(testInvitation.senderReference.displayname);

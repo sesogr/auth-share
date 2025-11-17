@@ -1,37 +1,49 @@
 import React from "react";
-import type { ConvertedService } from "./types/types.ts";
+import { Collapse, List, Typography } from "antd";
+import type { ReceivedConvertedService } from "./types/ConvertedService.ts";
 
-const Service: React.FC<{ service: ConvertedService }> = ({ service }) => {
-  console.log(service);
+const { Panel } = Collapse;
+const { Title } = Typography;
+
+const Service: React.FC<{ service: ReceivedConvertedService }> = (
+  { service },
+) => {
   return (
-    <div>
-      <h2>{service.serviceName}</h2>
-      <ul>
-        <li>
-          Groups:{" "}
-          <ul>
-            {service.groups!.map((e, i) => <li key={i}>{e}</li>)}
-          </ul>
-        </li>
-        <li>
-          Owner:{" "}
-          <ul>
-            {service.owners!.map((e, i) => <li key={i}>{e}</li>)}
-          </ul>
-        </li>
-        <li>
-          Sent Invitations:{" "}
-          <ul>
-            {service.sentInvitations!.map((e, i) => <li key={i}>{e}</li>)}
-          </ul>
-        </li>
-        <li>
-          Users:{" "}
-          <ul>
-            {service.users!.map((e, i) => <li key={i}>{e}</li>)}
-          </ul>
-        </li>
-      </ul>
+    <div style={{ padding: 24 }}>
+      <Title level={3}>{service.serviceName}</Title>
+
+      <Collapse accordion>
+        <Panel header={`Groups (${service.groups.length})`} key="groups">
+          <List
+            dataSource={service.groups}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+        </Panel>
+
+        <Panel header={`Owners (${service.owners.length})`} key="owners">
+          <List
+            dataSource={service.owners}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+        </Panel>
+
+        <Panel
+          header={`Sent Invitations (${service.sentInvitations.length})`}
+          key="sentInvitations"
+        >
+          <List
+            dataSource={service.sentInvitations}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+        </Panel>
+
+        <Panel header={`Users (${service.users.length})`} key="users">
+          <List
+            dataSource={service.users}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+        </Panel>
+      </Collapse>
     </div>
   );
 };

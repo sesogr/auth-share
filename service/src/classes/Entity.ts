@@ -1,5 +1,6 @@
 import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
 import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
+import { IdNameMap } from "./IdNameMap.ts";
 
 export class Entity implements DisplayableEntity {
   constructor(
@@ -12,19 +13,10 @@ export class Entity implements DisplayableEntity {
   getId(): string {
     return this.id;
   }
-  convertToShort(): ShortEntity { //hier eine IdNameMap macht probleme?
-    return {
-      displayname: this.getDisplayName(),
-      id: this.getId(),
-      equals(that: ShortEntity) {
-        return this.displayname === that.displayname && this.id === that.id;
-      },
-      "with": () => {
-        throw new Error("unimplemented");
-      },
-      "copy": () => {
-        throw new Error("unimplemented");
-      },
-    };
+  convertToShort(): ShortEntity {
+    return new IdNameMap(
+      this.getId(),
+      this.getDisplayName(),
+    );
   }
 }

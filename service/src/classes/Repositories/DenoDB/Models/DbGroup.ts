@@ -11,6 +11,15 @@ export class DbGroup extends Model {
     owner: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
+  static override get(): Promise<DbGroup | DbGroup[]> {
+    return super.get() as Promise<DbGroup | DbGroup[]>;
+  }
+  static override first(): Promise<DbGroup> {
+    return super.first() as Promise<DbGroup>;
+  }
+  static override all(): Promise<DbGroup[]> {
+    return super.all() as Promise<DbGroup[]>;
+  }
   static displayname() {
     return this.hasOne(DbIdDisplayname) as Promise<DbIdDisplayname>;
   }

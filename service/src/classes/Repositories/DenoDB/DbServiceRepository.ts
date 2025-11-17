@@ -20,9 +20,12 @@ import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { Invitation } from "../../Invitation.ts";
 import { DbServiceCredential } from "./Models/DbServiceCredentials.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
+import { DbRepository } from "./DbRepository.ts";
 
-export class DbServiceRepository implements ServiceRepository {
+export class DbServiceRepository extends DbRepository
+  implements ServiceRepository {
   constructor() {
+    super(DbService, "servicename");
   }
   async findOwnedByUserId(userId: string): Promise<Service[]> {
     const userServiceData: Model[] = await DbUserService.where(
@@ -55,36 +58,76 @@ export class DbServiceRepository implements ServiceRepository {
   findAll(): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
+  async update(item: Service): Promise<void> {
+    await DbService.where("id", item.getId()).update({
+      servicename: item.getDisplayName(),
+      serviceUrl: item.serviceUrl,
+    });
+    await DbServiceCredential.where("dbservice_id", item.getId()).update({
+      username: item.credentials.username,
+      password: item.credentials.password,
+    });
+    await DbIdDisplayname.where("id", item.getId()).update({
+      displayname: item.getDisplayName(),
+    });
+    //.all gives all rows out
+    const _groupServiceModel = await DbGroupService.where(
+      "dbservice_id",
+      item.getId(),
+    ).all();
+
+    const groupRelationToDelete = _groupServiceModel.filter((e) =>
+      item.allowedGroups.every((f) => e.id != f.toString())
+    );
+    const groupRelationToSave = item.allowedGroups.filter((e) =>
+      _groupServiceModel.every((f) => e.toString() != f.id)
+    );
+    await Promise.all(groupRelationToDelete.map((e) => e.delete()));
+    await Promise.all(
+      groupRelationToSave.map((e) =>
+        DbGroupService.create({
+          id: e.toString(),
+          dbserviceId: e.serviceId,
+          dbgroupId: e.groupId,
+        })
+      ),
+    );
+
+    //hier gehts weiter!!!
+  }
   async add(item: Service): Promise<void> {
     try {
       await DbService.create({
         id: item.getId(),
         serviceName: item.getDisplayName(),
+        serviceUrl: item.serviceUrl,
       });
       await DbServiceCredential.create({
         dbservice_id: item.getId(),
-        username: item.credentials.split(":")[0],
-        password: item.credentials.split(":")[1],
+        username: item.credentials.username,
+        password: item.credentials.password,
       });
       await DbIdDisplayname.create({
         id: item.getId(),
         displayname: item.getDisplayName(),
       });
       await DbUserService.create(
-        item.authorizedUsers.map((authorizedUsermap) => {
+        item.allowedUsers.map((allowedUsermap) => {
           return {
-            dbuser_id: authorizedUsermap.userId,
-            dbservice_id: authorizedUsermap.serviceId,
-            is_owner: authorizedUsermap.isOwner,
+            id: allowedUsermap.toString(),
+            dbuser_id: allowedUsermap.userId,
+            dbservice_id: allowedUsermap.serviceId,
+            is_owner: allowedUsermap.isOwner,
           };
         }),
       );
-      if (item.authorizedGroups.length != 0) {
+      if (item.allowedGroups.length != 0) {
         await DbGroupService.create(
-          item.authorizedGroups.map((authorizedGroupmap) => {
+          item.allowedGroups.map((allowedGroupmap) => {
             return {
-              dbgroup_id: authorizedGroupmap.groupId,
-              dbservice_id: authorizedGroupmap.serviceId,
+              id: allowedGroupmap.toString(),
+              dbgroup_id: allowedGroupmap.groupId,
+              dbservice_id: allowedGroupmap.serviceId,
             };
           }),
         );
@@ -108,16 +151,14 @@ export class DbServiceRepository implements ServiceRepository {
     throw new Error("Method not implemented.");
   }
   async save(item: Service): Promise<void> {
-    try {
-      await this.findById(item.getId());
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        this.add(item);
-        return;
-      }
-      throw error;
+    if (
+      (await this.existId(item.getId())) ||
+      (await this.existDisplayname(item.getDisplayName()))
+    ) {
+      return;
+    } else {
+      await this.add(item);
     }
-    throw new Error("UnImplemented");
   }
 
   async hydrate(searchedId: string): Promise<Service> {
@@ -128,6 +169,7 @@ export class DbServiceRepository implements ServiceRepository {
         DbServiceCredential.field("username", "un_cred"),
         DbServiceCredential.field("password", "pw_cred"),
         DbService.field("servicename", "servicename"),
+        DbService.field("service_url"),
         DbIdDisplaynameInvitationsSender.field("id", "sender_id"),
         DbIdDisplaynameInvitationsSender.field("displayname", "sender_name"),
         DbIdDisplaynameInvitationsReceiver.field("id", "receiver_id"),
@@ -188,6 +230,7 @@ export class DbServiceRepository implements ServiceRepository {
           pw_cred: string;
         };
         displayname: string;
+        serviceUrl: string;
         sentGroupInvites: {
           [l in string]: {
             senderRef: { id: string; displayname: string };
@@ -211,6 +254,7 @@ export class DbServiceRepository implements ServiceRepository {
             pw_cred: record.pwCred?.toString()!,
           },
           displayname: record.servicename?.toString()!,
+          serviceUrl: record.serviceUrl?.toString()!,
           sentGroupInvites: {},
           authorizedUsers: [],
           authorizedGroups: [],
@@ -264,6 +308,7 @@ export class DbServiceRepository implements ServiceRepository {
       temp.credentials.pw_cred,
     );
     const servicename = temp.displayname;
+    const serviceUrl = temp.serviceUrl;
     const serviceRef = new IdNameMap(
       searchedId,
       servicename,
@@ -304,6 +349,7 @@ export class DbServiceRepository implements ServiceRepository {
     return new Service(
       credentials,
       servicename,
+      serviceUrl,
       searchedId,
       sentGroupInvites,
       authorizedUsers,

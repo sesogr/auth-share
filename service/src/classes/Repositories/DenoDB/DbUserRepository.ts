@@ -76,7 +76,7 @@ export class DbUserRepository implements UserRepository {
   async save(item: User) {
     const result = await this.existId(item.getId());
     if (result !== true) {
-      this.add(item);
+      await this.add(item);
     }
   }
   //User_ID=searchedId

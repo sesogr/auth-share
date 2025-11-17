@@ -149,10 +149,9 @@ console.log(
 
 //Object of DbUserCredential and .credentials an Objectmethod of DbUser
 //deno-ignore
-const dbuser: DbUser =
-  (await DbUser.where("id", "testID1").get() as DbUser[])[0];
+const dbuser: DbUser = (await DbUser.where("id", "testID1").all())[0];
 if (dbuser != null) {
   console.log(
-    dbuser.credentials(),
+    dbuser,
   );
 }

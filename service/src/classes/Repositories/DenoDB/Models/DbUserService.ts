@@ -11,6 +11,7 @@ export function setupUserService() {
   );
   DbUserService.fields = {
     ...DbUserService.fields,
+    id: { primaryKey: true, type: DataTypes.STRING },
     isOwner: DataTypes.BOOLEAN,
   };
   return DbUserService;

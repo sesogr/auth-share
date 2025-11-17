@@ -5,9 +5,10 @@ import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
 
 export class UserController {
-  constructor(private readonly userRepository: UserRepository) {}
-
-  private readonly ME = "df5755b6-67dd-4a8a-8dbf-249654e4df49"; //TODO with meaningfull
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly ME: string,
+  ) {}
 
   async listMyServices(
     c: Context,
@@ -30,10 +31,10 @@ export class UserController {
     );
   }
   async changePassword(c: Context) {
-    const requestData = await c.req.json();
-    const newPassword: string = requestData.password;
+    const requestData: ConvertedUser = await c.req.json();
+    const newPassword: string = requestData.credentials.split(":")[1];
     //TODO we need the loggedin User here!!
-    const myself: User = (await this.userRepository.findAll())[0];
+    const myself: User = await this.userRepository.findById(this.ME);
     myself.changeUserCredentials(
       new UserCredential(myself.getCredentials().username, newPassword),
     );

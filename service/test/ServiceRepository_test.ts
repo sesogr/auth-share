@@ -31,14 +31,14 @@ Deno.test("ServiceRepository", async (t) => {
       "1234567",
     );
     const currService = serviceList[3];
-    currService.giveAuthorizationToUser(user.convertToShort());
+    currService.giveAuthorizationToUser(user);
     await serviceRepository.save(currService);
 
     // Assert that the service was saved correctly
     const savedService = await serviceRepository.findById(currService.getId());
     assertEquals(
-      savedService.listAuthorizedUsers(),
-      currService.listAuthorizedUsers(),
+      savedService.listAllowedUsers(),
+      currService.listAllowedUsers(),
     );
     // must add test for removeAuthorization
     //test for steps ()

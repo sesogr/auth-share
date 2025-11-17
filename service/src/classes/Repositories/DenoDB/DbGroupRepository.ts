@@ -24,8 +24,12 @@ import {
   DbInvitationJoinOnObject,
   DbInvitationJoinOnReceived,
 } from "./Models/DbInvitation.ts";
+import { DbRepository } from "./DbRepository.ts";
 
-export class DbGroupRepository implements GroupRepository {
+export class DbGroupRepository extends DbRepository implements GroupRepository {
+  constructor() {
+    super(DbGroup, "groupname");
+  }
   async findByName(name: string): Promise<Group> {
     const searchedName = await DbGroup.where("groupname", name).first();
     return this.hydrate(searchedName.id?.toString() ?? "");
@@ -57,6 +61,7 @@ export class DbGroupRepository implements GroupRepository {
         DbIdDisplaynameInvitations2Sender.field("id", "invitedServiceSenderId"),
         DbIdDisplaynameUser.field("id", "allowedUserId"),
         DbIdDisplaynameUser.field("displayname", "allowedUserName"),
+        DbUserGroup.field("is_owner"),
       )
       .leftJoin(
         DbUserGroup,
@@ -80,33 +85,33 @@ export class DbGroupRepository implements GroupRepository {
       )
       .leftJoin(
         DbInvitationJoinOnObject,
-        DbInvitationJoinOnObject.field("objReference"),
+        DbInvitationJoinOnObject.field("obj_reference"),
         DbGroup.field("id"),
       )
       .leftJoin(
         DbIdDisplaynameInvitationsReceiver,
         DbIdDisplaynameInvitationsReceiver.field("id"),
-        DbInvitationJoinOnObject.field("receiverReference"),
+        DbInvitationJoinOnObject.field("receiver_reference"),
       )
       .leftJoin(
         DbIdDisplaynameInvitationsSender,
         DbIdDisplaynameInvitationsSender.field("id"),
-        DbInvitationJoinOnObject.field("senderReference"),
+        DbInvitationJoinOnObject.field("sender_reference"),
       )
       .leftJoin(
         DbInvitationJoinOnReceived,
-        DbInvitationJoinOnReceived.field("receiverReference"),
+        DbInvitationJoinOnReceived.field("receiver_reference"),
         DbGroup.field("id"),
       )
       .leftJoin(
         DbIdDisplaynameInvitationsObj,
         DbIdDisplaynameInvitationsObj.field("id"),
-        DbInvitationJoinOnReceived.field("objReference"),
+        DbInvitationJoinOnReceived.field("obj_reference"),
       )
       .leftJoin(
         DbIdDisplaynameInvitations2Sender,
         DbIdDisplaynameInvitations2Sender.field("id"),
-        DbInvitationJoinOnReceived.field("senderReference"),
+        DbInvitationJoinOnReceived.field("sender_reference"),
       )
       .where(DbGroup.field("id"), searchedId)
       .get() as Model[];
@@ -280,18 +285,14 @@ export class DbGroupRepository implements GroupRepository {
     }
     throw new RuntimeError();
   }
+  async saveAll(item: Group[]) {
+    await Promise.all(item.map(async (e) => await this.save(e)));
+  }
   async save(item: Group) {
     //first call of existId --> assertEquals(stubExistId.calls[0].arg[0] in Deno.Test)
     const result = await this.existId(item.getId());
     if (result !== true) {
-      this.add(item);
-    }
-  }
-  async existId(id: string): Promise<boolean> {
-    if ((await DbGroup.where("id", id).first())) {
-      return true;
-    } else {
-      return false;
+      await this.add(item);
     }
   }
   async removeById(id: string): Promise<void> {
@@ -336,6 +337,7 @@ export class DbGroupRepository implements GroupRepository {
       }
       await DbUserGroup.create(item.allowedUser.map((e) => {
         return {
+          id: e.toString(),
           dbuser_id: e.userId,
           dbgroup_id: item.getId(),
           isOwner: e.isOwner,

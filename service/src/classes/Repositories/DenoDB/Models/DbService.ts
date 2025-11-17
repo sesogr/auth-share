@@ -8,8 +8,19 @@ export class DbService extends Model {
   static override timestamps = true;
   static override fields = {
     servicename: DataTypes.string(40),
+    serviceUrl: DataTypes.string(40),
     id: { type: DataTypes.UUID, primaryKey: true },
   };
+  static override get(): Promise<DbService | DbService[]> {
+    return super.get() as Promise<DbService | DbService[]>;
+  }
+  static override first(): Promise<DbService> {
+    return super.first() as Promise<DbService>;
+  }
+  static override all(): Promise<DbService[]> {
+    return super.all() as Promise<DbService[]>;
+  }
+
   static displayname() {
     return this.hasOne(DbIdDisplayname) as Promise<DbIdDisplayname>;
   }

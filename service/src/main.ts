@@ -44,6 +44,7 @@ db.link([
   DbInvitation,
   DbIdDisplayname,
 ]);
+const ME = (await DbUser.first()).id;
 try {
   await db.sync();
 } catch (error) {
@@ -88,7 +89,7 @@ app.get("/data", (c) => {
   return dataController.getData(c);
 });
 
-const userController = new UserController(userRepository);
+const userController = new UserController(userRepository, ME);
 app.get(
   "/user",
   (c) => {
@@ -108,6 +109,7 @@ app.put(
 const serviceController = new ServiceController(
   serviceRepository,
   userRepository,
+  ME,
 );
 app.get(
   "/user/owned",

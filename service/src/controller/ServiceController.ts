@@ -9,8 +9,8 @@ export class ServiceController {
   constructor(
     private readonly serviceRepository: ServiceRepository,
     private readonly userRepo: UserRepository,
+    private readonly ME = "0d7f0653-1bac-48d4-ad2b-f228759301c1",
   ) {}
-  private readonly ME = "df5755b6-67dd-4a8a-8dbf-249654e4df49"; //Todo with meaningfull?!
 
   async listMyServices(
     c: Context,
@@ -32,11 +32,15 @@ export class ServiceController {
     try {
       const convertedService: ConvertedService = await c.req!.json!();
       const service = Service.createService(
-        ServiceCredential.fromString(convertedService.credentials),
+        new ServiceCredential(
+          convertedService.credentials.username,
+          convertedService.credentials.password,
+        ),
         convertedService.serviceName,
-        (await this.userRepo.findById(
+        convertedService.serviceUrl,
+        await this.userRepo.findById(
           this.ME,
-        )).convertToShort(),
+        ),
       ); //Todo: new = new type(arguments);, convertedService.serviceName)
       await this.serviceRepository.save(service);
       return c.body!(null, 201);

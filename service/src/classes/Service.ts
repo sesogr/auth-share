@@ -1,23 +1,30 @@
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { ConvertedService } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
+import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
+import { User } from "./User.ts";
 
 export class Service extends Entity {
-  public get authorizedGroups(): AllowedGroupServiceMap[] {
-    return [...this._authorizedGroups];
+  public get serviceUrl(): string {
+    return this._serviceUrl;
   }
-  public set authorizedGroups(value: AllowedGroupServiceMap[]) {
-    this._authorizedGroups = value;
+  public set serviceUrl(value: string) {
+    this._serviceUrl = value;
   }
-  public get authorizedUsers(): AllowedUserServiceMap[] {
-    return [...this._authorizedUsers];
+  public get allowedGroups(): AllowedGroupServiceMap[] {
+    return [...this._allowedGroups];
   }
-  public set authorizedUsers(value: AllowedUserServiceMap[]) {
-    this._authorizedUsers = value;
+  public set allowedGroups(value: AllowedGroupServiceMap[]) {
+    this._allowedGroups = value;
+  }
+  public get allowedUsers(): AllowedUserServiceMap[] {
+    return [...this._allowedUsers];
+  }
+  public set allowedUsers(value: AllowedUserServiceMap[]) {
+    this._allowedUsers = value;
   }
   public get sentInvitations(): Invitation[] {
     return [...this._sentInvitations];
@@ -25,8 +32,8 @@ export class Service extends Entity {
   public set sentInvitations(value: Invitation[]) {
     this._sentInvitations = value;
   }
-  public get credentials(): string {
-    return this._credentials.toString();
+  public get credentials(): ServiceCredential {
+    return this._credentials;
   }
   public set credentials(value: ServiceCredential) {
     this._credentials = value;
@@ -34,56 +41,57 @@ export class Service extends Entity {
   constructor(
     private _credentials: ServiceCredential,
     private serviceName: string = "",
+    private _serviceUrl: string = "",
     protected override readonly id: string = crypto.randomUUID(),
     private _sentInvitations: Invitation[] = [],
     //List for AuthorizedUsers
-    private _authorizedUsers: AllowedUserServiceMap[] = [],
-    private _authorizedGroups: AllowedGroupServiceMap[] = [],
+    private _allowedUsers: AllowedUserServiceMap[] = [],
+    private _allowedGroups: AllowedGroupServiceMap[] = [],
   ) {
     super(id, serviceName);
+  }
+  giveAuthorizationToGroup(group: Group): void {
+    this._allowedGroups.push(
+      new AllowedGroupServiceMap(group.convertToShort(), this.convertToShort()),
+    );
   }
   static createService(
     credentials: ServiceCredential,
     serviceName: string,
-    owner: ShortEntity,
+    serviceUrl: string,
+    owner: User,
     id: string = crypto.randomUUID(),
   ) {
-    const service = new Service(credentials, serviceName, id);
-    service._authorizedUsers.push(
-      new AllowedUserServiceMap(owner, service.convertToShort(), true),
+    const service = new Service(credentials, serviceName, serviceUrl, id);
+    service._allowedUsers.push(
+      new AllowedUserServiceMap(
+        owner.convertToShort(),
+        service.convertToShort(),
+        true,
+      ),
     );
     return service;
   }
   override getDisplayName(): string {
     return this.serviceName;
   }
-  listAuthorizedUsers(onlyOwners = false): string[] {
+  listAllowedUsers(onlyOwners = false): string[] {
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
       currentElement.username;
     if (onlyOwners) {
-      return this.authorizedUsers.filter((currElement) => currElement.isOwner)
+      return this.allowedUsers.filter((currElement) => currElement.isOwner)
         .map(mapCallback);
     }
-    return this.authorizedUsers.map(mapCallback);
+    return this.allowedUsers.map(mapCallback);
   }
-  listAuthorizedGroups(): string[] {
+  listAllowedGroups(): string[] {
     const mapCallback = (currElement: AllowedGroupServiceMap): string =>
       currElement.groupname;
-    return this.authorizedGroups.map(mapCallback);
+    return this.allowedGroups.map(mapCallback);
   }
-  createService(
-    owner: ShortEntity,
-    credentials: ServiceCredential,
-    serviceName: string,
-  ): void {
-    const service = new Service(credentials, serviceName);
-    this.authorizedUsers.push(
-      new AllowedUserServiceMap(owner, service.convertToShort(), true),
-    );
-  }
-  giveAuthorizationToUser(user: ShortEntity): void {
-    this._authorizedUsers.push(
-      new AllowedUserServiceMap(user, this.convertToShort()),
+  giveAuthorizationToUser(user: User): void {
+    this._allowedUsers.push(
+      new AllowedUserServiceMap(user.convertToShort(), this.convertToShort()),
     );
   }
   toJsonString(): string {
@@ -91,14 +99,15 @@ export class Service extends Entity {
   }
   private convertToSerializeableObj(): ConvertedService {
     return {
-      serviceName: this.getDisplayName(),
       credentials: {
         username: this._credentials.username,
         password: this._credentials.password,
       },
-      groups: this.listAuthorizedGroups(),
-      users: this.listAuthorizedUsers(),
-      owners: this.listAuthorizedUsers(true),
+      serviceName: this.getDisplayName(),
+      serviceUrl: this.serviceUrl,
+      groups: this.listAllowedGroups(),
+      users: this.listAllowedUsers(),
+      owners: this.listAllowedUsers(true),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
     };
   }
@@ -106,11 +115,11 @@ export class Service extends Entity {
   toJson() {
     return this.convertToSerializeableObj();
   }
-  sendInvitation(receiver: ShortEntity, sender: ShortEntity) {
+  sendInvitation(receiver: Group, sender: User) {
     const invitation = new Invitation(
-      sender,
+      sender.convertToShort(),
       this.convertToShort(),
-      receiver,
+      receiver.convertToShort(),
     );
     this._sentInvitations.push(invitation);
   }

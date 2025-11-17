@@ -12,7 +12,15 @@ export class DbServiceCredential extends Model {
   static service() {
     return this.hasOne(DbService);
   }
-
+  static override get(): Promise<DbServiceCredential | DbServiceCredential[]> {
+    return super.get() as Promise<DbServiceCredential | DbServiceCredential[]>;
+  }
+  static override first(): Promise<DbServiceCredential> {
+    return super.first() as Promise<DbServiceCredential>;
+  }
+  static override all(): Promise<DbServiceCredential[]> {
+    return super.all() as Promise<DbServiceCredential[]>;
+  }
   username!: string;
   password!: string;
 }
