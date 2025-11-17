@@ -70,6 +70,7 @@ export class DbServiceRepository extends DbRepository
     await DbIdDisplayname.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
     });
+    //GroupService
     //.all gives all rows out
     const _groupServiceModel = await DbGroupService.where(
       "dbservice_id",
@@ -83,17 +84,60 @@ export class DbServiceRepository extends DbRepository
       _groupServiceModel.every((f) => e.toString() != f.id)
     );
     await Promise.all(groupRelationToDelete.map((e) => e.delete()));
-    await Promise.all(
-      groupRelationToSave.map((e) =>
-        DbGroupService.create({
+    await DbGroupService.create(
+      groupRelationToSave.map((e) => {
+        return {
           id: e.toString(),
           dbserviceId: e.serviceId,
           dbgroupId: e.groupId,
-        })
-      ),
+        };
+      }),
+    );
+    //UserService
+    const _userServiceModel = await DbUserService.where(
+      "dbservice_id",
+      item.getId(),
+    ).all();
+
+    const userRelationToDelete = _userServiceModel.filter((e) =>
+      item.allowedUsers.every((f) => e.id != f.toString())
+    );
+    const userRelationsToSave = item.allowedUsers.filter((e) =>
+      _userServiceModel.every((f) => e.toString() != f.id)
+    );
+    await Promise.all(userRelationToDelete.map((e) => e.delete()));
+    await DbUserService.create(userRelationsToSave.map((e) => {
+      return {
+        id: e.toString(),
+        dbuserId: e.userId,
+        dbserviceId: e.serviceId,
+        is_owner: e.isOwner,
+      };
+    }));
+    //Invitations
+    //sender_reference=user, reciever_reference=group, obj_reference=whole invitation ->
+    const _invitationsModel = await DbInvitation.where(
+      "obj_reference",
+      item.getId(),
+    ).all();
+
+    const invitationsToDelete = _invitationsModel.filter((e) =>
+      item.sentInvitations.every((f) => e.id != f.toString())
     );
 
-    //hier gehts weiter!!!
+    const invitationsToSave = item.sentInvitations.filter((e) =>
+      _invitationsModel.every((f) => e.toString() != f.id)
+    );
+
+    await Promise.all(invitationsToDelete.map((e) => e.delete()));
+    await DbInvitation.create(invitationsToSave.map((e) => {
+      return {
+        sender_reference: e.senderId,
+        obj_reference: e.objId,
+        receiver_reference: e.receiverId,
+      };
+    }));
+    //end of update!!
   }
   async add(item: Service): Promise<void> {
     try {
