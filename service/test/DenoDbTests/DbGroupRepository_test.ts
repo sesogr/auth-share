@@ -1,4 +1,4 @@
-import { spy, stub } from "@std/testing/mock";
+import { stub } from "@std/testing/mock";
 import { Group } from "../../src/classes/Group.ts";
 import { DbGroupRepository } from "../../src/classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbGroup } from "../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
@@ -55,13 +55,13 @@ Deno.test("ExistId", async () => {
     "first",
     () => Promise.resolve(true as unknown as DbGroup),
   );
-  const spys = spy(DbGroup, "where");
+  const stubWhere = stub(DbGroup, "where", () => DbGroup);
   //call for existID
   const result = await repo.existId(testGroupId);
 
   assertEquals(result, true);
-  assertEquals(spys.calls.length, 1);
+  assertEquals(stubWhere.calls.length, 1);
   //@ts-ignore overload issue
-  assertEquals(spys.calls[0].args[1], testGroupId);
+  assertEquals(stubWhere.calls[0].args[1], testGroupId);
   assertEquals(stub2.calls.length, 1);
 });

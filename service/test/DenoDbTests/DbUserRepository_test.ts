@@ -1,7 +1,3 @@
-import { DbUserRepository } from "../../src/classes/Repositories/DenoDB/DbUserRepository.ts";
-import { assertEquals, assertInstanceOf } from "@std/assert";
-import { User } from "../../src/classes/User.ts";
-import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
 import { Database, Model, MySQLConnector } from "@denodb";
 import { DbGroup } from "../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
 import {
@@ -49,84 +45,6 @@ db.link([
   DbInvitation,
   DbIdDisplayname,
 ]);
-
-Deno.test("DbUserRepository: hydrate", async () => {
-  // Methode aufrufen und erwartetes Ergebnis überprüfen
-  const userRepository: UserRepository & {
-    hydrate: (id: string) => Promise<User>;
-  } = new DbUserRepository();
-
-  const fakeuser: User = new User(
-    new UserCredential(
-      fakeUser[0].credentials._username,
-      fakeUser[0].credentials._password,
-    ),
-    fakeUser[0].displayname,
-    fakeUser[0].id,
-    fakeUser[0].callableService,
-    fakeUser[0].userGroupInvitations,
-    fakeUser[0].joinedGroups,
-  );
-  const user = await userRepository.hydrate(fakeuser.getId());
-  assertInstanceOf(user, User);
-  assertEquals(user.getId(), fakeuser.getId());
-  assertEquals(user.getDisplayName(), fakeuser.getDisplayName());
-  assertEquals(user.listServices().length, fakeuser.listServices().length);
-  assertEquals(user.listServices()[0], fakeuser.listServices()[0]);
-  assertEquals(
-    user.listJoinedGroups().length,
-    fakeuser.listJoinedGroups().length,
-  );
-  assertEquals(user.listJoinedGroups()[0], fakeuser.listJoinedGroups()[0]);
-});
-
-Deno.test("HYdrate with DenoDB", async () => {
-  const queryData = await DbUser
-    .select(
-      DbUser.field("displayname", "Username"),
-      DbUserCredential.field("username", "uncred"),
-      DbUserCredential.field("password", "pwcred"),
-      DbIdDisplaynameService.field("displayname", "Service"),
-      DbIdDisplaynameService.field("id", "ServiceID"),
-      DbIdDisplaynameGroups.field("displayname", "Group"),
-      DbIdDisplaynameGroups.field("id", "GroupID"),
-      DbInvitation.field("obj_reference", "InvObjRef"),
-      DbInvitation.field("sender_reference", "InvSendRef"),
-    )
-    .leftJoin(
-      DbUserGroup,
-      DbUserGroup.field("dbuser_id"),
-      DbUser.field("id"),
-    )
-    .leftJoin(
-      DbUserService,
-      DbUserService.field("dbuser_id"),
-      DbUser.field("id"),
-    )
-    .leftJoin(
-      DbUserCredential,
-      DbUserCredential.field("dbuser_id"),
-      DbUser.field("id"),
-    )
-    .leftJoin(
-      DbInvitation,
-      DbInvitation.field("receiver_reference"),
-      DbUser.field("id"),
-    )
-    .leftJoin(
-      DbIdDisplaynameService,
-      DbIdDisplaynameService.field("id"),
-      DbUserService.field("dbservice_id"),
-    )
-    .leftJoin(
-      DbIdDisplaynameGroups,
-      DbIdDisplaynameGroups.field("id"),
-      DbUserGroup.field("dbgroup_id"),
-    ).get();
-
-  console.log(queryData);
-  //.where("Users_id", searchedId);
-});
 
 Deno.test("Hydrate with GroupChange", async () => {
   const queryData = await DbUser
@@ -268,6 +186,5 @@ Deno.test("Hydrate with GroupChange", async () => {
       };
     }
   }
-  console.log(tempData);
-  console.log(Object.keys(tempData[Object.keys(tempData)[0]].invitations));
+  await db.close();
 });

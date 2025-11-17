@@ -52,7 +52,6 @@ Deno.test("DbUserController", async (_t) => {
   const serviceList =
     (await serviceController.listMyServices(mockContext)) as unknown as [];
 
-  console.log(serviceList);
   assertGreater(serviceList.length, 0);
 
   db.close();
