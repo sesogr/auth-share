@@ -23,7 +23,6 @@ import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyT
 import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepository.ts";
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 
-const ME = "0d7f0653-1bac-48d4-ad2b-f228759301c1";
 const db = new Database(
   new MySQLConnector({
     database: Deno.env.get("DB_NAME")!,
@@ -45,6 +44,7 @@ db.link([
   DbInvitation,
   DbIdDisplayname,
 ]);
+const ME = (await DbUser.first()).id;
 try {
   await db.sync();
 } catch (error) {
