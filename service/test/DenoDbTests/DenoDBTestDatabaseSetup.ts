@@ -97,10 +97,7 @@ async function buildUpUserRepo() {
       console.log(error);
     }
   }));
-  await Deno.writeTextFile(
-    "./service/test/testuser.json",
-    JSON.stringify(fakeUserList),
-  );
+
   return { mockUserIdList, fakeUserList };
 }
 async function buildUpServRepo(userList: User[]) {
@@ -109,19 +106,13 @@ async function buildUpServRepo(userList: User[]) {
   await Promise.all(
     serviceList.map(async (e) => await serviceRepository.save(e)),
   );
-  Deno.writeTextFile(
-    "./service/test/testservice.json",
-    JSON.stringify(serviceList),
-  );
+
   return { serviceList, serviceRepository };
 }
 async function buildUpGroupRepo(userList: User[]) {
   const groupList: Group[] = FakeObjectGen.generateFakeGroups(userList);
   const groupRepository = new DbGroupRepository();
   await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
-  Deno.writeTextFile(
-    "./service/test/fakegroup.json",
-    JSON.stringify(groupList),
-  );
+
   return { groupList, groupRepository };
 }
