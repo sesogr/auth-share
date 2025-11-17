@@ -37,9 +37,11 @@ Deno.test("DbUserController", async (_t) => {
     DbInvitation,
     DbIdDisplayname,
   ]);
+  const ME = (await DbUser.first()).id;
   const serviceController = new ServiceController(
     new DbServiceRepository(),
     new DbUserRepository(),
+    ME,
   );
   const mockContext = {
     req: {},
@@ -52,4 +54,6 @@ Deno.test("DbUserController", async (_t) => {
 
   console.log(serviceList);
   assertGreater(serviceList.length, 0);
+
+  db.close();
 });
