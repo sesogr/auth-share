@@ -1,3 +1,4 @@
+import { DuplicateError } from "../errors/DuplicateError.ts";
 import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
@@ -7,9 +8,6 @@ import { Invitation } from "./Invitation.ts";
 import { User } from "./User.ts";
 
 export class Group extends Entity {
-  public get allowedUser(): AllowedUserGroupMap[] {
-    return this._allowedUser;
-  }
   public constructor(
     private groupname: string,
     private owner: ShortEntity,
@@ -17,7 +15,7 @@ export class Group extends Entity {
     private serviceList: AllowedGroupServiceMap[] = [],
     private sentInvitations: Invitation[] = [],
     private serviceInvitations: Invitation[] = [],
-    private _allowedUser: AllowedUserGroupMap[] = [],
+    public readonly allowedUser: AllowedUserGroupMap[] = [],
   ) {
     super(id, groupname);
   }
@@ -26,6 +24,14 @@ export class Group extends Entity {
   }
   override getDisplayName(): string {
     return this.groupname;
+  }
+  giveAuthorizationToUser(user: User): void {
+    if (this.allowedUser.some((e) => e.userId == user.getId())) {
+      throw new DuplicateError("User is already allowed to join");
+    }
+    this.allowedUser.push(
+      new AllowedUserGroupMap(user.convertToShort(), this.convertToShort()),
+    );
   }
   listAllowedUsers(owned = false): string[] {
     const mapCallback = (currElement: AllowedUserGroupMap): string =>
@@ -75,7 +81,7 @@ export class Group extends Entity {
     return {
       groupname: this.groupname,
       owner: this.getOwner().displayname,
-      users: this._allowedUser.map((e) => e.username),
+      users: this.allowedUser.map((e) => e.username),
       serviceList: this.serviceList.map((e) => e.servicename),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
