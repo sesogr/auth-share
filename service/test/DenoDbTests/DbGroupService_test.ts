@@ -34,7 +34,7 @@ db.link([
   DbInvitation,
   DbIdDisplayname,
 ]);
-//Test how DenoDB react
+//Test how DenoDB react --> Integrationstest
 Deno.test("DenoDB Update", async () => {
   const serviceRepo = new DbServiceRepository();
   const groupRepo = new DbGroupRepository();
@@ -51,7 +51,7 @@ Deno.test("DenoDB Update", async () => {
   )
     .all();
   //newData
-  service.giveAuthorizationToGroup(groups[1]);
+  service.giveAuthorizationToGroup(groups[5]);
   //Filter
   const toDelete = _groupServiceModel.filter((e) =>
     service.allowedGroups.every((f) => e.id != f.toString())
@@ -69,6 +69,7 @@ Deno.test("DenoDB Update", async () => {
       })
     ),
   );
+  await db.close();
   //console.log(item.allowedGroups);
   //console.log(item.allowedGroups);
   //change some inside allowedGroupMap
