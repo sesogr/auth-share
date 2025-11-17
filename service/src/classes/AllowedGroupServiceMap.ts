@@ -2,6 +2,12 @@ import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { ValueClass } from "./ValueClass.ts";
 
 export class AllowedGroupServiceMap extends ValueClass {
+  override with(_: object): ValueClass {
+    throw new Error("Method not implemented.");
+  }
+  override copy(): ValueClass {
+    throw new Error("Method not implemented.");
+  }
   public get groupId(): string {
     return this._groupRef.id;
   }
