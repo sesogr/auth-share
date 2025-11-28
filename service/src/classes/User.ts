@@ -7,6 +7,7 @@ import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { ConvertedUser } from "../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
+import { Session } from "./Session.ts";
 export class User extends Entity {
   constructor(
     private credentials: UserCredential,
@@ -17,6 +18,7 @@ export class User extends Entity {
     private userGroupInvitations: Invitation[] = [],
     //..includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
+    private readonly sessions: Session[] = [],
   ) {
     super(id, username);
   }

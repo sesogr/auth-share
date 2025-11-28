@@ -20,6 +20,8 @@ import { DbInvitation } from "./Models/DbInvitation.ts";
 import { UserCredential } from "../../UserCredential.ts";
 import { Invitation } from "../../Invitation.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
+import { DbSessions } from "./Models/DbSessions.ts";
+import { Session } from "../../Session.ts";
 
 export class DbUserRepository implements UserRepository {
   async update(item: User): Promise<void> {
@@ -102,15 +104,17 @@ export class DbUserRepository implements UserRepository {
         DbUserCredential.field("username", "un_cred"),
         DbUserCredential.field("password", "pw_cred"),
         DbIdDisplaynameService.field("displayname", "service"),
-        DbIdDisplaynameService.field("id", "serviceID"),
+        DbIdDisplaynameService.field("id", "serviceId"),
         DbUserService.field("is_owner", "serviceOwner"),
         DbIdDisplaynameGroups.field("displayname", "group"),
-        DbIdDisplaynameGroups.field("id", "groupID"),
+        DbIdDisplaynameGroups.field("id", "groupId"),
         DbUserGroup.field("is_owner", "groupOwner"),
         DbIdDisplaynameInvitationsObj.field("displayname", "invObjRefName"),
         DbIdDisplaynameInvitationsSender.field("displayname", "invSendRefName"),
         DbInvitation.field("obj_reference", "invObjRef"),
         DbInvitation.field("sender_reference", "invSendRef"),
+        DbSessions.field("id", "sessionsId"),
+        DbSessions.field("expiresAt"),
       )
       .leftJoin(
         DbUserGroup,
@@ -152,6 +156,11 @@ export class DbUserRepository implements UserRepository {
         DbIdDisplaynameGroups.field("id"),
         DbUserGroup.field("dbgroup_id"),
       )
+      .leftJoin(
+        DbSessions,
+        DbSessions.field("dbuser_id"),
+        DbUser.field("id"),
+      )
       .where(DbUser.field("id"), searchedId)
       .get() as Model[];
 
@@ -172,6 +181,7 @@ export class DbUserRepository implements UserRepository {
             senderRef: { id: string; displayname: string };
           };
         };
+        sessions: [{ id: string; expiresAt: string }?];
       };
     } = {};
 
@@ -186,10 +196,11 @@ export class DbUserRepository implements UserRepository {
           services: [],
           groups: [],
           invitations: {},
+          sessions: [],
         };
       }
 
-      const exists = (type: "service" | "group"): boolean => {
+      const exists = (type: "service" | "group" | "session"): boolean => {
         if (type == "service") {
           return tempData[searchedId].services.some((
             s,
@@ -201,6 +212,10 @@ export class DbUserRepository implements UserRepository {
           return tempData[searchedId].groups.some((g) =>
             g!.groupId === record.groupId
           ) || record.groupId == undefined;
+        } else if (type == "session") {
+          return tempData[searchedId].sessions.some((s) =>
+            s!.id === record.sessionId
+          ) || record.sessionId == undefined;
         }
         throw new RuntimeError();
       };
@@ -216,6 +231,12 @@ export class DbUserRepository implements UserRepository {
           groupname: record.group?.toString()!,
           groupId: record.groupId?.toString()!,
           is_owner: record.groupOwner?.valueOf() as boolean,
+        });
+      }
+      if (!exists("session")) {
+        tempData[searchedId].sessions.push({
+          id: record.id?.toString()!,
+          expiresAt: record.expiresAt?.toString()!,
         });
       }
       if (record.invObjRef == undefined) continue;
@@ -263,6 +284,12 @@ export class DbUserRepository implements UserRepository {
         e?.is_owner,
       )
     );
+    let sessions: Session[] = [];
+    if (temp.sessions.length > 0) {
+      sessions = temp.sessions.map((e) =>
+        new Session(e!.id, new Date(e!.expiresAt), searchedId)
+      );
+    }
     const user: User = new User(
       credentials,
       displayname,
@@ -270,7 +297,9 @@ export class DbUserRepository implements UserRepository {
       serviceList,
       invitations,
       joinedGroups,
+      sessions,
     );
+
     return user;
   }
 }

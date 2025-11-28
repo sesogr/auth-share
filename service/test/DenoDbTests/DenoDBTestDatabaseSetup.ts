@@ -19,6 +19,7 @@ import { User } from "../../src/classes/User.ts";
 import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
 import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts";
 import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
+import { DbSessions } from "../../src/classes/Repositories/DenoDB/Models/DbSessions.ts";
 
 const connector = new MySQLConnector({
   database: "authshare",
@@ -40,6 +41,7 @@ db.link([
   DbGroupService,
   DbInvitation,
   DbIdDisplayname,
+  DbSessions,
 ]);
 
 await db.sync({ drop: true });

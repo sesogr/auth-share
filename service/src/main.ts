@@ -22,6 +22,7 @@ import { DbUserService } from "./classes/Repositories/DenoDB/Models/DbUserServic
 import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepository.ts";
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
+import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
 
 const db = new Database(
   new MySQLConnector({
@@ -43,6 +44,7 @@ db.link([
   DbGroupService,
   DbInvitation,
   DbIdDisplayname,
+  DbSessions,
 ]);
 const ME = (await DbUser.first()).id;
 try {
