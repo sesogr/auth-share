@@ -1,4 +1,10 @@
 import { Model } from "@denodb";
+import { Entity } from "../../Entity.ts";
+import { DbInvitation } from "./Models/DbInvitation.ts";
+import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
+import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
+import { Invitation } from "../../Invitation.ts";
 
 export class DbRepository {
   constructor(
@@ -8,6 +14,53 @@ export class DbRepository {
     protected readonly id: string = "id",
   ) {
   }
+  protected nTomFilter(
+    modelList: Model[],
+    objectRelationList: AllowedGroupServiceMap[],
+  ): { relationsToDelete: Model[]; relationsToSave: AllowedGroupServiceMap[] };
+  protected nTomFilter(
+    modelList: Model[],
+    objectRelationList: AllowedUserGroupMap[],
+  ): { relationsToDelete: Model[]; relationsToSave: AllowedUserGroupMap[] };
+  protected nTomFilter(
+    modelList: Model[],
+    objectRelationList: AllowedUserServiceMap[],
+  ): { relationsToDelete: Model[]; relationsToSave: AllowedUserServiceMap[] };
+  protected nTomFilter(
+    modelList: Model[],
+    objectRelationList: Invitation[],
+  ): { relationsToDelete: Model[]; relationsToSave: Invitation[] };
+  //n:m Model Filter Methode
+  //
+  protected nTomFilter(
+    //old List from DB
+    modelList: Model[],
+    //new updated List for the DB
+    objectRelationList:
+      | AllowedGroupServiceMap[]
+      | AllowedUserGroupMap[]
+      | AllowedUserServiceMap[]
+      | Invitation[],
+  ): {
+    //Difference between old and new List
+    // --> Delete(if allowence of user and Groups are cancled or any kind of Invitations are expired) or Save(if there are new allowence for User or Groups as well as any new kind of Invitations)
+    relationsToDelete: Model[];
+    relationsToSave: (
+      | AllowedGroupServiceMap
+      | AllowedUserGroupMap
+      | AllowedUserServiceMap
+      | Invitation
+    )[];
+  } {
+    const relationsToDelete = modelList.filter((e) =>
+      objectRelationList.every((f) => e.id != f.toString())
+    );
+    const relationsToSave = objectRelationList.filter((e) =>
+      modelList.every((f) => e.toString() != f.id)
+    );
+    return { relationsToDelete, relationsToSave };
+  }
+
   async existId(id: string): Promise<boolean> {
     if ((await this.model.where(this.id, id).first())) {
       return true;
@@ -21,5 +74,25 @@ export class DbRepository {
     } else {
       return false;
     }
+  }
+  protected async updateInvitation(item: Entity) {
+    const _invitationsModel = await DbInvitation.where(
+      "obj_reference",
+      item.getId(),
+    ).all();
+
+    const {
+      relationsToDelete: invitationsToDelete,
+      relationsToSave: invitationsToSave,
+    } = this.nTomFilter(_invitationsModel, item.sentInvitations);
+
+    await Promise.all(invitationsToDelete.map((e) => e.delete()));
+    await DbInvitation.create(invitationsToSave.map((e) => {
+      return {
+        sender_reference: e.senderId,
+        obj_reference: e.objId,
+        receiver_reference: e.receiverId,
+      };
+    }));
   }
 }

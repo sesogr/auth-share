@@ -70,22 +70,20 @@ export class DbServiceRepository extends DbRepository
     await DbIdDisplayname.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
     });
-    //GroupService
+    //GroupService --> allowedGroups[]
     //.all gives all rows out
     const _groupServiceModel = await DbGroupService.where(
       "dbservice_id",
       item.getId(),
     ).all();
 
-    const groupRelationToDelete = _groupServiceModel.filter((e) =>
-      item.allowedGroups.every((f) => e.id != f.toString())
-    );
-    const groupRelationToSave = item.allowedGroups.filter((e) =>
-      _groupServiceModel.every((f) => e.toString() != f.id)
-    );
-    await Promise.all(groupRelationToDelete.map((e) => e.delete()));
+    const {
+      relationsToDelete: groupRelationsToDelete,
+      relationsToSave: groupRelationsToSave,
+    } = this.nTomFilter(_groupServiceModel, item.allowedGroups);
+    await Promise.all(groupRelationsToDelete.map((e) => e.delete()));
     await DbGroupService.create(
-      groupRelationToSave.map((e) => {
+      groupRelationsToSave.map((e) => {
         return {
           id: e.toString(),
           dbserviceId: e.serviceId,
@@ -99,11 +97,12 @@ export class DbServiceRepository extends DbRepository
       item.getId(),
     ).all();
 
-    const userRelationToDelete = _userServiceModel.filter((e) =>
-      item.allowedUsers.every((f) => e.id != f.toString())
-    );
-    const userRelationsToSave = item.allowedUsers.filter((e) =>
-      _userServiceModel.every((f) => e.toString() != f.id)
+    const {
+      relationsToDelete: userRelationToDelete,
+      relationsToSave: userRelationsToSave,
+    } = this.nTomFilter(
+      _userServiceModel,
+      item.allowedUsers,
     );
     await Promise.all(userRelationToDelete.map((e) => e.delete()));
     await DbUserService.create(userRelationsToSave.map((e) => {
@@ -114,31 +113,12 @@ export class DbServiceRepository extends DbRepository
         is_owner: e.isOwner,
       };
     }));
-    //Invitations
+    //Invitations //N:M
     //sender_reference=user, reciever_reference=group, obj_reference=whole invitation ->
-    const _invitationsModel = await DbInvitation.where(
-      "obj_reference",
-      item.getId(),
-    ).all();
-
-    const invitationsToDelete = _invitationsModel.filter((e) =>
-      item.sentInvitations.every((f) => e.id != f.toString())
-    );
-
-    const invitationsToSave = item.sentInvitations.filter((e) =>
-      _invitationsModel.every((f) => e.toString() != f.id)
-    );
-
-    await Promise.all(invitationsToDelete.map((e) => e.delete()));
-    await DbInvitation.create(invitationsToSave.map((e) => {
-      return {
-        sender_reference: e.senderId,
-        obj_reference: e.objId,
-        receiver_reference: e.receiverId,
-      };
-    }));
+    await this.updateInvitation(item);
     //end of update!!
   }
+
   async add(item: Service): Promise<void> {
     try {
       await DbService.create({

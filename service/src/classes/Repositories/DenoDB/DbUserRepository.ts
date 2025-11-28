@@ -22,6 +22,21 @@ import { Invitation } from "../../Invitation.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
 
 export class DbUserRepository implements UserRepository {
+  async update(item: User): Promise<void> {
+    await DbUser.where("id", item.getId()).update({
+      displayname: item.getDisplayName(),
+    });
+
+    await DbIdDisplayname.where("id", item.getId()).update({
+      displayname: item.getDisplayName(),
+    });
+
+    await DbUserCredential.where("dbuser_id", item.getId()).update({
+      username: item.getCredentials().username,
+      password: item.getCredentials().password,
+    });
+  }
+
   async findByName(name: string): Promise<User> {
     const aUser = await DbUser.where("displayname", name).first();
     if (!aUser.id) {

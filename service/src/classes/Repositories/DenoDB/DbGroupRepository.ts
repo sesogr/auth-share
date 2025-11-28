@@ -30,6 +30,40 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
   constructor() {
     super(DbGroup, "groupname");
   }
+  async update(item: Group): Promise<void> {
+    await DbGroup.where("id", item.getId()).update({
+      groupname: item.getDisplayName(),
+      owner: item.getOwner().id,
+    });
+    await DbIdDisplayname.where("id", item.getId()).update({
+      displayname: item.getDisplayName(),
+    });
+
+    const _userGroupModel = await DbUserGroup.where(
+      "dbgroup_id",
+      item.getId(),
+    ).all();
+
+    const {
+      relationsToDelete: groupRelationsToDelete,
+      relationsToSave: groupRelationsToSave,
+    } = this.nTomFilter(_userGroupModel, item.allowedUser);
+
+    await Promise.all(groupRelationsToDelete.map((e) => e.delete()));
+    await DbUserGroup.create(
+      groupRelationsToSave.map((e) => {
+        return {
+          id: e.toString(),
+          dbuserId: e.userId,
+          dbgroupId: e.groupId,
+        };
+      }),
+    );
+    //Invitations
+    //sender_reference=user, reciever_reference=group, obj_reference=whole invitation ->
+    await this.updateInvitation(item);
+  }
+
   async findByName(name: string): Promise<Group> {
     const searchedName = await DbGroup.where("groupname", name).first();
     return this.hydrate(searchedName.id?.toString() ?? "");
