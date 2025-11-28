@@ -11,32 +11,17 @@ export class Service extends Entity {
   public get serviceUrl(): string {
     return this._serviceUrl;
   }
-  public set serviceUrl(value: string) {
-    this._serviceUrl = value;
-  }
   public get allowedGroups(): AllowedGroupServiceMap[] {
     return [...this._allowedGroups];
-  }
-  public set allowedGroups(value: AllowedGroupServiceMap[]) {
-    this._allowedGroups = value;
   }
   public get allowedUsers(): AllowedUserServiceMap[] {
     return [...this._allowedUsers];
   }
-  public set allowedUsers(value: AllowedUserServiceMap[]) {
-    this._allowedUsers = value;
-  }
-  public get sentInvitations(): Invitation[] {
+  public override get sentInvitations(): Invitation[] {
     return [...this._sentInvitations];
-  }
-  public set sentInvitations(value: Invitation[]) {
-    this._sentInvitations = value;
   }
   public get credentials(): ServiceCredential {
     return this._credentials;
-  }
-  public set credentials(value: ServiceCredential) {
-    this._credentials = value;
   }
   constructor(
     private _credentials: ServiceCredential,
