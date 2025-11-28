@@ -8,14 +8,20 @@ import { Invitation } from "./Invitation.ts";
 import { User } from "./User.ts";
 
 export class Group extends Entity {
+  public override get sentInvitations(): Invitation[] {
+    return [...this._sentInvitations];
+  }
+  public get allowedUser(): AllowedUserGroupMap[] {
+    return [...this._allowedUser];
+  }
   public constructor(
     private groupname: string,
     private owner: ShortEntity,
     protected override readonly id: string = crypto.randomUUID(),
     private serviceList: AllowedGroupServiceMap[] = [],
-    private sentInvitations: Invitation[] = [],
+    private readonly _sentInvitations: Invitation[] = [],
     private serviceInvitations: Invitation[] = [],
-    public readonly allowedUser: AllowedUserGroupMap[] = [],
+    private readonly _allowedUser: AllowedUserGroupMap[] = [],
   ) {
     super(id, groupname);
   }
