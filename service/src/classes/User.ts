@@ -18,9 +18,28 @@ export class User extends Entity {
     private userGroupInvitations: Invitation[] = [],
     //..includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
-    private readonly sessions: Session[] = [],
+    private sessions: Session[] = [],
   ) {
     super(id, username);
+  }
+  //private _validated: boolean;
+  //controller ver
+  validateSession(sessionToken: string) {
+    const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
+    const session = this.sessions.find((e) => sessionId == e.id);
+    if (session == undefined) {
+      throw new Error("Session not found!");
+    }
+    if (Date.now() >= session.expiresAt.getTime()) {
+      this.sessions = this.sessions.filter((e) => !e.equals(session));
+      throw new Error("Session is expired");
+    }
+    // if 15 days are left until the session expires, refresh the session
+    if (
+      Date.now() >= session.expiresAt.getTime() - Session.REFRESH_INTERVAL_MS
+    ) {
+      //session.expiresAt = new Date(Date.now() + Session.MAX_DURATION_MS);
+    }
   }
 
   override getId(): string {

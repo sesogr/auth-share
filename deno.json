@@ -9,6 +9,7 @@
     "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts"
   },
   "imports": {
+    "@std/encoding": "jsr:@std/encoding",
     "@ant-design/icons": "npm:@ant-design/icons@^6.1.0",
     "@denodb/datatypes": "https://deno.land/x/denodb@v1.4.0/lib/data-types.ts",
     "@std/testing": "jsr:@std/testing@^1.0.16",
@@ -24,7 +25,8 @@
     "@hono/hono/cors": "jsr:@hono/hono@^4.9.10/cors",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
     "@jackfiszr/faker": "jsr:@jackfiszr/faker@1.1.6",
-    "https://deno.land/std@0.224.0/crypto/_wasm/lib/deno_std_wasm_crypto.generated.d.mts": "data:text/typescript,export {}"
+    "https://deno.land/std@0.224.0/crypto/_wasm/lib/deno_std_wasm_crypto.generated.d.mts": "data:text/typescript,export {}",
+    "@std/hash": "https://deno.land/std@0.114.0/hash/sha256.ts"
   },
   "scopes": {
     "https://raw.githubusercontent.com/Zhomart/dex/": {
