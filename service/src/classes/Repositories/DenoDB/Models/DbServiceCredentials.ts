@@ -10,7 +10,7 @@ export class DbServiceCredential extends Model {
     //TODO add foreign key, primary key etc.
   };
   static service() {
-    return this.hasOne(DbService);
+    return this.hasOne(DbService) as Promise<DbService>;
   }
   static override get(): Promise<DbServiceCredential | DbServiceCredential[]> {
     return super.get() as Promise<DbServiceCredential | DbServiceCredential[]>;
@@ -23,4 +23,5 @@ export class DbServiceCredential extends Model {
   }
   username!: string;
   password!: string;
+  dbServiceId!: string;
 }

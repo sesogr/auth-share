@@ -1,5 +1,4 @@
 import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
-import { IdNameMap } from "../interfaceTypes/ShortEntity.ts";
 import { IdNameMap } from "./IdNameMap.ts";
 import { Invitation } from "./Invitation.ts";
 

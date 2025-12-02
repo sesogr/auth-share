@@ -1,8 +1,19 @@
 import { OnlyProperties } from "../types/OnlyProperties.ts";
 
 export abstract class ValueClass<T extends ValueClass<T>> {
-  //every key is a string --> that mapps to an unknown type
-  [key: string]: unknown;
+  //every key is a string --> that mapps to a primitive type. RecursiveValueClass is ValueClass<RecursiveValueClass>
+  [key: string]:
+    | string
+    | number
+    | bigint
+    | symbol
+    | undefined
+    | null
+    | RecursiveValueClass
+    | ((...args: never[]) => unknown)
+    | boolean;
+  constructor() {
+  }
   equals(that: T): boolean {
     return this.toString() === that.toString();
   }
@@ -21,3 +32,4 @@ export abstract class ValueClass<T extends ValueClass<T>> {
     return Object.assign(instance, newData);
   }
 }
+type RecursiveValueClass = ValueClass<RecursiveValueClass>;

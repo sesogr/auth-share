@@ -1,9 +1,9 @@
 import { DuplicateError } from "../errors/DuplicateError.ts";
-import { IdNameMap } from "../interfaceTypes/ShortEntity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { Entity } from "./Entity.ts";
+import { IdNameMap } from "./IdNameMap.ts";
 import { Invitation } from "./Invitation.ts";
 import { User } from "./User.ts";
 
@@ -25,7 +25,7 @@ export class Group extends Entity {
   ) {
     super(id, groupname);
   }
-  override getId(): string {
+  overridegetUserId(): string {
     return this.id;
   }
   override getDisplayName(): string {
@@ -41,7 +41,7 @@ export class Group extends Entity {
   }
   listAllowedUsers(owned = false): string[] {
     const mapCallback = (currElement: AllowedUserGroupMap): string =>
-      currElement.userId;
+      currElement.getUserId;
     if (owned) {
       return this.allowedUser.filter((currentElement) => currentElement.isOwner)
         .map(mapCallback);
@@ -87,8 +87,8 @@ export class Group extends Entity {
     return {
       groupname: this.groupname,
       owner: this.getOwner().displayname,
-      users: this.allowedUser.map((e) => e.username),
-      serviceList: this.serviceList.map((e) => e.servicename),
+      users: this.allowedUser.map((e) => e.getUsername),
+      serviceList: this.serviceList.map((e) => e.getServicename),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
     };

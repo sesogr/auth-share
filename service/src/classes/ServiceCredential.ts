@@ -2,8 +2,8 @@ import { ValueClass } from "./ValueClass.ts";
 
 export class ServiceCredential extends ValueClass<ServiceCredential> {
   constructor(
-    private readonly username?: string,
-    private readonly password?: string,
+    readonly username?: string,
+    readonly password?: string,
   ) {
     super();
   }
@@ -13,6 +13,6 @@ export class ServiceCredential extends ValueClass<ServiceCredential> {
   }
 }
 
-Deno.test("With from valueClass", () => {
-  console.log(new ServiceCredential("d", "e").with({ "username": "u" }));
-});
+//Deno.test("With from valueClass", () => {
+//  console.log(new ServiceCredential("d", "e").with({ "username": "u" }));
+//});

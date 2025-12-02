@@ -50,7 +50,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     this.allowedUser.push(...missingAllowedUsers);
 
     const extraAllowedUsers = this.allowedUser.filter((e) =>
-      e.serviceId === authorizedUsers[0].serviceId
+      e.getServiceId === authorizedUsers[0].getServiceId
     ).filter((e) => !authorizedUsers.some((f) => e.equals(f)));
     this.allowedUser = this.allowedUser.filter((e) =>
       extraAllowedUsers.every((f) => !e.equals(f))
@@ -62,7 +62,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     );
     this.allowedGroups.push(...missingAllowedGroups);
     const extraAllowedGroups = this.allowedGroups.filter((e) =>
-      e.serviceId === authorizedGroups[0].serviceId
+      e.getServiceId === authorizedGroups[0].getServiceId
     ).filter((e) => !authorizedGroups.some((f) => e.equals(f)));
     this.allowedGroups = this.allowedGroups.filter((e) =>
       extraAllowedGroups.every((f) => !e.equals(f))
@@ -77,11 +77,9 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     const sentInvitations = this.invitations.filter((e) =>
       e.objId === serviceId
     );
-    const authorizedUsers = this.allowedUser.filter((e) =>
-      e.serviceId === serviceId
-    );
+    const authorizedUsers = this.allowedUser.filter((e) => e.serviceId);
     const authorizedGroups = this.allowedGroups.filter((e) =>
-      e.serviceId === serviceId
+      e.getServiceId === serviceId
     );
     const hydratedService: Service = new Service(
       credentials,
@@ -97,14 +95,14 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
   findOwnedByUserId(userId: string): Promise<Service[]> {
     return Promise.all(
       this.allowedUser.filter((currMap) =>
-        (currMap.userId === userId) && currMap.isOwner
-      ).map((currMap) => this.findById(currMap.serviceId)),
+        (currMap.getUserId === userId) && currMap.isOwner
+      ).map((currMap) => this.findById(currMap.getServiceId)),
     );
   }
   findAuthorizedForId(id: string): Promise<Service[]> {
     return Promise.all(
-      this.allowedUser.filter((e) => e.userId === id).map((f) =>
-        this.findById(f.serviceId)
+      this.allowedUser.filter((e) => e.getUserId === id).map((f) =>
+        this.findById(f.getServiceId)
       ),
     );
   }
@@ -123,11 +121,9 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     } catch (e) {
       throw Error(`service: ${serviceId} not removed, ${e}`);
     }
-    this.allowedUser = this.allowedUser.filter((e) =>
-      e.serviceId !== serviceId
-    );
+    this.allowedUser = this.allowedUser.filter((e) => e.serviceId);
     this.allowedGroups = this.allowedGroups.filter((e) =>
-      e.serviceId !== serviceId
+      e.getServiceId !== serviceId
     );
     return Promise.resolve();
   }

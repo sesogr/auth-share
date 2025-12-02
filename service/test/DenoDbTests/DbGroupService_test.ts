@@ -64,8 +64,8 @@ Deno.test("DenoDB Update", async () => {
     toSave.map((e) =>
       DbGroupService.create({
         id: e.toString(),
-        dbserviceId: e.serviceId,
-        dbgroupId: e.groupId,
+        dbserviceId: e.getServiceId,
+        dbgroupId: e.getGroupId,
       })
     ),
   );

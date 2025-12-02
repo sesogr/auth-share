@@ -60,7 +60,7 @@ export class User extends Entity {
   }
   listServices(owned = false): string[] {
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
-      currentElement.servicename;
+      currentElement.getServicename;
     if (owned) {
       return this.callableService.filter((currentElement) =>
         currentElement.isOwner
@@ -70,7 +70,7 @@ export class User extends Entity {
   }
   listJoinedGroups(owned = false): string[] {
     const mapCallback = (currentElement: AllowedUserGroupMap): string =>
-      currentElement.groupname;
+      currentElement.getGroupname;
     if (owned) {
       return this.joinedGroups.filter((currentElement) =>
         currentElement.isOwner

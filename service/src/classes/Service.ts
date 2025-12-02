@@ -62,7 +62,7 @@ export class Service extends Entity {
   }
   listAllowedUsers(onlyOwners = false): string[] {
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
-      currentElement.username;
+      currentElement.getUsername;
     if (onlyOwners) {
       return this.allowedUsers.filter((currElement) => currElement.isOwner)
         .map(mapCallback);
@@ -71,7 +71,7 @@ export class Service extends Entity {
   }
   listAllowedGroups(): string[] {
     const mapCallback = (currElement: AllowedGroupServiceMap): string =>
-      currElement.groupname;
+      currElement.getGroupname;
     return this.allowedGroups.map(mapCallback);
   }
   giveAuthorizationToUser(user: User): void {
@@ -85,8 +85,8 @@ export class Service extends Entity {
   private convertToSerializeableObj(): ConvertedService {
     return {
       credentials: {
-        username: this._credentials.username,
-        password: this._credentials.password,
+        username: this._credentials.username!,
+        password: this._credentials.password!,
       },
       serviceName: this.getDisplayName(),
       serviceUrl: this.serviceUrl,

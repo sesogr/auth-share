@@ -5,6 +5,7 @@
     "jsr:@jackfiszr/faker@1.1.6": "1.1.6",
     "jsr:@std/assert@^1.0.15": "1.0.15",
     "jsr:@std/data-structures@^1.0.9": "1.0.9",
+    "jsr:@std/encoding@*": "1.0.5",
     "jsr:@std/fs@^1.0.19": "1.0.19",
     "jsr:@std/internal@^1.0.10": "1.0.12",
     "jsr:@std/internal@^1.0.12": "1.0.12",
@@ -35,6 +36,9 @@
     },
     "@std/data-structures@1.0.9": {
       "integrity": "033d6e17e64bf1f84a614e647c1b015fa2576ae3312305821e1a4cb20674bb4d"
+    },
+    "@std/encoding@1.0.5": {
+      "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
     },
     "@std/fs@1.0.19": {
       "integrity": "051968c2b1eae4d2ea9f79a08a3845740ef6af10356aff43d3e2ef11ed09fb06",

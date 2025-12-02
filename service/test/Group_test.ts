@@ -1,4 +1,4 @@
-import { assertArrayIncludes, assertEquals, assertFalse } from "@std/assert";
+import { assertArrayIncludes, assertEquals } from "@std/assert";
 import { Group } from "../src/classes/Group.ts";
 import { User } from "../src/classes/User.ts";
 import { UserCredential } from "../src/classes/UserCredential.ts";
@@ -69,8 +69,7 @@ Deno.test("Group Class", async (t) => {
         testReceiver,
       );
       const listSentInvitation = group.listSentInvitation();
-      console.log(testInvitation.senderReference.displayname);
-      assertFalse(!listSentInvitation.some((e) => e.equals(testInvitation)));
+      assertEquals([testInvitation], listSentInvitation);
     },
   );
 });

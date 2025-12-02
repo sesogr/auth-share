@@ -26,10 +26,10 @@ export class InMemUserRepository extends InMemoryRepository<User>
     const displayname = item.getDisplayName();
     const credentials = item.getCredentials();
     const serviceList = this.serviceRepoView.viewAllowedUser().filter((e) =>
-      e.userId === id
+      e.getUserId === id
     );
     const joinedGroups = this.groupRepoView.viewAllowedUser().filter((e) =>
-      e.userId === id
+      e.getUserId === id
     );
     const invitations = this.groupRepoView.viewInvitations().filter((e) =>
       e.receiverId === id

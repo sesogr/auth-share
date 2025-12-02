@@ -3,31 +3,31 @@ import { ValueClass } from "./ValueClass.ts";
 
 export class Invitation extends ValueClass<Invitation> {
   public get reveicername(): string {
-    return this._receiverReference.displayname;
+    return this.receiverReference.displayname;
   }
 
   public get receiverId(): string {
-    return this._receiverReference.id;
+    return this.receiverReference.id;
   }
 
   public get objname(): string {
-    return this._objReference.displayname;
+    return this.objReference.displayname;
   }
   public get objId(): string {
-    return this._objReference.id;
+    return this.objReference.id;
   }
 
   public get senderId(): string {
-    return this._senderReference.id;
+    return this.senderReference.id;
   }
 
   public get sendername(): string {
-    return this._senderReference.displayname;
+    return this.senderReference.displayname;
   }
   constructor(
-    private readonly _senderReference: IdNameMap,
-    private readonly _objReference: IdNameMap,
-    private readonly _receiverReference: IdNameMap,
+    readonly senderReference: IdNameMap,
+    readonly objReference: IdNameMap,
+    readonly receiverReference: IdNameMap,
   ) {
     super();
   }

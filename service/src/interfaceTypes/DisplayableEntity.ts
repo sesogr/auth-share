@@ -1,7 +1,6 @@
 import { Displayable } from "./Displayable.ts";
 import { Entity } from "./Entity.ts";
-import { IdNameMap } from "./ShortEntity.ts";
-
+import { IdNameMap } from "../classes/IdNameMap.ts";
 export type DisplayableEntity = Displayable & Entity & {
   convertToShort(): IdNameMap;
 };

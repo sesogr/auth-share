@@ -43,7 +43,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     );
     this._allowedUser.push(...missingAllowedUsers);
     const extraAllowedUsers = this.allowedUser.filter((e) =>
-      e.groupId === allowedUser[0].groupId
+      e.getGroupId === allowedUser[0].getGroupId
     ).filter((e) => !allowedUser.some((f) => e.equals(f)));
     this._allowedUser = this.allowedUser.filter((e) =>
       extraAllowedUsers.every((f) => !e.equals(f))
@@ -69,7 +69,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     const groupId = _item.getId();
     const filterCallback = (
       currElement: AllowedGroupServiceMap,
-    ): boolean => currElement.groupId === groupId;
+    ): boolean => currElement.getGroupId === groupId;
     const serviceList = this.serviceRepoView.viewAllowedGroups().filter(
       filterCallback,
     );
@@ -82,7 +82,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
         filterCallback2,
       );
     const allowedUser = this._allowedUser.filter((currElement) =>
-      currElement.groupId === groupId
+      currElement.getGroupId === groupId
     );
 
     const group: Group = new Group(
@@ -103,8 +103,8 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
   findOwnedByUserId(userId: string): Promise<Group[]> {
     return Promise.all(
       this.allowedUser.filter((currMap) =>
-        (currMap.userId === userId) && currMap.isOwner
-      ).map((currMap) => this.findById(currMap.groupId)),
+        (currMap.getUserId === userId) && currMap.isOwner
+      ).map((currMap) => this.findById(currMap.getGroupId)),
     );
   }
 }

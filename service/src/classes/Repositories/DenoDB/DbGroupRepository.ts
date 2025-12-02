@@ -54,8 +54,8 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       groupRelationsToSave.map((e) => {
         return {
           id: e.toString(),
-          dbuserId: e.userId,
-          dbgroupId: e.groupId,
+          dbuserId: e.getUserId,
+          dbgroupId: e.getGroupId,
         };
       }),
     );
@@ -372,7 +372,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       await DbUserGroup.create(item.allowedUser.map((e) => {
         return {
           id: e.toString(),
-          dbuser_id: e.userId,
+          dbuser_id: e.getUserId,
           dbgroup_id: item.getId(),
           isOwner: e.isOwner,
         };

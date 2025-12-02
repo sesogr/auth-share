@@ -4,21 +4,20 @@ import { encodeBase64, encodeHex } from "@std/encoding";
 //vielleicht keine Valueclass???
 
 export class Session {
-  readonly id: string;
-  expiresAt: Date;
-  readonly userId: string;
-
   constructor(
-    sessionToken: string,
-    userId: string,
+    readonly id: string,
+    public expiresAt: Date,
+    readonly userId: string,
   ) {
-    const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
-
-    this.id = sessionId;
-    this.userId = userId;
-    this.expiresAt = new Date(Date.now() + Session.MAX_DURATION_MS);
   }
-
+  static create(sessionToken: string, userId: string) {
+    const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
+    return new Session(
+      sessionId,
+      new Date(Date.now() + Session.MAX_DURATION_MS),
+      userId,
+    );
+  }
   //DB Table "Sessions"
   //Session Class done
   //DB Session link to?

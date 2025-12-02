@@ -11,6 +11,6 @@ export class UserCredential extends ValueClass<UserCredential> {
 // Deno.test("jdsj", () => {
 //   console.log(new UserCredential("a", "b").toString());
 // });
-Deno.test("With from valueClass", () => {
-  console.log(new UserCredential("a", "b").with({ "username": "c" }));
-});
+//Deno.test("With from valueClass", () => {
+//  console.log(new UserCredential("a", "b").with({ "username": "c" }));
+//});

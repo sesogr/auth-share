@@ -2,27 +2,27 @@ import { IdNameMap } from "./IdNameMap.ts";
 import { ValueClass } from "./ValueClass.ts";
 
 export class AllowedUserServiceMap extends ValueClass<AllowedUserServiceMap> {
-  public get serviceId(): string {
+  public get getServiceId(): string {
     return this.serviceRef.id;
   }
-  public get servicename(): string {
+  public get getServicename(): string {
     return this.serviceRef.displayname;
   }
-  public get username(): string {
+  public get getUsername(): string {
     return this.userRef.displayname;
   }
-  public get userId(): string {
+  public get getUserId(): string {
     return this.userRef.id;
   }
 
   constructor(
-    private readonly userRef: IdNameMap,
-    private readonly serviceRef: IdNameMap,
+    readonly userRef: IdNameMap,
+    readonly serviceRef: IdNameMap,
     readonly isOwner: boolean = false,
   ) {
     super();
   }
   override toString(): string {
-    return `${this.userId}:${this.serviceId}:${this.isOwner}`;
+    return `${this.getUserId}:${this.getServiceId}:${this.isOwner}`;
   }
 }
