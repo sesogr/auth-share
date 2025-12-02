@@ -22,7 +22,8 @@ export class User extends Entity {
   ) {
     super(id, username);
   }
-  //private _validated: boolean;
+  private validated: boolean = false;
+
   //controller ver
   validateSession(sessionToken: string) {
     const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
@@ -31,20 +32,26 @@ export class User extends Entity {
       throw new Error("Session not found!");
     }
     if (Date.now() >= session.expiresAt.getTime()) {
-      this.sessions = this.sessions.filter((e) => !e.equals(session));
+      this.deleteSession(session);
       throw new Error("Session is expired");
     }
     // if 15 days are left until the session expires, refresh the session
     if (
       Date.now() >= session.expiresAt.getTime() - Session.REFRESH_INTERVAL_MS
     ) {
-      //session.expiresAt = new Date(Date.now() + Session.MAX_DURATION_MS);
+      session.expiresAt = new Date(Date.now() + Session.MAX_DURATION_MS);
     }
+    this.validated = true;
+  }
+
+  deleteSession(session: Session) {
+    this.sessions = this.sessions.filter((e) => e.id != session.id);
   }
 
   override getId(): string {
     return this.id;
   }
+  // Entry Guards because of validatesession == true/false?
   getCredentials() {
     return this.credentials;
   }

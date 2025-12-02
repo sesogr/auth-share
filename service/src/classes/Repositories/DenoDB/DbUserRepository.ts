@@ -35,7 +35,7 @@ export class DbUserRepository implements UserRepository {
 
     await DbUserCredential.where("dbuser_id", item.getId()).update({
       username: item.getCredentials().username,
-      password: item.getCredentials().password,
+      password: item.getCredentials().hash,
     });
   }
 
@@ -79,7 +79,7 @@ export class DbUserRepository implements UserRepository {
       await DbUserCredential.create({
         dbuser_id: item.getId(),
         username: item.getCredentials().username,
-        password: item.getCredentials().password,
+        password: item.getCredentials().hash,
       });
       await DbIdDisplayname.create({
         id: item.getId(),

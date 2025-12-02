@@ -1,40 +1,24 @@
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
+import { IdNameMap } from "./IdNameMap.ts";
 import { ValueClass } from "./ValueClass.ts";
 
-export class AllowedUserServiceMap extends ValueClass {
-  override with(_: object): ValueClass {
-    throw new Error("Method not implemented.");
-  }
-  override copy(): ValueClass {
-    throw new Error("Method not implemented.");
-  }
-  public get isOwner(): boolean {
-    return this._isOwner;
-  }
+export class AllowedUserServiceMap extends ValueClass<AllowedUserServiceMap> {
   public get serviceId(): string {
-    return this._serviceRef.id;
+    return this.serviceRef.id;
   }
   public get servicename(): string {
-    return this._serviceRef.displayname;
+    return this.serviceRef.displayname;
   }
   public get username(): string {
-    return this._userRef.displayname;
+    return this.userRef.displayname;
   }
   public get userId(): string {
-    return this._userRef.id;
-  }
-
-  public get userRef(): ShortEntity {
-    return this._userRef;
-  }
-  public get serviceRef(): ShortEntity {
-    return this._serviceRef;
+    return this.userRef.id;
   }
 
   constructor(
-    private readonly _userRef: ShortEntity,
-    private readonly _serviceRef: ShortEntity,
-    private readonly _isOwner: boolean = false,
+    private readonly userRef: IdNameMap,
+    private readonly serviceRef: IdNameMap,
+    readonly isOwner: boolean = false,
   ) {
     super();
   }

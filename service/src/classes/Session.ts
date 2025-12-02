@@ -1,29 +1,17 @@
 import { Sha256 } from "@std/hash";
-import { ValueClass } from "./ValueClass.ts";
 import { encodeBase64, encodeHex } from "@std/encoding";
 
 //vielleicht keine Valueclass???
 
-export class Session extends ValueClass {
-  override toString(): string {
-    throw new Error("Method not implemented.");
-  }
-  override with(_: object): ValueClass {
-    throw new Error("Method not implemented.");
-  }
-  override copy(): ValueClass {
-    throw new Error("Method not implemented.");
-  }
-
+export class Session {
   readonly id: string;
-  readonly expiresAt: Date;
+  expiresAt: Date;
   readonly userId: string;
 
   constructor(
     sessionToken: string,
     userId: string,
   ) {
-    super();
     const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
 
     this.id = sessionId;

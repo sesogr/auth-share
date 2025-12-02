@@ -32,7 +32,7 @@ export class InMemUserRepository extends InMemoryRepository<User>
       e.userId === id
     );
     const invitations = this.groupRepoView.viewInvitations().filter((e) =>
-      e.receiverReference.id === id
+      e.receiverId === id
     );
     const user: User = new User(
       credentials,

@@ -1,5 +1,5 @@
 import { DuplicateError } from "../errors/DuplicateError.ts";
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
+import { IdNameMap } from "../interfaceTypes/ShortEntity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
@@ -16,7 +16,7 @@ export class Group extends Entity {
   }
   public constructor(
     private groupname: string,
-    private owner: ShortEntity,
+    private owner: IdNameMap,
     protected override readonly id: string = crypto.randomUUID(),
     private serviceList: AllowedGroupServiceMap[] = [],
     private readonly _sentInvitations: Invitation[] = [],
@@ -77,7 +77,7 @@ export class Group extends Entity {
       ),
     );
   }
-  getOwner(): ShortEntity {
+  getOwner(): IdNameMap {
     return this.owner;
   }
   toJsonString(): string {

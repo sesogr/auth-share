@@ -46,7 +46,7 @@ Deno.test("UserController - Test", async (t) => {
           const testUser = {
             changeUserCredentials: (a: UserCredential) => {
               testUser.username = a.username;
-              testUser.password = a.password;
+              testUser.password = a.hash;
             },
             username: "",
             password: "",
@@ -75,7 +75,7 @@ Deno.test("UserController - Test", async (t) => {
       assertEquals(spyFindByID.calls.length, 1);
       assertEquals(spySave.calls.length, 1);
       assertEquals(
-        spySave.calls[0].args[0].getCredentials().password,
+        spySave.calls[0].args[0].getCredentials().hash,
         "wh234he",
       );
       assertEquals(spySave.calls[0].args[0].getId(), "123456");

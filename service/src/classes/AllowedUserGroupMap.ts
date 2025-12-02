@@ -1,22 +1,16 @@
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
+import { IdNameMap } from "./IdNameMap.ts";
 import { ValueClass } from "./ValueClass.ts";
 
-export class AllowedUserGroupMap extends ValueClass {
-  override with(_: object): ValueClass {
-    throw new Error("Method not implemented.");
-  }
-  override copy(): ValueClass {
-    throw new Error("Method not implemented.");
-  }
+export class AllowedUserGroupMap extends ValueClass<AllowedUserGroupMap> {
   public get groupId(): string {
     return this._groupRef.id;
   }
 
-  public get groupRef(): ShortEntity {
+  public get groupRef(): IdNameMap {
     return this._groupRef;
   }
 
-  public get userRef(): ShortEntity {
+  public get userRef(): IdNameMap {
     return this._userRef;
   }
 
@@ -33,8 +27,8 @@ export class AllowedUserGroupMap extends ValueClass {
     return this._isOwner;
   }
   constructor(
-    private readonly _userRef: ShortEntity,
-    private readonly _groupRef: ShortEntity,
+    private readonly _userRef: IdNameMap,
+    private readonly _groupRef: IdNameMap,
     private readonly _isOwner: boolean = false,
   ) {
     super();

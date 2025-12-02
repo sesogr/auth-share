@@ -75,7 +75,7 @@ export class InMemGroupRepository extends InMemoryRepository<Group>
     );
     const filterCallback2 = (
       currElement: Invitation,
-    ): boolean => currElement.objReference.id === groupId;
+    ): boolean => currElement.objId === groupId;
     const sentInvitationList = this._invitationList.filter(filterCallback2);
     const serviceInvitations = this.serviceRepoView.viewInvitedGroups()
       .filter(

@@ -75,7 +75,7 @@ export class InMemServiceRepository extends InMemoryRepository<Service>
     const serviceName = service.getDisplayName();
     const serviceId = service.getId();
     const sentInvitations = this.invitations.filter((e) =>
-      e.objReference.id === serviceId
+      e.objId === serviceId
     );
     const authorizedUsers = this.allowedUser.filter((e) =>
       e.serviceId === serviceId
