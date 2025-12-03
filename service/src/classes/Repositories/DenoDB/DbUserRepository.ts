@@ -35,11 +35,19 @@ export class DbUserRepository implements UserRepository {
 
     await DbUserCredential.where("dbuser_id", item.getId()).update({
       username: item.getCredentials().username,
-      password: item.getCredentials().hash,
+      hash: item.getCredentials().hash,
+      salt: item.getCredentials().salt,
     });
   }
+  async findByUserName(name: string): Promise<User> {
+    const aUser = await DbUserCredential.where("username", name).first();
+    if (!aUser.id) {
+      throw new Error("User not found");
+    }
+    return this.hydrate(aUser.dbuserId);
+  }
 
-  async findByName(name: string): Promise<User> {
+  async findByDisplayName(name: string): Promise<User> {
     const aUser = await DbUser.where("displayname", name).first();
     if (!aUser.id) {
       throw new Error("User not found");
@@ -79,7 +87,8 @@ export class DbUserRepository implements UserRepository {
       await DbUserCredential.create({
         dbuser_id: item.getId(),
         username: item.getCredentials().username,
-        password: item.getCredentials().hash,
+        hash: item.getCredentials().hash,
+        salt: item.getCredentials().salt,
       });
       await DbIdDisplayname.create({
         id: item.getId(),
@@ -102,7 +111,8 @@ export class DbUserRepository implements UserRepository {
       .select(
         DbUser.field("displayname", "username"),
         DbUserCredential.field("username", "un_cred"),
-        DbUserCredential.field("password", "pw_cred"),
+        DbUserCredential.field("hash", "pw_cred"),
+        DbUserCredential.field("salt"),
         DbIdDisplaynameService.field("displayname", "service"),
         DbIdDisplaynameService.field("id", "serviceId"),
         DbUserService.field("is_owner", "serviceOwner"),
@@ -169,6 +179,7 @@ export class DbUserRepository implements UserRepository {
         credentials: {
           un_cred: string;
           pw_cred: string;
+          salt: string;
         };
         displayname: string;
         services: [
@@ -191,6 +202,7 @@ export class DbUserRepository implements UserRepository {
           credentials: {
             un_cred: record.unCred?.toString()!,
             pw_cred: record.pwCred?.toString()!,
+            salt: record.salt?.toString()!,
           },
           displayname: record.username?.toString()!,
           services: [],
@@ -259,6 +271,7 @@ export class DbUserRepository implements UserRepository {
     const credentials = new UserCredential(
       temp.credentials.un_cred,
       temp.credentials.pw_cred,
+      temp.credentials.salt,
     );
     const displayname = temp.displayname;
     const userRef = new IdNameMap(searchedId, displayname);
