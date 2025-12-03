@@ -92,6 +92,12 @@ app.get("/data", (c) => {
 });
 
 const userController = new UserController(userRepository, ME);
+app.post(
+  "/login",
+  (c) => {
+    return userController.logIn(c);
+  },
+);
 app.get(
   "/user",
   (c) => {
@@ -124,7 +130,7 @@ app.get(
 
 app.put();
 
-app.post("/user", (c) => {
+app.post("/user/register", (c) => {
   return userController.create(c);
 });
 
