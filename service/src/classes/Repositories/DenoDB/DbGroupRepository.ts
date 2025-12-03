@@ -64,7 +64,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
     await this.updateInvitation(item);
   }
 
-  async findByName(name: string): Promise<Group> {
+  async findByDisplayName(name: string): Promise<Group> {
     const searchedName = await DbGroup.where("groupname", name).first();
     return this.hydrate(searchedName.id?.toString() ?? "");
   }

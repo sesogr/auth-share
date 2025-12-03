@@ -52,7 +52,7 @@ export class DbServiceRepository extends DbRepository
     }
     return this.hydrate(id);
   }
-  findByName(_name: string): Promise<Service> {
+  findByDisplayName(_name: string): Promise<Service> {
     throw new Error("Method not implemented.");
   }
   findAll(): Promise<Service[]> {
