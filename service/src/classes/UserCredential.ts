@@ -3,6 +3,7 @@ export class UserCredential extends ValueClass<UserCredential> {
   constructor(
     readonly username: string,
     readonly hash: string,
+    readonly salt: string,
   ) {
     super();
   }
