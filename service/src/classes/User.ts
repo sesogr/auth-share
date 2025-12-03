@@ -92,8 +92,11 @@ export class User extends Entity {
     return displayName.length > 40;
   }
 
-  static authenticate(credentials: UserCredential): User {
-    return new User(credentials);
+  createSession() {
+    const token = Session.generateRandomSessionToken();
+    const session = Session.create(token, this.id);
+    this.sessions.push(session);
+    return { token, session };
   }
 
   removeInvitation(invite: Invitation) {
