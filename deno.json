@@ -9,6 +9,7 @@
     "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts"
   },
   "imports": {
+    "@bcrypt": "https://deno.land/x/bcrypt/mod.ts",
     "@std/encoding": "jsr:@std/encoding",
     "@ant-design/icons": "npm:@ant-design/icons@^6.1.0",
     "@denodb/datatypes": "https://deno.land/x/denodb@v1.4.0/lib/data-types.ts",

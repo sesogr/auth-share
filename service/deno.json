@@ -4,6 +4,7 @@
     "denodb": "deno run --allow-all --watch test/DenoDbTests/DenoDB.ts"
   },
   "imports": {
+    "@bcrypt": "https://deno.land/x/bcrypt/mod.ts",
     "@std/encoding": "jsr:@std/encoding",
     "@hono/hono": "jsr:@hono/hono@^4.9.10",
     "@hono/hono/cors": "jsr:@hono/hono@^4.9.10/cors",
