@@ -3,7 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./Home.tsx";
 import User from "./User.tsx";
 import Navbar from "./Navbar.tsx";
-import CreateUser from "./CreateUser.tsx";
+import Register from "./Register.tsx";
+import Login from "./Login.tsx";
 
 const App: React.FC = () => {
   return (
@@ -11,8 +12,9 @@ const App: React.FC = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/user" element={<User />} />
-        <Route path="/user/create" element={<CreateUser />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/:serviceName" element={<Home />} />
         <Route path="*" element={<div>Missing Page!!</div>} />
       </Routes>
@@ -21,3 +23,8 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+/*
+-login.tsx anlegen -->
+-
+*/

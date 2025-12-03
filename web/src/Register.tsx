@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Col, Form, Input, message, Row } from "antd";
 import type { SendingConvertedUser } from "./types/ConvertedUser.ts";
 
-const CreateUser: React.FC = () => {
+const Register: React.FC = () => {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: FormValues) => {
@@ -86,7 +86,7 @@ const CreateUser: React.FC = () => {
   );
 };
 
-export default CreateUser;
+export default Register;
 
 type FormValues = {
   name: string;
