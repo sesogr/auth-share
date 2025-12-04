@@ -49,15 +49,15 @@ function sleep(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 const groupsWithService = async () => {
-  const fakeUser = FakeObjectGen.createFakeUser();
-  const fakeService = FakeObjectGen.createFakeService(
+  const fakeUser = await FakeObjectGen.createFakeUser();
+  const fakeService = await FakeObjectGen.createFakeService(
     fakeUser,
   );
 
   const fakeGroups: Group[] = [];
 
   for (let i = 0; i < 10; i++) {
-    const group = FakeObjectGen.createFakeGroup(
+    const group = await FakeObjectGen.createFakeGroup(
       undefined,
       fakeUser,
     );
@@ -87,7 +87,7 @@ sleep(2500).then(async () => {
 await groupsWithService();
 
 async function buildUpUserRepo() {
-  const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
+  const fakeUserList: User[] = await FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const userRepository: UserRepository = new DbUserRepository();
   await Promise.all(fakeUserList.map(async (e) => {
@@ -103,7 +103,9 @@ async function buildUpUserRepo() {
   return { mockUserIdList, fakeUserList };
 }
 async function buildUpServRepo(userList: User[]) {
-  const serviceList: Service[] = FakeObjectGen.generateFakeServices(userList);
+  const serviceList: Service[] = await FakeObjectGen.generateFakeServices(
+    userList,
+  );
   const serviceRepository: ServiceRepository = new DbServiceRepository();
   await Promise.all(
     serviceList.map(async (e) => await serviceRepository.save(e)),
@@ -112,7 +114,7 @@ async function buildUpServRepo(userList: User[]) {
   return { serviceList, serviceRepository };
 }
 async function buildUpGroupRepo(userList: User[]) {
-  const groupList: Group[] = FakeObjectGen.generateFakeGroups(userList);
+  const groupList: Group[] = await FakeObjectGen.generateFakeGroups(userList);
   const groupRepository = new DbGroupRepository();
   await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
 

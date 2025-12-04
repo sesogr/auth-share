@@ -41,18 +41,18 @@ export class DbUserRepository implements UserRepository {
   }
   async findByUserName(name: string): Promise<User> {
     const aUser = await DbUserCredential.where("username", name).first();
-    if (!aUser.id) {
-      throw new Error("User not found");
+    if (!aUser.username) {
+      throw new Error("User by Username not found!");
     }
     return this.hydrate(aUser.dbuserId);
   }
 
   async findByDisplayName(name: string): Promise<User> {
     const aUser = await DbUser.where("displayname", name).first();
-    if (!aUser.id) {
-      throw new Error("User not found");
+    if (!aUser.displayname) {
+      throw new Error("User by Displayname not found!");
     }
-    return this.hydrate(aUser.id.toString());
+    return this.hydrate(aUser.id);
   }
   async removeById(id: string): Promise<void> {
     await DbUser.where("id", id).delete();

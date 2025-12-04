@@ -8,7 +8,6 @@ export abstract class ValueClass<T extends ValueClass<T>> {
     | bigint
     | symbol
     | undefined
-    | null
     | RecursiveValueClass
     | ((...args: never[]) => unknown)
     | boolean;
