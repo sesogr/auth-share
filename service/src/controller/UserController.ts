@@ -3,8 +3,8 @@ import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { User } from "../classes/User.ts";
 import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
-import * as bcrypt from "@bcrypt";
 import { setCookie } from "@hono/hono/cookie";
+import * as bcrypt from "@bcrypt";
 
 export class UserController {
   constructor(
@@ -32,22 +32,23 @@ export class UserController {
       user.toJson(),
     );
   }
-  async changePassword(c: Context) {
-    const requestData: ConvertedUser = await c.req.json();
-    const myself: User = await this.userRepository.findById(this.ME);
-    const newPassword: string = requestData.credentials.split(":")[1];
-    const { hashedPassword } = await this.hashPassword(
-      newPassword,
-      myself.getCredentials().salt,
-    );
+  // async changePassword(c: Context) {
+  //   const requestData: ConvertedUser = await c.req.json();
+  //   const myself: User = await this.userRepository.findById(this.ME);
+  //   const newPassword: string = requestData.credentials.split(":")[1];
+  //   const { hashedPassword } = await UserCredential.hashPassword(
+  //     newPassword,
+  //     myself.getCredentials().salt,
+  //   );
 
-    //TODO we need the loggedin User here!!
-    myself.changeUserCredentials(
-      myself.getCredentials().with({ "hash": hashedPassword }),
-    );
-    this.userRepository.save(myself);
-    return c.body(null, 204);
-  }
+  //   //TODO we need the loggedin User here!!
+  //   myself.changeUserCredentials(
+  //     myself.getCredentials().with({ "hash": hashedPassword }),
+  //   );
+  //   this.userRepository.save(myself);
+  //   return c.body(null, 204);
+  // }
+
   // async create(c: Context) {
   //   try {
   //     c.res.headers.set("Access-Control-Allow-Origin", "*");
@@ -71,7 +72,6 @@ export class UserController {
   // }
   async logIn(c: Context) {
     try {
-      c.res.headers.set("Access-Control-Allow-Origin", "*");
       const requestData: ConvertedUser = await c.req.json();
 
       const [username, plainPassword] = requestData.credentials.split(":");
@@ -98,6 +98,7 @@ export class UserController {
       }
     } catch (error) {
       if (error instanceof Error) {
+        console.log(error);
         return c.body(error.message, 500);
       }
     }
@@ -106,18 +107,10 @@ export class UserController {
     try {
       c.res.headers.set("Access-Control-Allow-Origin", "*");
       const requestData: ConvertedUser = await c.req.json();
-
       const [username, plainPassword] = requestData.credentials.split(":");
 
-      // Salt generieren (z.B. 12 Runden)
-      const { hashedPassword, salt } = await this.hashPassword(plainPassword);
-
       const newUser = new User(
-        new UserCredential(
-          username,
-          hashedPassword,
-          salt, // optionales Salt-Feld
-        ),
+        await UserCredential.create(username, plainPassword),
         requestData.displayname,
         requestData.id,
       );
@@ -129,14 +122,5 @@ export class UserController {
         return c.body(error.message, 500);
       }
     }
-  }
-
-  private async hashPassword(plainPassword: string, salt?: string) {
-    const saltRounds = 12;
-    salt = salt ? salt : await bcrypt.genSalt(saltRounds);
-
-    // Passwort mit Salt hashen
-    const hashedPassword = await bcrypt.hash(plainPassword, salt);
-    return { hashedPassword, salt };
   }
 }
