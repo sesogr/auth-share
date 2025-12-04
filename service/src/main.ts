@@ -76,8 +76,9 @@ export const app = new Hono();
 app.use(
   "*",
   cors({
-    origin: "*",
-    allowMethods: ["GET", "POST", "PUT", "DELETE"],
+    origin: Deno.env.get("FRONT_END_URL")!,
+    credentials: true,
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   }),
 );
 //Endpoints
@@ -105,14 +106,14 @@ app.get(
   },
 );
 
-app.put(
-  "/user/me/password",
-  (c) => {
-    return userController.changePassword(
-      c,
-    );
-  },
-);
+// app.put(
+//   "/user/me/password",
+//   (c) => {
+//     return userController.changePassword(
+//       c,
+//     );
+//   },
+// );
 
 const serviceController = new ServiceController(
   serviceRepository,
