@@ -12,6 +12,7 @@ import {
   Typography,
 } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import type { SendingConvertedUser } from "./types/ConvertedUser.ts";
 
 const { Title } = Typography;
 
@@ -33,14 +34,14 @@ export default function Login(): JSX.Element {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
 
-      const res = await fetch("/api/login", {
+      const data: SendingConvertedUser = {
+        credentials: values.username + ":" + values.password,
+      };
+      const res = await fetch(import.meta.env.VITE_APIURL + "/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // wichtig, wenn Server HttpOnly-Cookies setzt
-        body: JSON.stringify({
-          username: values.username,
-          password: values.password,
-        }),
+        body: JSON.stringify(data),
         signal: controller.signal,
       });
 

@@ -18,7 +18,7 @@ const Register: React.FC = () => {
     console.log("newUserData:", newUserData);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_APIURL}/user`, {
+      const response = await fetch(import.meta.env.VITE_APIURL + "/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
