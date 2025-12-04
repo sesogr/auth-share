@@ -5,6 +5,7 @@ services:
       context: ./service
       dockerfile: ./Dockerfile
     environment:
+      FRONT_END_URL: http://localhost:3000
       DB_HOST: mariadb
       DB_NAME: authshare
       DB_USER: authshare
