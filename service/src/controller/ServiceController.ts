@@ -4,12 +4,13 @@ import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { Context } from "@hono/hono";
 import { Service } from "../classes/Service.ts";
 import { ServiceCredential } from "../classes/ServiceCredential.ts";
+import { User } from "../classes/User.ts";
 
 export class ServiceController {
   constructor(
     private readonly serviceRepository: ServiceRepository,
     private readonly userRepo: UserRepository,
-    private readonly ME = "0d7f0653-1bac-48d4-ad2b-f228759301c1",
+    private readonly ME: User,
   ) {}
 
   async listMyServices(
@@ -17,7 +18,7 @@ export class ServiceController {
   ) {
     try {
       const serviceList = await this.serviceRepository.findOwnedByUserId(
-        this.ME,
+        this.ME.getId(),
       );
       const convertedList: ConvertedService[] = serviceList.map((e) =>
         e.toJson()
@@ -38,9 +39,7 @@ export class ServiceController {
         ),
         convertedService.serviceName,
         convertedService.serviceUrl,
-        await this.userRepo.findById(
-          this.ME,
-        ),
+        this.ME,
       ); //Todo: new = new type(arguments);, convertedService.serviceName)
       await this.serviceRepository.save(service);
       return c.body!(null, 201);

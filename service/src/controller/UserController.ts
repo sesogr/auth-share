@@ -3,33 +3,26 @@ import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { User } from "../classes/User.ts";
 import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
-import { setCookie } from "@hono/hono/cookie";
-import * as bcrypt from "@bcrypt";
+import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
 
 export class UserController {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly ME: string,
+    private readonly ME: User,
   ) {}
 
-  async listMyServices(
+  listMyServices(
     c: Context,
   ) {
-    const user = await this.userRepository.findById(
-      this.ME,
-    );
-    user.listServices();
+    const list = this.ME.listServices();
     return c.json(
-      user.toJson(),
+      list,
     );
   }
 
-  async read(c: Context) {
-    const user = await this.userRepository.findById(
-      this.ME,
-    );
+  read(c: Context) {
     return c.json(
-      user.toJson(),
+      this.ME.toJson(),
     );
   }
   // async changePassword(c: Context) {
@@ -70,19 +63,32 @@ export class UserController {
   //     }
   //   }
   // }
+  async logOut(c: Context) {
+    const sessionToken = getCookie(c, "session");
+    if (!sessionToken) {
+      return c.body(null, 401);
+    }
+    const user = await this.userRepository.findBySessionToken(sessionToken);
+    user.deleteSessionByToken(sessionToken);
+    await this.userRepository.save(user);
+    deleteCookie(c, "session");
+    //redirect to sign in page --> Front End
+    return c.body(null, 201);
+  }
   async logIn(c: Context) {
     try {
       const requestData: ConvertedUser = await c.req.json();
+      console.log(requestData);
 
       const [username, plainPassword] = requestData.credentials.split(":");
 
       const userToCheck = await this.userRepository.findByUserName(username);
 
       if (
-        await bcrypt.compare(plainPassword, userToCheck.getCredentials().hash)
+        await userToCheck.getCredentials().verifyPasswordHash(plainPassword)
       ) {
+        console.log("sjfksjd");
         const { token, session } = userToCheck.createSession();
-        this.userRepository.save(userToCheck);
         setCookie(c, "session", token, {
           path: "/",
           secure: true,
@@ -92,6 +98,7 @@ export class UserController {
           expires: session.expiresAt,
           sameSite: "lax" as const,
         });
+        this.userRepository.save(userToCheck);
         return c.body(null, 200);
       } else {
         return c.body(null, 401);
@@ -103,6 +110,7 @@ export class UserController {
       }
     }
   }
+
   async create(c: Context) {
     try {
       c.res.headers.set("Access-Control-Allow-Origin", "*");
