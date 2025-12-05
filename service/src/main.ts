@@ -1,6 +1,7 @@
 import { Database, MySQLConnector } from "@denodb";
 import { Hono } from "@hono/hono";
 import { cors } from "@hono/hono/cors";
+import { except } from "@hono/hono/combine";
 import { DbUserRepository } from "./classes/Repositories/DenoDB/DbUserRepository.ts";
 import { DbGroup } from "./classes/Repositories/DenoDB/Models/DbGroup.ts";
 import { DbGroupService } from "./classes/Repositories/DenoDB/Models/DbGroupService.ts";
@@ -23,6 +24,9 @@ import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyT
 import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepository.ts";
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
+import { getCookie } from "@hono/hono/cookie";
+import { User } from "./classes/User.ts";
+import { UserCredential } from "./classes/UserCredential.ts";
 
 const db = new Database(
   new MySQLConnector({
@@ -46,7 +50,7 @@ db.link([
   DbIdDisplayname,
   DbSessions,
 ]);
-const ME = (await DbUser.first()).id;
+let ME: User = new User(await UserCredential.create("", ""));
 try {
   await db.sync();
 } catch (error) {
@@ -79,6 +83,25 @@ app.use(
     origin: Deno.env.get("FRONT_END_URL")!,
     credentials: true,
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  }),
+);
+app.use(
+  "*",
+  except(["/register", "/login"], async (c, next) => {
+    console.log(c.req.path);
+
+    try {
+      const sessiontoken = getCookie(c, "session")!;
+      ME = await userRepository.findBySessionToken(sessiontoken);
+      ME.validateSession(sessiontoken);
+      await next();
+    } catch (_error) {
+      return new Response(null, {
+        headers: c.res.headers,
+        status: 403,
+        statusText: "Session Expired",
+      });
+    }
   }),
 );
 //Endpoints
@@ -131,7 +154,7 @@ app.get(
 
 app.put();
 
-app.post("/user/register", (c) => {
+app.post("/register", (c) => {
   return userController.create(c);
 });
 
