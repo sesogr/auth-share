@@ -8,9 +8,20 @@ export class UserCredential extends ValueClass<UserCredential> {
   ) {
     super();
   }
-  public name(_newPassword: string) {
+  public async verifyPasswordHash(plainPassword: string) {
+    return await bcrypt.compare(
+      plainPassword,
+      this.hash,
+    );
+  }
+  public async changePassword(newPassword: string) {
     //neuen usercred --> alles alt außer hash neu!!
+    const { hashedPassword } = await UserCredential.hashPassword(
+      newPassword,
+      this.salt,
+    );
     //this. und this.with() nicht vergessen!!
+    return this.with({ hash: hashedPassword });
   }
   private static async hashPassword(plainPassword: string, salt?: string) {
     const saltRounds = 12;
