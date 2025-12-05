@@ -74,17 +74,16 @@ const groupsWithService = async () => {
   await serviceRepo.save(fakeService);
   await db.close();
 };
-
 const { fakeUserList } = await buildUpUserRepo();
 
-sleep(2500).then(async () => {
-  await buildUpGroupRepo(fakeUserList);
-});
-sleep(2500).then(async () => {
-  await buildUpServRepo(fakeUserList);
-});
+console.log();
+await buildUpServRepo(fakeUserList);
 
+await buildUpGroupRepo(fakeUserList);
 await groupsWithService();
+sleep(2500).then(async () => {
+  await db.close();
+});
 
 async function buildUpUserRepo() {
   const fakeUserList: User[] = await FakeObjectGen.generateFakeUsers();
@@ -116,7 +115,7 @@ async function buildUpServRepo(userList: User[]) {
 async function buildUpGroupRepo(userList: User[]) {
   const groupList: Group[] = await FakeObjectGen.generateFakeGroups(userList);
   const groupRepository = new DbGroupRepository();
-  await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
 
+  await Promise.all(groupList.map(async (e) => await groupRepository.save(e)));
   return { groupList, groupRepository };
 }
