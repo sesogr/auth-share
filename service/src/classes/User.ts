@@ -9,6 +9,9 @@ import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
 import { Session } from "./Session.ts";
 export class User extends Entity {
+  public get sessions(): Session[] {
+    return [...this._sessions];
+  }
   constructor(
     private credentials: UserCredential,
     private username: string = "",
@@ -18,7 +21,7 @@ export class User extends Entity {
     private userGroupInvitations: Invitation[] = [],
     //..includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
-    private sessions: Session[] = [],
+    private _sessions: Session[] = [],
   ) {
     super(id, username);
   }
@@ -26,11 +29,7 @@ export class User extends Entity {
 
   //controller ver
   validateSession(sessionToken: string) {
-    const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
-    const session = this.sessions.find((e) => sessionId == e.id);
-    if (session == undefined) {
-      throw new Error("Session not found!");
-    }
+    const session = this.findSessionByToken(sessionToken);
     if (Date.now() >= session.expiresAt.getTime()) {
       this.deleteSession(session);
       throw new Error("Session is expired");
@@ -43,9 +42,21 @@ export class User extends Entity {
     }
     this.validated = true;
   }
+  private findSessionByToken(sessionToken: string) {
+    const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
+    const session = this.sessions.find((e) => sessionId == e.id);
+    if (session == undefined) {
+      throw new Error("Session not found!");
+    }
+    return session;
+  }
+
+  deleteSessionByToken(token: string) {
+    this.deleteSession(this.findSessionByToken(token));
+  }
 
   deleteSession(session: Session) {
-    this.sessions = this.sessions.filter((e) => e.id != session.id);
+    this._sessions = this.sessions.filter((e) => e.id != session.id);
   }
 
   override getId(): string {
