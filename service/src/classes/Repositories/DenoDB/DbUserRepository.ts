@@ -22,8 +22,12 @@ import { Invitation } from "../../Invitation.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { DbSessions } from "./Models/DbSessions.ts";
 import { Session } from "../../Session.ts";
+import { DbRepository } from "./DbRepository.ts";
 
-export class DbUserRepository implements UserRepository {
+export class DbUserRepository extends DbRepository implements UserRepository {
+  constructor() {
+    super(DbUser, "displayname");
+  }
   async update(item: User): Promise<void> {
     await DbUser.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
@@ -38,6 +42,27 @@ export class DbUserRepository implements UserRepository {
       hash: item.getCredentials().hash,
       salt: item.getCredentials().salt,
     });
+    const _userSessionModel = await DbSessions.where("dbuser_id", item.getId())
+      .all();
+
+    const {
+      relationsToDelete: sessionsToDelete,
+      relationsToSave: sessionsToSave,
+    } = this.nTomFilter(_userSessionModel, item.sessions);
+    if (sessionsToDelete) {
+      await Promise.all(sessionsToDelete.map((e) => e.delete()));
+    }
+    if (sessionsToSave) {
+      await DbUserGroup.create(
+        sessionsToSave.map((e) => {
+          return {
+            id: e.id,
+            expiresAt: e.expiresAt,
+            dbuserId: e.userId,
+          };
+        }),
+      );
+    }
   }
   async findByUserName(name: string): Promise<User> {
     const aUser = await DbUserCredential.where("username", name).first();
@@ -57,13 +82,18 @@ export class DbUserRepository implements UserRepository {
   async removeById(id: string): Promise<void> {
     await DbUser.where("id", id).delete();
   }
+  async findBySessionToken(token: string): Promise<User> {
+    const sessionId = Session.fromSessionTokenToSessionId(token);
+    const sessionData = await DbSessions.where("id", sessionId).first();
+    return this.hydrate(sessionData.dbUserId);
+  }
   async findById(id: string): Promise<User> {
     if (!(await this.existId(id))) {
       throw new NotFoundError("");
     }
     return this.hydrate(id);
   }
-  async existId(id: string): Promise<boolean> {
+  override async existId(id: string): Promise<boolean> {
     if ((await DbUser.where("id", id).first())) {
       return true;
     } else {
@@ -103,6 +133,8 @@ export class DbUserRepository implements UserRepository {
     const result = await this.existId(item.getId());
     if (result !== true) {
       await this.add(item);
+    } else {
+      this.update(item);
     }
   }
   //User_ID=searchedId
@@ -124,7 +156,7 @@ export class DbUserRepository implements UserRepository {
         DbInvitation.field("obj_reference", "invObjRef"),
         DbInvitation.field("sender_reference", "invSendRef"),
         DbSessions.field("id", "sessionsId"),
-        DbSessions.field("expiresAt"),
+        DbSessions.field("expires_at"),
       )
       .leftJoin(
         DbUserGroup,
