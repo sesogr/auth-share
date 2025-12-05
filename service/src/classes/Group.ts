@@ -56,7 +56,7 @@ export class Group extends Entity {
   }
   static createUserGroup(groupname: string, owner: User): Group {
     const newGroup = new Group(groupname, owner.convertToShort());
-    newGroup.allowedUser.push(
+    newGroup._allowedUser.push(
       new AllowedUserGroupMap(
         owner.convertToShort(),
         newGroup.convertToShort(),

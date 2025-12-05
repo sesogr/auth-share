@@ -27,7 +27,9 @@ export class Session {
   //authtoken? jsonwebtoken = jwt .. jwtio
   //npm audit tool
   //
-
+  toString() {
+    return this.id;
+  }
   static generateRandomSessionToken = () => {
     const bytes = new Uint8Array(20);
     crypto.getRandomValues(bytes);
