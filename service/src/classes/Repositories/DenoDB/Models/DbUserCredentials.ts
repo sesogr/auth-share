@@ -5,9 +5,9 @@ export class DbUserCredential extends Model {
   static override table = "UserCredentials";
   static override timestamps = true;
   static override fields = {
-    username: DataTypes.string(40),
-    hash: DataTypes.string(40),
-    salt: DataTypes.string(40),
+    username: DataTypes.STRING,
+    hash: DataTypes.STRING,
+    salt: DataTypes.STRING,
   };
   static override get(): Promise<DbUserCredential | DbUserCredential[]> {
     return super.get() as Promise<DbUserCredential | DbUserCredential[]>;
