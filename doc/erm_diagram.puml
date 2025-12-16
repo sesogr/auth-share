@@ -1,0 +1,78 @@
+@startuml Erm_Diagram
+hide circle
+skinparam entityStyle rectangle
+skinparam linetype ortho
+skinparam defaultTextAlignment left
+skinparam shadowing false
+skinparam dpi 150
+
+entity "Users" as Users {
+  *id : UUID
+  --
+  displayname : string(40)
+  timestamps
+}
+
+entity "Groups" as Groups {
+  *id : UUID
+  --
+  groupname : string(40)
+  timestamps
+}
+
+entity "Services" as Services {
+  *id : UUID
+  --
+  serviceName : string(40)
+  timestamps
+}
+
+entity "UserGroups" as UserGroups {
+  *dbuser_id : UUID <<FK>>
+  *dbgroup_id : UUID <<FK>>
+  --
+  timestamps
+}
+
+entity "UserServices" as UserServices {
+  *dbuser_id : UUID <<FK>>
+  *dbservice_id : UUID <<FK>>
+  isOwner : boolean
+  --
+  timestamps
+}
+
+entity "UserCredentials" as UserCredentials {
+  *dbuser_id : UUID <<FK>>
+  --
+  username : string
+  password : string
+  timestamps
+}
+
+entity "ServiceCredentials" as ServiceCredentials {
+  *dbservice_id : UUID <<FK>>
+  --
+  username : string
+  password : string
+  timestamps
+}
+
+entity "Invitations" as Invitations {
+  senderReference : JSON
+  objReference : JSON
+  receiverReference : JSON
+  --
+  timestamps
+}
+
+' Relationships
+Users ||--o{ UserGroups
+Groups ||--o{ UserGroups
+
+Users ||--o{ UserServices
+Services ||--o{ UserServices
+
+Users ||--|| UserCredentials
+Services ||--|| ServiceCredentials
+@enduml
