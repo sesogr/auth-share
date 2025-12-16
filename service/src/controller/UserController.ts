@@ -25,22 +25,17 @@ export class UserController {
       this.ME.toJson(),
     );
   }
-  // async changePassword(c: Context) {
-  //   const requestData: ConvertedUser = await c.req.json();
-  //   const myself: User = await this.userRepository.findById(this.ME);
-  //   const newPassword: string = requestData.credentials.split(":")[1];
-  //   const { hashedPassword } = await UserCredential.hashPassword(
-  //     newPassword,
-  //     myself.getCredentials().salt,
-  //   );
+  async changePassword(c: Context) {
+    const requestData: ConvertedUser = await c.req.json();
+    const myself: User = await this.userRepository.findById(this.ME.getId());
+    const newPassword: string = requestData.credentials.split(":")[1];
 
-  //   //TODO we need the loggedin User here!!
-  //   myself.changeUserCredentials(
-  //     myself.getCredentials().with({ "hash": hashedPassword }),
-  //   );
-  //   this.userRepository.save(myself);
-  //   return c.body(null, 204);
-  // }
+    myself.changeUserCredentials(
+      await myself.getCredentials().changePassword(newPassword),
+    );
+    this.userRepository.save(myself);
+    return c.body(null, 204);
+  }
 
   // async create(c: Context) {
   //   try {
@@ -99,6 +94,7 @@ export class UserController {
           sameSite: "lax" as const,
         });
         this.userRepository.save(userToCheck);
+        console.log(token);
         return c.body(null, 200);
       } else {
         return c.body(null, 401);

@@ -106,7 +106,7 @@ export class User extends Entity {
   createSession() {
     const token = Session.generateRandomSessionToken();
     const session = Session.create(token, this.id);
-    this.sessions.push(session);
+    this._sessions.push(session);
     return { token, session };
   }
 

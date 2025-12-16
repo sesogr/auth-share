@@ -6,13 +6,12 @@ const Register: React.FC = () => {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: FormValues) => {
-    const { name, password } = values;
+    const { username, displayname, password } = values;
     console.log("Form values:", values);
 
     const newUserData: SendingConvertedUser = {
-      displayname: name,
-      credentials: name + ":" + password,
-      id: crypto.randomUUID(),
+      displayname: displayname,
+      credentials: username + ":" + password,
     };
 
     console.log("newUserData:", newUserData);
@@ -47,16 +46,31 @@ const Register: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              name="name"
-              label="Name"
+              name="username"
+              label="Username"
               rules={[
                 {
                   required: true,
-                  message: "Please enter your name",
+                  message: "Please enter your Username",
                 },
               ]}
             >
-              <Input placeholder="Enter your name" />
+              <Input placeholder="Enter your Username" />
+            </Form.Item>
+          </Col>
+
+          <Col span={12}>
+            <Form.Item
+              name="displayname"
+              label="Displayname"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter your Displayname",
+                },
+              ]}
+            >
+              <Input placeholder="Enter your Displayname" />
             </Form.Item>
           </Col>
 
@@ -89,6 +103,7 @@ const Register: React.FC = () => {
 export default Register;
 
 type FormValues = {
-  name: string;
+  username: string;
+  displayname: string;
   password: string;
 };

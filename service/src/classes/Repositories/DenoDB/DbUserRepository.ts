@@ -29,6 +29,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
     super(DbUser, "displayname");
   }
   async update(item: User): Promise<void> {
+    console.log(item);
     await DbUser.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
     });
@@ -53,7 +54,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
       await Promise.all(sessionsToDelete.map((e) => e.delete()));
     }
     if (sessionsToSave) {
-      await DbUserGroup.create(
+      await DbSessions.create(
         sessionsToSave.map((e) => {
           return {
             id: e.id,

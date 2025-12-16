@@ -4,7 +4,7 @@ export class DbSessions extends Model {
   static override table = "Sessions";
   static override timestamps = true;
   static override fields = {
-    id: { type: DataTypes.UUID, primaryKey: true },
+    id: { type: DataTypes.STRING, primaryKey: true },
     expiresAt: DataTypes.DATE,
   };
   id!: string;
