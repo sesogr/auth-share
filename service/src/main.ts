@@ -115,20 +115,42 @@ app.get("/data", (c) => {
   return dataController.getData(c);
 });
 
-const userController = new UserController(userRepository, ME);
+const userController = new UserController(userRepository);
+
 app.post(
   "/login",
   (c) => {
     return userController.logIn(c);
   },
 );
+app.post("/logout", (c) => {
+  return userController.logOut(c);
+});
+
 app.get(
   "/user",
   (c) => {
     return userController.read(c);
   },
 );
-
+// Neuer Endpoint: /user/:displayname (geschützt durch Middleware)
+// stellt sicher, dass eingeloggter Nutzer nur auf sein eigenes Profil zugreift
+app.get("/user/:displayname", async (c) => {
+  try {
+    const raw = c.req.param("displayname") ?? "";
+    const requested = decodeURIComponent(raw);
+    const sessionToken = getCookie(c, "session")!;
+    const me = await userRepository.findBySessionToken(sessionToken);
+    // validiere Session falls nötig
+    if (me.getDisplayName() !== requested) {
+      return c.body(null, 403);
+    }
+    return userController.read(c);
+  } catch (err) {
+    console.error(err);
+    return c.body(null, 500);
+  }
+});
 // app.put(
 //   "/user/me/password",
 //   (c) => {

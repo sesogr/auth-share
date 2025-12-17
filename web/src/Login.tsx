@@ -13,6 +13,7 @@ import {
 } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import type { SendingConvertedUser } from "./types/ConvertedUser.ts";
+import { useAuth } from "./Context/AuthContext.tsx";
 
 const { Title } = Typography;
 
@@ -26,6 +27,7 @@ export default function Login(): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const onFinish = async (values: LoginFormValues) => {
     setErrorMsg(null);
@@ -56,7 +58,7 @@ export default function Login(): JSX.Element {
         } else {
           localStorage.removeItem("rememberedUsername");
         }
-
+        login();
         navigate("/");
         return;
       }
