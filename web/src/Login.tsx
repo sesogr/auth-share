@@ -1,6 +1,6 @@
 // src/components/Login.tsx
 import { type JSX, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -27,7 +27,12 @@ export default function Login(): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, login } = useAuth();
+  if (user) {
+    return (
+      <Navigate to={`/user/${encodeURIComponent(user.displayname)}`} replace />
+    );
+  }
 
   const onFinish = async (values: LoginFormValues) => {
     setErrorMsg(null);
