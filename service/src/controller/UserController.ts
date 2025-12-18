@@ -4,21 +4,14 @@ import { User } from "../classes/User.ts";
 import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
 import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
+import { HeadController } from "./HeadController.ts";
 
-export class UserController {
+export class UserController extends HeadController {
   constructor(
-    private readonly userRepository: UserRepository,
-  ) {}
-
-  private async getMeFromContext(c: Context): Promise<User> {
-    const sessionToken = getCookie(c, "session");
-    if (!sessionToken) throw new Error("No session token");
-    const me = await this.userRepository.findBySessionToken(sessionToken);
-    // optional: validate session here to be robust
-    me.validateSession(sessionToken);
-    return me;
+    userRepository: UserRepository,
+  ) {
+    super(userRepository);
   }
-
   async listMyServices(
     c: Context,
   ) {
@@ -35,7 +28,7 @@ export class UserController {
   async changePassword(c: Context) {
     const requestData: ConvertedUser = await c.req.json();
     const me: User = await this.getMeFromContext(c);
-    const newPassword: string = requestData.credentials.split(":")[1];
+    const newPassword: string = requestData.credentials!.split(":")[1];
 
     me.changeUserCredentials(
       await me.getCredentials().changePassword(newPassword),
@@ -59,7 +52,7 @@ export class UserController {
   async logIn(c: Context) {
     try {
       const requestData: ConvertedUser = await c.req.json();
-      const [username, plainPassword] = requestData.credentials.split(":");
+      const [username, plainPassword] = requestData.credentials!.split(":");
 
       const userToCheck = await this.userRepository.findByUserName(username);
 
@@ -98,7 +91,7 @@ export class UserController {
     try {
       c.res.headers.set("Access-Control-Allow-Origin", "*");
       const requestData: ConvertedUser = await c.req.json();
-      const [username, plainPassword] = requestData.credentials.split(":");
+      const [username, plainPassword] = requestData.credentials!.split(":");
 
       const newUser = new User(
         await UserCredential.create(username, plainPassword),
