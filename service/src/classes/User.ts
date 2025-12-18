@@ -131,7 +131,6 @@ export class User extends Entity {
   }
   private toConvertedUser(): ConvertedUser {
     return {
-      credentials: this.credentials.toString(),
       displayname: this.username,
       owned: this.listServices(true),
       callable: this.listServices(),
