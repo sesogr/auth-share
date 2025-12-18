@@ -5,10 +5,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import type { SendingConvertedUser } from "../types/ConvertedUser.ts";
+import type { ReceivedConvertedUser } from "../types/ConvertedUser.ts";
 
 type AuthContextShape = {
-  user: SendingConvertedUser | null;
+  user: ReceivedConvertedUser | null;
   login: () => void;
   logout: () => void;
   isAuthenticated: boolean;
@@ -31,10 +31,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
       .then((data) => setUser(data))
       .catch(() => null);
   };
-  const [user, setUser] = useState<SendingConvertedUser | null>(null);
+  const [user, setUser] = useState<ReceivedConvertedUser | null>(null);
 
   useEffect(() => {
-  }, [user]);
+    refreshUser();
+  }, []);
 
   const login = () => {
     refreshUser();
