@@ -75,55 +75,22 @@
 
 // export default User;
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext.tsx";
 
 const User: React.FC = () => {
   const { displayname } = useParams();
   const { user } = useAuth();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        if (!displayname) return;
-        // nur eigene Seite abrufen: backend verlangt Session -> credentials: include
-        const res = await fetch(
-          `${import.meta.env.VITE_APIURL}/user/${
-            encodeURIComponent(displayname)
-          }`,
-          { credentials: "include" },
-        );
-        if (res.status === 403) throw new Error("Forbidden");
-        if (!res.ok) throw new Error("User not found");
-        const json = await res.json();
-        setData(json);
-      } catch (_err) {
-        setData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, [displayname]);
-
-  // wenn nicht eingeloggt, weiterleiten zur Login-Seite
   if (!user) return <Navigate to="/login" replace />;
-
-  // wenn displayname in URL nicht dem eingeloggten user entspricht -> 403 clientseitig
   if (displayname && user.displayname !== displayname) {
     return <div>Forbidden — das ist nicht dein Profil</div>;
   }
 
-  if (loading) return <div>Lade...</div>;
-  if (!data) return <div>Benutzer nicht gefunden oder Zugriff verweigert</div>;
-
   return (
     <div>
       <h1>Profil: {displayname}</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <pre>{JSON.stringify(user, null, 2)}</pre>
     </div>
   );
 };
