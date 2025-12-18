@@ -69,12 +69,13 @@ export class UserController {
         const { token, session } = userToCheck.createSession();
         // Hinweis: domain weglassen, secure/httpOnly/expire setzen nach Bedarf
         setCookie(c, "session", token, {
+          domain: "localhost", //Deno.env.get("FRONT_END_DOMAIN")!,
           path: "/",
           secure: true,
           httpOnly: true,
           maxAge: 1000,
           expires: session.expiresAt,
-          sameSite: "lax" as const,
+          sameSite: "None" as const,
         });
         await this.userRepository.save(userToCheck);
         // Gib Id + displayname zurück (Frontend benötigt das)

@@ -29,7 +29,6 @@ export class DbUserRepository extends DbRepository implements UserRepository {
     super(DbUser, "displayname");
   }
   async update(item: User): Promise<void> {
-    console.log(item);
     await DbUser.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
     });

@@ -5,7 +5,7 @@ services:
       context: ./service
       dockerfile: ./Dockerfile
     environment:
-      FRONT_END_URL: http://localho.st:3000
+      FRONT_END_URL: http://localhost:3000
       DB_HOST: mariadb
       DB_NAME: authshare
       DB_USER: authshare
@@ -24,7 +24,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       DENO_ENV: development
-      VITE_APIURL: http://localho.st:8000
+      VITE_APIURL: http://localhost:8000
     volumes:
       - ./web/src:/app/src
     ports:
