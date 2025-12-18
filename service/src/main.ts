@@ -88,8 +88,6 @@ app.use(
 app.use(
   "*",
   except(["/register", "/login"], async (c, next) => {
-    console.log(c.req.path);
-
     try {
       const sessiontoken = getCookie(c, "session")!;
       ME = await userRepository.findBySessionToken(sessiontoken);
@@ -133,24 +131,6 @@ app.get(
     return userController.read(c);
   },
 );
-// Neuer Endpoint: /user/:displayname (geschützt durch Middleware)
-// stellt sicher, dass eingeloggter Nutzer nur auf sein eigenes Profil zugreift
-app.get("/user/:displayname", async (c) => {
-  try {
-    const raw = c.req.param("displayname") ?? "";
-    const requested = decodeURIComponent(raw);
-    const sessionToken = getCookie(c, "session")!;
-    const me = await userRepository.findBySessionToken(sessionToken);
-    // validiere Session falls nötig
-    if (me.getDisplayName() !== requested) {
-      return c.body(null, 403);
-    }
-    return userController.read(c);
-  } catch (err) {
-    console.error(err);
-    return c.body(null, 500);
-  }
-});
 // app.put(
 //   "/user/me/password",
 //   (c) => {
@@ -163,7 +143,6 @@ app.get("/user/:displayname", async (c) => {
 const serviceController = new ServiceController(
   serviceRepository,
   userRepository,
-  ME,
 );
 app.get(
   "/user/owned",
