@@ -85,7 +85,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
   async findBySessionToken(token: string): Promise<User> {
     const sessionId = Session.fromSessionTokenToSessionId(token);
     const sessionData = await DbSessions.where("id", sessionId).first();
-    return this.hydrate(sessionData.dbUserId);
+    return this.hydrate(sessionData.dbuserId);
   }
   async findById(id: string): Promise<User> {
     if (!(await this.existId(id))) {
@@ -258,8 +258,8 @@ export class DbUserRepository extends DbRepository implements UserRepository {
           ) || record.groupId == undefined;
         } else if (type == "session") {
           return tempData[searchedId].sessions.some((s) =>
-            s!.id === record.sessionId
-          ) || record.sessionId == undefined;
+            s!.id === record.sessionsId
+          ) || record.sessionsId == undefined;
         }
         throw new RuntimeError();
       };
@@ -279,7 +279,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
       }
       if (!exists("session")) {
         tempData[searchedId].sessions.push({
-          id: record.id?.toString()!,
+          id: record.sessionsId?.toString()!,
           expiresAt: record.expiresAt?.toString()!,
         });
       }

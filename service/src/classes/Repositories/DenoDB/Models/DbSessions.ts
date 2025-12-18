@@ -9,7 +9,7 @@ export class DbSessions extends Model {
   };
   id!: string;
   expiresAt!: string;
-  dbUserId!: string;
+  dbuserId!: string;
   static override get(): Promise<DbSessions | DbSessions[]> {
     return super.get() as Promise<DbSessions | DbSessions[]>;
   }
