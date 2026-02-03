@@ -5,9 +5,9 @@ import { UserCredential } from "../src/classes/UserCredential.ts";
 import { Invitation } from "../src/classes/Invitation.ts";
 import { FakeObjectGen } from "../src/FakeObjectGen.ts";
 
-const userCredential = new UserCredential("Hans Meiser", "abcdef");
+const userCredential = new UserCredential("Hans Meiser", "abcdef", "");
 
-const user = FakeObjectGen.createFakeUser("asddh", "hallo");
+const user = await FakeObjectGen.createFakeUser("asddh", "hallo");
 function createTestGroup(): Group {
   return Group.createUserGroup("Schachverein", user);
 }
@@ -52,6 +52,7 @@ Deno.test("Group Class", async (t) => {
       const testUserCredentials: UserCredential = new UserCredential(
         "Don Receiver",
         "qwertz",
+        "",
       );
       const testReceiver: User = User.createUser(
         testUserCredentials,

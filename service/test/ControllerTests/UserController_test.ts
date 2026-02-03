@@ -13,7 +13,8 @@ const context = {
     },
   },
   req: {
-    json: () => FakeObjectGen.createFakeUser("Hans Maiser", "wh234he").toJson(),
+    json: async () =>
+      (await FakeObjectGen.createFakeUser("Hans Maiser", "wh234he")).toJson(),
   },
   //@ts-ignore any parameter
   body: (a, b) => {
@@ -27,7 +28,7 @@ Deno.test("UserController - Test", async (t) => {
       const repo = {
         save: () => Promise.resolve(),
       } as unknown as UserRepository;
-      const controller = new UserController(repo, "");
+      const controller = new UserController(repo);
       const spySave = spy(repo, "save");
       const response = await controller.create(context);
       assertEquals(response?.body, null);
@@ -65,7 +66,7 @@ Deno.test("UserController - Test", async (t) => {
       } as unknown as UserRepository;
 
       //initieren des zu testenden Objects
-      const controller = new UserController(repo, "123456");
+      const controller = new UserController(repo);
       const spyFindByID = spy(repo, "findById");
       const spySave = spy(repo, "save");
       //start der zu testenden Methode mit folgenden assertions

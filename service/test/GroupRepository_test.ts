@@ -13,6 +13,10 @@ import { NotFoundError } from "../src/errors/NotFoundError.ts";
 import { ItemAlreadyExistsError } from "../src/errors/ItemAlreadyExistsError.ts";
 import { AllowedUserGroupMap } from "../src/classes/AllowedUserGroupMap.ts";
 import { User } from "../src/classes/User.ts";
+import { promiseHooks } from "node:v8";
+import { UserCredential } from "../src/classes/UserCredential.ts";
+import { Service } from "../src/classes/Service.ts";
+import { ServiceCredential } from "../src/classes/ServiceCredential.ts";
 
 Deno.test("Group Repository", async (t) => {
   await t.step("findbyid", async (st) => {
@@ -37,8 +41,8 @@ Deno.test("Group Repository", async (t) => {
       }, ItemAlreadyExistsError);
     });
     await st.step("correct save", async (sst) => {
-      const idmap1: User = FakeObjectGen.createFakeUser();
-      const idmap2: User = FakeObjectGen.createFakeUser();
+      const idmap1: User = await FakeObjectGen.createFakeUser();
+      const idmap2: User = await FakeObjectGen.createFakeUser();
       await sst.step("Invitations", async () => {
         const invitation: Invitation = new Invitation(
           idmap1.convertToShort(),
@@ -76,7 +80,7 @@ type GroupRepoTestsuit = {
 };
 
 async function buildUp(): Promise<GroupRepoTestsuit> {
-  const groupList: Group[] = FakeObjectGen.generateFakeGroups();
+  const groupList: Group[] = await FakeObjectGen.generateFakeGroups();
   const serviceRepository = createServiceRepository(groupList);
   const groupRepository = new InMemGroupRepository(
     serviceRepository,
@@ -101,13 +105,20 @@ function createServiceRepository(
       throw new Error("Not your business");
     }),
     viewInvitedGroups: spy(() => {
-      return groupList.map((e) =>
-        new Invitation(
-          FakeObjectGen.createFakeUser().convertToShort(),
-          FakeObjectGen.createFakeService().convertToShort(),
+      return groupList.map((e) => {
+        const user = User.createUser(new UserCredential("", "", ""), "");
+        const service = Service.createService(
+          new ServiceCredential("", ""),
+          "",
+          "",
+          user,
+        ).convertToShort();
+        return new Invitation(
+          user.convertToShort(),
+          service,
           e.convertToShort(),
-        )
-      );
+        );
+      });
     }),
   };
   return serviceDatabase;

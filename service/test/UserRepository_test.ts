@@ -63,7 +63,7 @@ Deno.test("UserRepository", async (t) => {
 });
 
 async function buildUp(): Promise<UserRepoTestSuit> {
-  const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
+  const fakeUserList: User[] = await FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const serviceRepository: SpyObject<ServiceAggregateView> =
     createServiceRepository(mockUserIdList);

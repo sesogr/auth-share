@@ -5,7 +5,7 @@ Deno.test("UserClass", async (t) => {
   await t.step("name to long error", () => {
     assertThrows(() => {
       User.createUser(
-        new UserCredential("", ""),
+        new UserCredential("", "", ""),
         "i'mwayyyyytoolongandhave$pecialcharactersasmyname",
       );
     });

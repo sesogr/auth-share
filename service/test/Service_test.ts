@@ -6,10 +6,18 @@ import { Invitation } from "../src/classes/Invitation.ts";
 import { Group } from "../src/classes/Group.ts";
 
 const serviceCredential = new ServiceCredential("", "");
-const userShort = FakeObjectGen.createFakeUser(undefined, undefined, "uwe");
-const user2Short = FakeObjectGen.createFakeUser(undefined, undefined, "swe");
-const user = FakeObjectGen.createFakeUser();
-const user2 = FakeObjectGen.createFakeUser();
+const userShort = await FakeObjectGen.createFakeUser(
+  undefined,
+  undefined,
+  "uwe",
+);
+const user2Short = await FakeObjectGen.createFakeUser(
+  undefined,
+  undefined,
+  "swe",
+);
+const user = await FakeObjectGen.createFakeUser();
+const user2 = await FakeObjectGen.createFakeUser();
 const service = Service.createService(serviceCredential, "sag", "", userShort);
 Deno.test("Service Class", async (t) => {
   await t.step("Service Creates with correct Owner", () => {

@@ -41,7 +41,6 @@ Deno.test("DbUserController", async (_t) => {
   const serviceController = new ServiceController(
     new DbServiceRepository(),
     new DbUserRepository(),
-    ME,
   );
   const mockContext = {
     req: {},
