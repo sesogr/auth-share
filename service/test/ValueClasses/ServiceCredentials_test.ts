@@ -1,5 +1,5 @@
 import { assertFalse } from "@std/assert";
-import { ServiceCredential } from "../src/classes/ServiceCredential.ts";
+import { ServiceCredential } from "../../src/classes/ServiceCredential.ts";
 
 Deno.test("Value Class", async (t) => {
   const serviceCred1 = new ServiceCredential("hallo", "hallo2");

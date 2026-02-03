@@ -1,3 +1,4 @@
+import { RuntimeError } from "../errors/RuntimeError.ts";
 import { OnlyProperties } from "../types/OnlyProperties.ts";
 
 export abstract class ValueClass<T extends ValueClass<T>> {
@@ -28,6 +29,21 @@ export abstract class ValueClass<T extends ValueClass<T>> {
   with(newData: Partial<OnlyProperties<T>>): T {
     const instance = Object.create(Object.getPrototypeOf(this));
     Object.assign(instance, this);
+    if (
+      !Object.keys(newData).every((e) =>
+        Object.keys(instance).some((f) => e == f)
+      ) || Object.keys(newData).some((e) =>
+        Object.keys(instance).every((f) =>
+          e != f
+        )
+      )
+    ) {
+      throw new RuntimeError(
+        `${JSON.stringify(newData)} is not applicable to ${
+          JSON.stringify(this)
+        }`,
+      );
+    }
     return Object.assign(instance, newData);
   }
 }

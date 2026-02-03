@@ -6,7 +6,8 @@
     "hooks:install": "deno run --allow-read=deno.json,.git/hooks/ --allow-write=.git/hooks/ jsr:@hongminhee/deno-task-hooks",
     "hooks:pre-commit": "deno task check",
     "deno-check": "deno task check-web && deno task check-service",
-    "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts"
+    "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts",
+    "coverTest": "deno test --coverage --allow-import && deno coverage --lcov > coverage.lcov"
   },
   "imports": {
     "@bcrypt": "https://deno.land/x/bcrypt/mod.ts",
