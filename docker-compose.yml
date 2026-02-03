@@ -4,6 +4,8 @@ services:
     build:
       context: ./service
       dockerfile: ./Dockerfile
+    security_opt:
+      - label=disable
     environment:
       FRONT_END_URL: http://localhost:3000
       DB_HOST: mariadb
@@ -15,13 +17,15 @@ services:
       - ./service:/app
     ports:
       - "8000:8000"
-    entrypoint: ["deno", "run", "--allow-import", "dev"]
+    entrypoint: ["deno", "run" ,"--allow-all", "--watch" ,"src/main.ts"]
 
   web-dev:
     container_name: dev-web
     build:
       context: ./web
       dockerfile: ./Dockerfile
+    security_opt:
+      - label=disable
     environment:
       DENO_ENV: development
       VITE_APIURL: http://localhost:8000

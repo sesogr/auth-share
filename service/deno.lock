@@ -3,7 +3,9 @@
   "specifiers": {
     "jsr:@hono/hono@^4.9.10": "4.9.10",
     "jsr:@jackfiszr/faker@1.1.6": "1.1.6",
+    "jsr:@std/assert@1.0.15": "1.0.15",
     "jsr:@std/encoding@*": "1.0.10",
+    "jsr:@std/internal@^1.0.12": "1.0.12",
     "npm:@types/node@*": "24.2.0"
   },
   "jsr": {
@@ -13,8 +15,17 @@
     "@jackfiszr/faker@1.1.6": {
       "integrity": "0d04ca2a13889243670c17ef30d318208c918a7c6a5afbdb6e0958d4cd71e98b"
     },
+    "@std/assert@1.0.15": {
+      "integrity": "d64018e951dbdfab9777335ecdb000c0b4e3df036984083be219ce5941e4703b",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
+    },
+    "@std/internal@1.0.12": {
+      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
     }
   },
   "npm": {
