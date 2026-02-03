@@ -1,34 +1,50 @@
-import { DuplicateError } from "../errors/DuplicateError.ts";
 import { ValueClass } from "./ValueClass.ts";
-
-export class UserCredential extends ValueClass {
-  public get password(): string {
-    return this._password;
-  }
-  public get username(): string {
-    return this._username;
-  }
+import * as bcrypt from "@bcrypt";
+export class UserCredential extends ValueClass<UserCredential> {
   constructor(
-    private readonly _username: string,
-    private readonly _password: string,
+    readonly username: string,
+    readonly hash: string,
+    readonly salt: string,
   ) {
     super();
   }
-  override toString() {
-    return `${this.username}:${this.password}`;
+  public async verifyPasswordHash(plainPassword: string) {
+    return await bcrypt.compare(
+      plainPassword,
+      this.hash,
+    );
   }
-  override with(
-    newStuff: { username?: string; password?: string },
-  ): UserCredential {
-    const newName = newStuff.username ?? this.username;
-    const newPassword = newStuff.password ?? this.password;
-    const newCred = new UserCredential(newName, newPassword);
-    if (newCred.equals(this)) {
-      throw new DuplicateError(newCred.toString() + " is the same");
-    }
-    return newCred;
+  public async changePassword(newPassword: string) {
+    //neuen usercred --> alles alt außer hash neu!!
+    const { hashedPassword } = await UserCredential.hashPassword(
+      newPassword,
+      this.salt,
+    );
+    //this. und this.with() nicht vergessen!!
+    return this.with({ hash: hashedPassword });
   }
-  override copy(): UserCredential {
-    return new UserCredential(this.username, this.password);
+  private static async hashPassword(plainPassword: string, salt?: string) {
+    const saltRounds = 12;
+    salt = salt ? salt : await bcrypt.genSalt(saltRounds);
+
+    // Passwort mit Salt hashen
+    const hashedPassword = await bcrypt.hash(plainPassword, salt);
+    return { hashedPassword, salt };
+  }
+  static async create(username: string, plainPassword: string) {
+    // Salt generieren (z.B. 12 Runden)
+    const { hashedPassword, salt } = await this.hashPassword(plainPassword);
+    return new UserCredential(
+      username,
+      hashedPassword,
+      salt, // optionales Salt-Feld
+    );
   }
 }
+
+// Deno.test("jdsj", () => {
+//   console.log(new UserCredential("a", "b").toString());
+// });
+//Deno.test("With from valueClass", () => {
+//  console.log(new UserCredential("a", "b").with({ "username": "c" }));
+//});

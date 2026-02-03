@@ -1,41 +1,27 @@
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
+import { IdNameMap } from "./IdNameMap.ts";
 import { ValueClass } from "./ValueClass.ts";
 
-export class AllowedGroupServiceMap extends ValueClass {
-  override with(_: object): ValueClass {
-    throw new Error("Method not implemented.");
+export class AllowedGroupServiceMap extends ValueClass<AllowedGroupServiceMap> {
+  public get getGroupId(): string {
+    return this.groupRef.id;
   }
-  override copy(): ValueClass {
-    throw new Error("Method not implemented.");
+  public get getGroupname(): string {
+    return this.groupRef.displayname;
   }
-  public get groupId(): string {
-    return this._groupRef.id;
+  public get getServiceId(): string {
+    return this.serviceRef.id;
   }
-  public get groupname(): string {
-    return this._groupRef.displayname;
-  }
-  public get serviceId(): string {
-    return this._serviceRef.id;
-  }
-  public get servicename(): string {
-    return this._serviceRef.displayname;
-  }
-
-  public get serviceRef(): ShortEntity {
-    return this._serviceRef;
-  }
-
-  public get groupRef(): ShortEntity {
-    return this.groupRef;
+  public get getServicename(): string {
+    return this.serviceRef.displayname;
   }
 
   constructor(
-    private readonly _groupRef: ShortEntity,
-    private readonly _serviceRef: ShortEntity,
+    readonly groupRef: IdNameMap,
+    readonly serviceRef: IdNameMap,
   ) {
     super();
   }
   override toString(): string {
-    return `${this.groupId}:${this.serviceId}`;
+    return `${this.getGroupId}:${this.getServiceId}`;
   }
 }

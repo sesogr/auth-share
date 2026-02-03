@@ -21,7 +21,7 @@ export abstract class InMemoryRepository<T extends Displayable & Entity>
     return hydratedItem;
   }
 
-  findByName(name: string): Promise<T> {
+  findByDisplayName(name: string): Promise<T> {
     const item = this.inMemList.find((i) => i.getDisplayName() === name);
     if (!item) {
       throw new NotFoundError(`Item with name=${name} not found`);

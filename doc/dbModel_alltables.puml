@@ -1,0 +1,70 @@
+@startuml Alltables
+
+class DbUser {
+  +displayname: string
+  +id: UUID
+}
+
+class DbGroup {
+  +groupname: string
+  +id: UUID
+}
+
+class DbService {
+  +serviceName: string
+  +id: UUID
+}
+
+class DbUserGroup {
+  +dbuser_id: UUID
+  +dbgroup_id: UUID
+}
+
+class DbUserService {
+  +dbuser_id: UUID
+  +dbservice_id: UUID
+  +isOwner: boolean
+}
+
+class DbUserCredential {
+  +dbuser_id: UUID
+  +username: string
+  +password: string
+}
+
+class DbServiceCredential {
+  +dbservice_id: UUID
+  +username: string
+  +password: string
+}
+
+class DbInvitation {
+  +senderReference: JSON
+  +objReference: JSON
+  +receiverReference: JSON
+}
+
+DbUser --> DbUserGroup : hasMany
+DbUser --> DbUserService : hasMany
+DbUser --> DbUserCredential : hasMany
+
+DbGroup --> DbUserGroup : hasMany
+
+DbService --> DbUserService : hasMany
+DbService --> DbServiceCredential : hasMany
+
+DbUserGroup --> DbUser : belongsTo
+DbUserGroup --> DbGroup : belongsTo
+
+DbUserService --> DbUser : belongsTo
+DbUserService --> DbService : belongsTo
+
+DbUserCredential --> DbUser : belongsTo
+
+DbServiceCredential --> DbService : belongsTo
+
+DbInvitation --> DbUser : belongsTo
+DbInvitation --> DbGroup : belongsTo
+DbInvitation --> DbService : belongsTo
+
+@enduml

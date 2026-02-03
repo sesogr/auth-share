@@ -52,7 +52,7 @@ export class DbServiceRepository extends DbRepository
     }
     return this.hydrate(id);
   }
-  findByName(_name: string): Promise<Service> {
+  findByDisplayName(_name: string): Promise<Service> {
     throw new Error("Method not implemented.");
   }
   findAll(): Promise<Service[]> {
@@ -64,8 +64,8 @@ export class DbServiceRepository extends DbRepository
       serviceUrl: item.serviceUrl,
     });
     await DbServiceCredential.where("dbservice_id", item.getId()).update({
-      username: item.credentials.username,
-      password: item.credentials.password,
+      username: item.credentials.username!,
+      password: item.credentials.password!,
     });
     await DbIdDisplayname.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
@@ -86,8 +86,8 @@ export class DbServiceRepository extends DbRepository
       groupRelationsToSave.map((e) => {
         return {
           id: e.toString(),
-          dbserviceId: e.serviceId,
-          dbgroupId: e.groupId,
+          dbserviceId: e.getServiceId,
+          dbgroupId: e.getGroupId,
         };
       }),
     );
@@ -108,8 +108,8 @@ export class DbServiceRepository extends DbRepository
     await DbUserService.create(userRelationsToSave.map((e) => {
       return {
         id: e.toString(),
-        dbuserId: e.userId,
-        dbserviceId: e.serviceId,
+        dbuserId: e.getUserId,
+        dbserviceId: e.getServiceId,
         is_owner: e.isOwner,
       };
     }));
@@ -127,6 +127,7 @@ export class DbServiceRepository extends DbRepository
         serviceUrl: item.serviceUrl,
       });
       await DbServiceCredential.create({
+        //@ts-ignore dbservice_id doesnt get typed, but dbuser_id does get typed, so i am not sure where the issue is yet.
         dbservice_id: item.getId(),
         username: item.credentials.username,
         password: item.credentials.password,
@@ -139,8 +140,8 @@ export class DbServiceRepository extends DbRepository
         item.allowedUsers.map((allowedUsermap) => {
           return {
             id: allowedUsermap.toString(),
-            dbuser_id: allowedUsermap.userId,
-            dbservice_id: allowedUsermap.serviceId,
+            dbuser_id: allowedUsermap.getUserId,
+            dbservice_id: allowedUsermap.getServiceId,
             is_owner: allowedUsermap.isOwner,
           };
         }),
@@ -150,8 +151,8 @@ export class DbServiceRepository extends DbRepository
           item.allowedGroups.map((allowedGroupmap) => {
             return {
               id: allowedGroupmap.toString(),
-              dbgroup_id: allowedGroupmap.groupId,
-              dbservice_id: allowedGroupmap.serviceId,
+              dbgroup_id: allowedGroupmap.getGroupId,
+              dbservice_id: allowedGroupmap.getServiceId,
             };
           }),
         );

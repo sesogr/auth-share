@@ -5,6 +5,7 @@ import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { Invitation } from "../../Invitation.ts";
+import { Session } from "../../Session.ts";
 
 export class DbRepository {
   constructor(
@@ -30,6 +31,10 @@ export class DbRepository {
     modelList: Model[],
     objectRelationList: Invitation[],
   ): { relationsToDelete: Model[]; relationsToSave: Invitation[] };
+  protected nTomFilter(
+    modelList: Model[],
+    objectRelationList: Session[],
+  ): { relationsToDelete: Model[]; relationsToSave: Session[] };
   //n:m Model Filter Methode
   //
   protected nTomFilter(
@@ -40,7 +45,8 @@ export class DbRepository {
       | AllowedGroupServiceMap[]
       | AllowedUserGroupMap[]
       | AllowedUserServiceMap[]
-      | Invitation[],
+      | Invitation[]
+      | Session[],
   ): {
     //Difference between old and new List
     // --> Delete(if allowence of user and Groups are cancled or any kind of Invitations are expired) or Save(if there are new allowence for User or Groups as well as any new kind of Invitations)
@@ -50,6 +56,7 @@ export class DbRepository {
       | AllowedUserGroupMap
       | AllowedUserServiceMap
       | Invitation
+      | Session
     )[];
   } {
     const relationsToDelete = modelList.filter((e) =>

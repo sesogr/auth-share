@@ -1,9 +1,9 @@
 import { GroupAggregateView } from "../../../interfaceTypes/GroupAggregateView.ts";
 import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
+import { Session } from "../../Session.ts";
 import { User } from "../../User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
-
 export class InMemUserRepository extends InMemoryRepository<User>
   implements UserRepository {
   constructor(
@@ -11,6 +11,21 @@ export class InMemUserRepository extends InMemoryRepository<User>
     private groupRepoView: GroupAggregateView,
   ) {
     super();
+  }
+  async findByUserName(username: string): Promise<User> {
+    return this.hydrate(
+      (await this.findAll()).find((e) =>
+        e.getCredentials().username == username
+      )!,
+    );
+  }
+  async findBySessionToken(sessiontoken: string): Promise<User> {
+    const sessionid = Session.fromSessionTokenToSessionId(sessiontoken);
+    return this.hydrate(
+      (await this.findAll()).find((e) =>
+        e.sessions.find((e) => e.id == sessionid)
+      )!,
+    );
   }
 
   override save(item: User): Promise<void> {
@@ -26,13 +41,13 @@ export class InMemUserRepository extends InMemoryRepository<User>
     const displayname = item.getDisplayName();
     const credentials = item.getCredentials();
     const serviceList = this.serviceRepoView.viewAllowedUser().filter((e) =>
-      e.userId === id
+      e.getUserId === id
     );
     const joinedGroups = this.groupRepoView.viewAllowedUser().filter((e) =>
-      e.userId === id
+      e.getUserId === id
     );
     const invitations = this.groupRepoView.viewInvitations().filter((e) =>
-      e.receiverReference.id === id
+      e.receiverId === id
     );
     const user: User = new User(
       credentials,

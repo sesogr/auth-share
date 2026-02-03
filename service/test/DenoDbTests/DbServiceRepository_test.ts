@@ -4,8 +4,8 @@ import { stub } from "@std/testing/mock";
 import { assert, assertEquals } from "@std/assert";
 
 Deno.test("DbServiceRepository - Save()", async (t) => {
-  const fakeService = FakeObjectGen.createFakeService();
-  const id = fakeService.getId();
+  const fakeService = await FakeObjectGen.createFakeService();
+  const id = fakeService;
   let idReturn: boolean;
   let displaynameReturn: boolean;
 
@@ -42,7 +42,7 @@ Deno.test("DbServiceRepository - Save()", async (t) => {
     );
 
     if (stubExistId.calls.length >= 1) {
-      assertEquals(stubExistId.calls[0].args[0], id);
+      assertEquals(stubExistId.calls[0].args[0], fakeService.getId());
     }
     if (stubExistDisplayname.calls.length >= 1) {
       assertEquals(
@@ -56,9 +56,8 @@ Deno.test("DbServiceRepository - Save()", async (t) => {
     restoreStubs();
     idReturn = false;
     displaynameReturn = false;
-
     await repo.save(fakeService);
-    assertEquals(stubExistId.calls[0].args[0], id);
+    assertEquals(stubExistId.calls[0].args[0], fakeService.getId());
     assertEquals(
       stubExistDisplayname.calls[0].args[0],
       fakeService.getDisplayName(),

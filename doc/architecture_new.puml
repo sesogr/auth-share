@@ -1,0 +1,69 @@
+@startuml Klassediagramm
+
+abstract class ValueClass<T extends ValueClass<T>> {
+  
+  +equals(that: T): boolean
+  +toString(): string
+  +copy(): T
+  +with(newData: Partial<OnlyProperties<T>>): T
+  
+  <<constructor>>
+  ValueClass()
+}
+
+class ServiceCredential extends ValueClass<ServiceCredential> {
+  -username: string
+  -password: string
+}
+
+class UserCredential extends ValueClass<UserCredential> {
+  -username: string
+  -password: string
+}
+
+class Session extends ValueClass<Session> {
+  +expiresAt: Date
+  +userId: string
+  +id: string
+  
+  +create(sessionToken: string, userId: string): Session
+  +toString(): string
+  +generateRandomSessionToken(): string
+  +readonly REFRESH_INTERVAL_MS: number
+  +readonly MAX_DURATION_MS: number
+  +readonly fromSessionTokenToSessionId(sessionToken: string): string
+}
+
+struct Invitation extends ValueClass<Invitation> {
+  +sendername: string
+  +objReference: string
+  +receiverReference: string
+}
+
+entity User extends Entity {
+  -credentials: UserCredential
+  -username: string
+  # id: string
+  -callableService: List<AllowedUserServiceMap>
+  -userGroupInvitations: List<Invitation>
+  -joinedGroups: List<AllowedUserGroupMap>
+  -_sessions: List<Session>
+  
+  +listOwnedServices(): List<Service>
+  {static}authenticate(Param1..or Credential_obj): User
+  addInvitation(:Invitation)
+  listServices(): List<Service>
+  changeUserCredentials(:UserCredential)
+  
+  listOwnedGroups(): List<Group>
+  listUsergroups(): List<Group>
+  listUsergroupInvitation(): List<Invitation>
+  validateSession(sessionToken: string): Void
+  findSessionByToken(sessionToken: string): Session
+  deleteSessionByToken(token: string): Void
+  deleteSession(session: Session): Void
+  
+  requestAuthorization(:Service)
+}
+
+@enduml

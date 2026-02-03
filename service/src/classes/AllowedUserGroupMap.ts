@@ -1,45 +1,28 @@
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
+import { IdNameMap } from "./IdNameMap.ts";
 import { ValueClass } from "./ValueClass.ts";
 
-export class AllowedUserGroupMap extends ValueClass {
-  override with(_: object): ValueClass {
-    throw new Error("Method not implemented.");
-  }
-  override copy(): ValueClass {
-    throw new Error("Method not implemented.");
-  }
-  public get groupId(): string {
-    return this._groupRef.id;
+export class AllowedUserGroupMap extends ValueClass<AllowedUserGroupMap> {
+  public get getGroupId(): string {
+    return this.groupRef.id;
   }
 
-  public get groupRef(): ShortEntity {
-    return this._groupRef;
+  public get getGroupname(): string {
+    return this.groupRef.displayname;
   }
-
-  public get userRef(): ShortEntity {
-    return this._userRef;
+  public get getUserId(): string {
+    return this.userRef.id;
   }
-
-  public get groupname(): string {
-    return this._groupRef.displayname;
-  }
-  public get userId(): string {
-    return this._userRef.id;
-  }
-  public get username(): string {
-    return this._userRef.displayname;
-  }
-  public get isOwner(): boolean {
-    return this._isOwner;
+  public get getUsername(): string {
+    return this.userRef.displayname;
   }
   constructor(
-    private readonly _userRef: ShortEntity,
-    private readonly _groupRef: ShortEntity,
-    private readonly _isOwner: boolean = false,
+    readonly userRef: IdNameMap,
+    readonly groupRef: IdNameMap,
+    readonly isOwner: boolean = false,
   ) {
     super();
   }
   override toString(): string {
-    return `${this.userId}:${this.groupId}:${this.isOwner}`;
+    return `${this.getUserId}:${this.getGroupId}:${this.isOwner}`;
   }
 }

@@ -37,7 +37,7 @@ Deno.test("UserRepository", async (t) => {
     const { fakeUserList, userRepository }: UserRepoTestSuit = await buildUp();
     //changing index of the fakeUserList > 9 => Test failed
     const userName: string = fakeUserList[9].getDisplayName();
-    const toCheck: string = (await userRepository.findByName(userName))
+    const toCheck: string = (await userRepository.findByDisplayName(userName))
       .getDisplayName();
 
     assertEquals(toCheck, userName);
@@ -63,7 +63,7 @@ Deno.test("UserRepository", async (t) => {
 });
 
 async function buildUp(): Promise<UserRepoTestSuit> {
-  const fakeUserList: User[] = FakeObjectGen.generateFakeUsers();
+  const fakeUserList: User[] = await FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const serviceRepository: SpyObject<ServiceAggregateView> =
     createServiceRepository(mockUserIdList);

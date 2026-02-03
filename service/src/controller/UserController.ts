@@ -3,56 +3,102 @@ import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { User } from "../classes/User.ts";
 import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
+import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
+import { HeadController } from "./HeadController.ts";
 
-export class UserController {
+export class UserController extends HeadController {
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly ME: string,
-  ) {}
-
+    userRepository: UserRepository,
+  ) {
+    super(userRepository);
+  }
   async listMyServices(
     c: Context,
   ) {
-    const user = await this.userRepository.findById(
-      this.ME,
-    );
-    user.listServices();
-    return c.json(
-      user.toJson(),
-    );
+    const me = await this.getMeFromContext(c);
+    const list = me.listServices();
+    return c.json(list);
   }
 
   async read(c: Context) {
-    const user = await this.userRepository.findById(
-      this.ME,
-    );
-    return c.json(
-      user.toJson(),
-    );
+    const me = await this.getMeFromContext(c);
+    return c.json(me.toJson());
   }
+
   async changePassword(c: Context) {
     const requestData: ConvertedUser = await c.req.json();
-    const newPassword: string = requestData.credentials.split(":")[1];
-    //TODO we need the loggedin User here!!
-    const myself: User = await this.userRepository.findById(this.ME);
-    myself.changeUserCredentials(
-      new UserCredential(myself.getCredentials().username, newPassword),
+    const me: User = await this.getMeFromContext(c);
+    const newPassword: string = requestData.credentials!.split(":")[1];
+
+    me.changeUserCredentials(
+      await me.getCredentials().changePassword(newPassword),
     );
-    this.userRepository.save(myself);
+    await this.userRepository.save(me);
     return c.body(null, 204);
   }
+
+  async logOut(c: Context) {
+    const sessionToken = getCookie(c, "session");
+    if (!sessionToken) {
+      return c.body(null, 401);
+    }
+    const user = await this.userRepository.findBySessionToken(sessionToken);
+    user.deleteSessionByToken(sessionToken);
+    await this.userRepository.save(user);
+    deleteCookie(c, "session");
+    return c.body(null, 200);
+  }
+
+  async logIn(c: Context) {
+    try {
+      const requestData: ConvertedUser = await c.req.json();
+      const [username, plainPassword] = requestData.credentials!.split(":");
+
+      const userToCheck = await this.userRepository.findByUserName(username);
+
+      if (
+        await userToCheck.getCredentials().verifyPasswordHash(plainPassword)
+      ) {
+        const { token, session } = userToCheck.createSession();
+        // Hinweis: domain weglassen, secure/httpOnly/expire setzen nach Bedarf
+        setCookie(c, "session", token, {
+          domain: "localhost", //Deno.env.get("FRONT_END_DOMAIN")!,
+          path: "/",
+          secure: true,
+          httpOnly: true,
+          maxAge: 1000,
+          expires: session.expiresAt,
+          sameSite: "None" as const,
+        });
+        await this.userRepository.save(userToCheck);
+        // Gib Id + displayname zurück (Frontend benötigt das)
+        return c.json({
+          id: userToCheck.getId(),
+          displayname: userToCheck.getDisplayName(),
+        }, 200);
+      } else {
+        return c.body(null, 401);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error);
+        return c.body(error.message, 500);
+      }
+    }
+  }
+
   async create(c: Context) {
     try {
       c.res.headers.set("Access-Control-Allow-Origin", "*");
       const requestData: ConvertedUser = await c.req.json();
+      const [username, plainPassword] = requestData.credentials!.split(":");
+
       const newUser = new User(
-        new UserCredential(
-          requestData.credentials.split(":")[0],
-          requestData.credentials.split(":")[1],
-        ),
+        await UserCredential.create(username, plainPassword),
         requestData.displayname,
         requestData.id,
       );
+
       await this.userRepository.save(newUser);
       return c.body(null, 201);
     } catch (error) {

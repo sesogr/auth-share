@@ -54,8 +54,8 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       groupRelationsToSave.map((e) => {
         return {
           id: e.toString(),
-          dbuserId: e.userId,
-          dbgroupId: e.groupId,
+          dbuserId: e.getUserId,
+          dbgroupId: e.getGroupId,
         };
       }),
     );
@@ -64,7 +64,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
     await this.updateInvitation(item);
   }
 
-  async findByName(name: string): Promise<Group> {
+  async findByDisplayName(name: string): Promise<Group> {
     const searchedName = await DbGroup.where("groupname", name).first();
     return this.hydrate(searchedName.id?.toString() ?? "");
   }
@@ -372,7 +372,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       await DbUserGroup.create(item.allowedUser.map((e) => {
         return {
           id: e.toString(),
-          dbuser_id: e.userId,
+          dbuser_id: e.getUserId,
           dbgroup_id: item.getId(),
           isOwner: e.isOwner,
         };

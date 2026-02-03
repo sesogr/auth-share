@@ -26,7 +26,7 @@ Deno.test("ServiceRepository", async (t) => {
     //   "owner-id"
     // );
     const user = new User(
-      new UserCredential("credentials-id", "credentials-secret"),
+      new UserCredential("credentials-id", "credentials-secret", ""),
       "TestUser1234",
       "1234567",
     );
@@ -52,7 +52,7 @@ type ServiceRepositoryTestsuit = {
 };
 
 async function buildUp(): Promise<ServiceRepositoryTestsuit> {
-  const serviceList: Service[] = FakeObjectGen.generateFakeServices();
+  const serviceList: Service[] = await FakeObjectGen.generateFakeServices();
   const serviceRepository: ServiceRepository = new InMemServiceRepository();
   await Promise.all(
     serviceList.map(async (e) => await serviceRepository.save(e)),

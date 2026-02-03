@@ -20,8 +20,14 @@ import { DbInvitation } from "./Models/DbInvitation.ts";
 import { UserCredential } from "../../UserCredential.ts";
 import { Invitation } from "../../Invitation.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
+import { DbSessions } from "./Models/DbSessions.ts";
+import { Session } from "../../Session.ts";
+import { DbRepository } from "./DbRepository.ts";
 
-export class DbUserRepository implements UserRepository {
+export class DbUserRepository extends DbRepository implements UserRepository {
+  constructor() {
+    super(DbUser, "displayname");
+  }
   async update(item: User): Promise<void> {
     await DbUser.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
@@ -33,19 +39,53 @@ export class DbUserRepository implements UserRepository {
 
     await DbUserCredential.where("dbuser_id", item.getId()).update({
       username: item.getCredentials().username,
-      password: item.getCredentials().password,
+      hash: item.getCredentials().hash,
+      salt: item.getCredentials().salt,
     });
+    const _userSessionModel = await DbSessions.where("dbuser_id", item.getId())
+      .all();
+
+    const {
+      relationsToDelete: sessionsToDelete,
+      relationsToSave: sessionsToSave,
+    } = this.nTomFilter(_userSessionModel, item.sessions);
+    if (sessionsToDelete) {
+      await Promise.all(sessionsToDelete.map((e) => e.delete()));
+    }
+    if (sessionsToSave) {
+      await DbSessions.create(
+        sessionsToSave.map((e) => {
+          return {
+            id: e.id,
+            expiresAt: e.expiresAt,
+            dbuserId: e.userId,
+          };
+        }),
+      );
+    }
+  }
+  async findByUserName(name: string): Promise<User> {
+    const aUser = await DbUserCredential.where("username", name).first();
+    if (!aUser.username) {
+      throw new Error("User by Username not found!");
+    }
+    return this.hydrate(aUser.dbuserId);
   }
 
-  async findByName(name: string): Promise<User> {
+  async findByDisplayName(name: string): Promise<User> {
     const aUser = await DbUser.where("displayname", name).first();
-    if (!aUser.id) {
-      throw new Error("User not found");
+    if (!aUser.displayname) {
+      throw new Error("User by Displayname not found!");
     }
-    return this.hydrate(aUser.id.toString());
+    return this.hydrate(aUser.id);
   }
   async removeById(id: string): Promise<void> {
     await DbUser.where("id", id).delete();
+  }
+  async findBySessionToken(token: string): Promise<User> {
+    const sessionId = Session.fromSessionTokenToSessionId(token);
+    const sessionData = await DbSessions.where("id", sessionId).first();
+    return this.hydrate(sessionData.dbuserId);
   }
   async findById(id: string): Promise<User> {
     if (!(await this.existId(id))) {
@@ -53,7 +93,7 @@ export class DbUserRepository implements UserRepository {
     }
     return this.hydrate(id);
   }
-  async existId(id: string): Promise<boolean> {
+  override async existId(id: string): Promise<boolean> {
     if ((await DbUser.where("id", id).first())) {
       return true;
     } else {
@@ -77,7 +117,8 @@ export class DbUserRepository implements UserRepository {
       await DbUserCredential.create({
         dbuser_id: item.getId(),
         username: item.getCredentials().username,
-        password: item.getCredentials().password,
+        hash: item.getCredentials().hash,
+        salt: item.getCredentials().salt,
       });
       await DbIdDisplayname.create({
         id: item.getId(),
@@ -92,6 +133,8 @@ export class DbUserRepository implements UserRepository {
     const result = await this.existId(item.getId());
     if (result !== true) {
       await this.add(item);
+    } else {
+      this.update(item);
     }
   }
   //User_ID=searchedId
@@ -100,17 +143,20 @@ export class DbUserRepository implements UserRepository {
       .select(
         DbUser.field("displayname", "username"),
         DbUserCredential.field("username", "un_cred"),
-        DbUserCredential.field("password", "pw_cred"),
+        DbUserCredential.field("hash", "pw_cred"),
+        DbUserCredential.field("salt"),
         DbIdDisplaynameService.field("displayname", "service"),
-        DbIdDisplaynameService.field("id", "serviceID"),
+        DbIdDisplaynameService.field("id", "serviceId"),
         DbUserService.field("is_owner", "serviceOwner"),
         DbIdDisplaynameGroups.field("displayname", "group"),
-        DbIdDisplaynameGroups.field("id", "groupID"),
+        DbIdDisplaynameGroups.field("id", "groupId"),
         DbUserGroup.field("is_owner", "groupOwner"),
         DbIdDisplaynameInvitationsObj.field("displayname", "invObjRefName"),
         DbIdDisplaynameInvitationsSender.field("displayname", "invSendRefName"),
         DbInvitation.field("obj_reference", "invObjRef"),
         DbInvitation.field("sender_reference", "invSendRef"),
+        DbSessions.field("id", "sessionsId"),
+        DbSessions.field("expires_at"),
       )
       .leftJoin(
         DbUserGroup,
@@ -152,6 +198,11 @@ export class DbUserRepository implements UserRepository {
         DbIdDisplaynameGroups.field("id"),
         DbUserGroup.field("dbgroup_id"),
       )
+      .leftJoin(
+        DbSessions,
+        DbSessions.field("dbuser_id"),
+        DbUser.field("id"),
+      )
       .where(DbUser.field("id"), searchedId)
       .get() as Model[];
 
@@ -160,6 +211,7 @@ export class DbUserRepository implements UserRepository {
         credentials: {
           un_cred: string;
           pw_cred: string;
+          salt: string;
         };
         displayname: string;
         services: [
@@ -172,6 +224,7 @@ export class DbUserRepository implements UserRepository {
             senderRef: { id: string; displayname: string };
           };
         };
+        sessions: [{ id: string; expiresAt: string }?];
       };
     } = {};
 
@@ -181,15 +234,17 @@ export class DbUserRepository implements UserRepository {
           credentials: {
             un_cred: record.unCred?.toString()!,
             pw_cred: record.pwCred?.toString()!,
+            salt: record.salt?.toString()!,
           },
           displayname: record.username?.toString()!,
           services: [],
           groups: [],
           invitations: {},
+          sessions: [],
         };
       }
 
-      const exists = (type: "service" | "group"): boolean => {
+      const exists = (type: "service" | "group" | "session"): boolean => {
         if (type == "service") {
           return tempData[searchedId].services.some((
             s,
@@ -201,6 +256,10 @@ export class DbUserRepository implements UserRepository {
           return tempData[searchedId].groups.some((g) =>
             g!.groupId === record.groupId
           ) || record.groupId == undefined;
+        } else if (type == "session") {
+          return tempData[searchedId].sessions.some((s) =>
+            s!.id === record.sessionsId
+          ) || record.sessionsId == undefined;
         }
         throw new RuntimeError();
       };
@@ -216,6 +275,12 @@ export class DbUserRepository implements UserRepository {
           groupname: record.group?.toString()!,
           groupId: record.groupId?.toString()!,
           is_owner: record.groupOwner?.valueOf() as boolean,
+        });
+      }
+      if (!exists("session")) {
+        tempData[searchedId].sessions.push({
+          id: record.sessionsId?.toString()!,
+          expiresAt: record.expiresAt?.toString()!,
         });
       }
       if (record.invObjRef == undefined) continue;
@@ -238,6 +303,7 @@ export class DbUserRepository implements UserRepository {
     const credentials = new UserCredential(
       temp.credentials.un_cred,
       temp.credentials.pw_cred,
+      temp.credentials.salt,
     );
     const displayname = temp.displayname;
     const userRef = new IdNameMap(searchedId, displayname);
@@ -263,6 +329,12 @@ export class DbUserRepository implements UserRepository {
         e?.is_owner,
       )
     );
+    let sessions: Session[] = [];
+    if (temp.sessions.length > 0) {
+      sessions = temp.sessions.map((e) =>
+        new Session(e!.id, new Date(e!.expiresAt), searchedId)
+      );
+    }
     const user: User = new User(
       credentials,
       displayname,
@@ -270,7 +342,9 @@ export class DbUserRepository implements UserRepository {
       serviceList,
       invitations,
       joinedGroups,
+      sessions,
     );
+
     return user;
   }
 }

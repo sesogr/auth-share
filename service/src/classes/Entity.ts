@@ -1,5 +1,4 @@
 import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { IdNameMap } from "./IdNameMap.ts";
 import { Invitation } from "./Invitation.ts";
 
@@ -17,7 +16,7 @@ export class Entity implements DisplayableEntity {
   getId(): string {
     return this.id;
   }
-  convertToShort(): ShortEntity {
+  convertToShort(): IdNameMap {
     return new IdNameMap(
       this.getId(),
       this.getDisplayName(),

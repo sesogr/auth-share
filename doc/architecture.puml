@@ -1,14 +1,14 @@
-@startuml
+@startuml Klassendiagramm
 
 entity User{
 
-    displayName: string
-    credentials: UserCredentials
-    -owned: List<Service>
-    callable: List<Service>
-    groups: List<Group>
-    invitedGroups: List<Invitation>
-    ownedGroups: List<Group>
+    -credentials: UserCredentials
+    -username: string
+    # id: string
+    -callableService: List<AllowedUserServiceMap>
+    -userGroupInvitations: List<Invitation>
+    -joinedGroups: List<AllowedUserGroupMap>
+    -_sessions: List<Session>
     
     +listOwnedServices(): List<Service>
     {static}authenticate(Param1..or Credential_obj): User
@@ -19,6 +19,12 @@ entity User{
     listOwnedGroups(): List<Group>
     listUsergroups(): List<Group>
     listUsergroupInvitation(): List<Invitation>
+    validateSession(sessionToken: string): Void
+    findSessionByToken(sessionToken: string): Session
+    deleteSessionByToken(token: string): Void
+    deleteSession(session: Session): Void
+
+
 
     requestAuthorization(:Service)
 }
@@ -53,7 +59,8 @@ entity Service{
 struct UserCredentials <<ValueObject>>{
 
     +username: string
-    +password: string
+    +hash: string
+    +salt: string
     
 }
 
@@ -65,7 +72,7 @@ struct ServiceCredentials <<ValueObject>>{
 
 }
 
-entity Group{
+entity Group {
     groupname: string
     users: List<User>
     sentUserInvitations: List<Invitation>
@@ -75,5 +82,54 @@ entity Group{
     sendInvitation(:User)
     addServiceInvitation(:Invitation)
 }
+
+struct Session <<ValueObject>>{
+  +id: string
+  +expiresAt: Date
+  +userId: string
+  
+  +create(sessionToken: string, userId: string): Session
+  +toString(): string
+  +generateRandomSessionToken(): string
+  +readonly REFRESH_INTERVAL_MS: number
+  +readonly MAX_DURATION_MS: number
+  +readonly fromSessionTokenToSessionId(sessionToken: string): string
+}
+
+class Entity {
+  +sentInvitations: Invitation[]
+  
+  +getDisplayName(): string
+  +getId(): string
+  +convertToShort(): IdNameMap
+  
+  -readonly id: string
+  -readonly displayname: string
+  
+  <<constructor>>
+  Entity(id: string, displayname: string)
+}
+
+
+abstract class ValueClass<T extends ValueClass<T>> {
+  [key: string]:
+    | string
+    | number
+    | bigint
+    | symbol
+    | undefined
+    | RecursiveValueClass
+    | ((...args: never[]) => unknown)
+    | boolean
+  
+  +equals(that: T): boolean
+  +toString(): string
+  +copy(): T
+  +with(newData: Partial<OnlyProperties<T>>): T
+  
+  <<constructor>>
+  ValueClass()
+}
+
 
 @enduml

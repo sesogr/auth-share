@@ -1,23 +1,44 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Home from "./Home.tsx";
 import User from "./User.tsx";
 import Navbar from "./Navbar.tsx";
-import CreateUser from "./CreateUser.tsx";
+import Register from "./Register.tsx";
+import Login from "./Login.tsx";
+import { AuthProvider, useAuth } from "./Context/AuthContext.tsx";
+
+const UserRedirect: React.FC = () => {
+  const { user } = useAuth();
+  if (user?.displayname) {
+    return (
+      <Navigate to={`/user/${encodeURIComponent(user.displayname)}`} replace />
+    );
+  }
+  return <Navigate to="/login" replace />;
+};
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/user" element={<User />} />
-        <Route path="/user/create" element={<CreateUser />} />
-        <Route path="/:serviceName" element={<Home />} />
-        <Route path="*" element={<div>Missing Page!!</div>} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/user" element={<UserRedirect />} />
+          <Route path="/user/:displayname" element={<User />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/:serviceName" element={<Home />} />
+          <Route path="*" element={<div>Missing Page!!</div>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
 
 export default App;
+
+/*
+-login.tsx anlegen -->
+-
+*/

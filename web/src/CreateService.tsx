@@ -33,6 +33,7 @@ const CreateService: React.FC = () => {
     console.log(newServiceData);
     fetch(import.meta.env.VITE_APIURL + "/service/create", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

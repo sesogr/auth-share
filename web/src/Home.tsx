@@ -19,7 +19,11 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(import.meta.env.VITE_APIURL + "/user/owned")
+    fetch(import.meta.env.VITE_APIURL + "/user/owned", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    })
       .then((res): Promise<ReceivedConvertedService[]> => {
         if (!res.ok) throw new Error("Netzwerkfehler");
         return res.json();

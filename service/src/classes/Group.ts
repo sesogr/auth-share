@@ -1,9 +1,9 @@
 import { DuplicateError } from "../errors/DuplicateError.ts";
-import { ShortEntity } from "../interfaceTypes/ShortEntity.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { Entity } from "./Entity.ts";
+import { IdNameMap } from "./IdNameMap.ts";
 import { Invitation } from "./Invitation.ts";
 import { User } from "./User.ts";
 
@@ -16,7 +16,7 @@ export class Group extends Entity {
   }
   public constructor(
     private groupname: string,
-    private owner: ShortEntity,
+    private owner: IdNameMap,
     protected override readonly id: string = crypto.randomUUID(),
     private serviceList: AllowedGroupServiceMap[] = [],
     private readonly _sentInvitations: Invitation[] = [],
@@ -25,7 +25,7 @@ export class Group extends Entity {
   ) {
     super(id, groupname);
   }
-  override getId(): string {
+  overridegetUserId(): string {
     return this.id;
   }
   override getDisplayName(): string {
@@ -41,7 +41,7 @@ export class Group extends Entity {
   }
   listAllowedUsers(owned = false): string[] {
     const mapCallback = (currElement: AllowedUserGroupMap): string =>
-      currElement.userId;
+      currElement.getUserId;
     if (owned) {
       return this.allowedUser.filter((currentElement) => currentElement.isOwner)
         .map(mapCallback);
@@ -56,7 +56,7 @@ export class Group extends Entity {
   }
   static createUserGroup(groupname: string, owner: User): Group {
     const newGroup = new Group(groupname, owner.convertToShort());
-    newGroup.allowedUser.push(
+    newGroup._allowedUser.push(
       new AllowedUserGroupMap(
         owner.convertToShort(),
         newGroup.convertToShort(),
@@ -77,7 +77,7 @@ export class Group extends Entity {
       ),
     );
   }
-  getOwner(): ShortEntity {
+  getOwner(): IdNameMap {
     return this.owner;
   }
   toJsonString(): string {
@@ -87,8 +87,8 @@ export class Group extends Entity {
     return {
       groupname: this.groupname,
       owner: this.getOwner().displayname,
-      users: this.allowedUser.map((e) => e.username),
-      serviceList: this.serviceList.map((e) => e.servicename),
+      users: this.allowedUser.map((e) => e.getUsername),
+      serviceList: this.serviceList.map((e) => e.getServicename),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
     };

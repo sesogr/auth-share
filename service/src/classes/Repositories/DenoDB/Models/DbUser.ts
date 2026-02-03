@@ -4,6 +4,7 @@ import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 import { DbUserService } from "./DbUserService.ts";
 import { DbUserGroup } from "./DbUserGroup.ts";
 import { DbInvitation } from "./DbInvitation.ts";
+import { DbSessions } from "./DbSessions.ts";
 
 export class DbUser extends Model {
   static override table = "Users";
@@ -50,3 +51,4 @@ export class DbUser extends Model {
 
 //(FK,PK)
 Relationships.belongsTo(DbUserCredential, DbUser);
+Relationships.belongsTo(DbSessions, DbUser);
