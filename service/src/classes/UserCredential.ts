@@ -1,5 +1,5 @@
 import { ValueClass } from "./ValueClass.ts";
-import * as bcrypt from "@bcrypt";
+import { bcryptAdapter } from "../deps/bcrypt_adapter.ts";
 export class UserCredential extends ValueClass<UserCredential> {
   constructor(
     readonly username: string,
@@ -9,7 +9,7 @@ export class UserCredential extends ValueClass<UserCredential> {
     super();
   }
   public async verifyPasswordHash(plainPassword: string) {
-    return await bcrypt.compare(
+    return await bcryptAdapter.compare(
       plainPassword,
       this.hash,
     );
@@ -25,10 +25,10 @@ export class UserCredential extends ValueClass<UserCredential> {
   }
   private static async hashPassword(plainPassword: string, salt?: string) {
     const saltRounds = 12;
-    salt = salt ? salt : await bcrypt.genSalt(saltRounds);
+    salt = salt ? salt : await bcryptAdapter.genSalt(saltRounds);
 
     // Passwort mit Salt hashen
-    const hashedPassword = await bcrypt.hash(plainPassword, salt);
+    const hashedPassword = await bcryptAdapter.hash(plainPassword, salt);
     return { hashedPassword, salt };
   }
   static async create(username: string, plainPassword: string) {
