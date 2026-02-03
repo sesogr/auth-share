@@ -25,15 +25,12 @@ export class Group extends Entity {
   ) {
     super(id, groupname);
   }
-  overridegetUserId(): string {
-    return this.id;
-  }
   override getDisplayName(): string {
     return this.groupname;
   }
   giveAuthorizationToUser(user: User): void {
     if (this.allowedUser.some((e) => e.userId == user.getId())) {
-      throw new DuplicateError("User is already allowed to join");
+      throw new DuplicateError("User is already allowed");
     }
     this.allowedUser.push(
       new AllowedUserGroupMap(user.convertToShort(), this.convertToShort()),
