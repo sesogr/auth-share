@@ -21,6 +21,7 @@ export class AllowedUserGroupMap extends ValueClass<AllowedUserGroupMap> {
     readonly isOwner: boolean = false,
   ) {
     super();
+    Object.freeze(this);
   }
   override toString(): string {
     return `${this.getUserId}:${this.getGroupId}:${this.isOwner}`;

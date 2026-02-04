@@ -21,6 +21,7 @@ export class AllowedUserServiceMap extends ValueClass<AllowedUserServiceMap> {
     readonly isOwner: boolean = false,
   ) {
     super();
+    Object.freeze(this);
   }
   override toString(): string {
     return `${this.getUserId}:${this.getServiceId}:${this.isOwner}`;

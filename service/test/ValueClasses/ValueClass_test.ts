@@ -1,7 +1,17 @@
-import { assert } from "node:console";
 import { ValueClass } from "../../src/classes/ValueClass.ts";
-import { assertEquals, assertInstanceOf, assertThrows } from "@std/assert";
+import {
+  assert,
+  assertEquals,
+  assertFalse,
+  assertInstanceOf,
+  assertThrows,
+} from "@std/assert";
 class TestValueClass extends ValueClass<TestValueClass> {
+  constructor(readonly a: number, readonly b: number) {
+    super();
+  }
+}
+class Test2ValueClass extends ValueClass<Test2ValueClass> {
   constructor(readonly a: number, readonly b: number) {
     super();
   }
@@ -19,5 +29,9 @@ Deno.test("ValueClass", async (t) => {
     assertThrows(() => {
       valueobj.with({ "c": "asdfk" });
     });
+  });
+  await t.step("typeinequality", () => {
+    const valueobj2 = new Test2ValueClass(123, 123);
+    assertFalse(valueobj.equals(valueobj2));
   });
 });

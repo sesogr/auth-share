@@ -7,6 +7,7 @@ export class UserCredential extends ValueClass<UserCredential> {
     readonly salt: string,
   ) {
     super();
+    Object.freeze(this);
   }
   public async verifyPasswordHash(plainPassword: string) {
     return await bcryptAdapter.compare(

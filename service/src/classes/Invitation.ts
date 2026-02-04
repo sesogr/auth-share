@@ -30,6 +30,7 @@ export class Invitation extends ValueClass<Invitation> {
     readonly receiverReference: IdNameMap,
   ) {
     super();
+    Object.freeze(this);
   }
   override toString() {
     return `${this.sendername}:${this.objname}:${this.receivername}`;

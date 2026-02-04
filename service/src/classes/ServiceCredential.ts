@@ -6,6 +6,7 @@ export class ServiceCredential extends ValueClass<ServiceCredential> {
     readonly password?: string,
   ) {
     super();
+    Object.freeze(this);
   }
   static fromString(string: string) {
     const [username, password] = string.split(":");

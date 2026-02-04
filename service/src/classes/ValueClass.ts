@@ -15,7 +15,8 @@ export abstract class ValueClass<T extends ValueClass<T>> {
   constructor() {
   }
   equals(that: T): boolean {
-    return this.toString() === that.toString();
+    return this.toString() === that.toString() &&
+      this.constructor === that.constructor;
   }
   toString(): string {
     return Object.values(this).join(":");

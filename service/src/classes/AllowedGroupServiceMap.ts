@@ -20,6 +20,7 @@ export class AllowedGroupServiceMap extends ValueClass<AllowedGroupServiceMap> {
     readonly serviceRef: IdNameMap,
   ) {
     super();
+    Object.freeze(this);
   }
   override toString(): string {
     return `${this.getGroupId}:${this.getServiceId}`;
