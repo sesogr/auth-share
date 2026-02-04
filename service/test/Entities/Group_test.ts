@@ -1,13 +1,19 @@
-import { assertArrayIncludes, assertEquals } from "@std/assert";
+import { assertArrayIncludes, assertEquals, assertThrows } from "@std/assert";
 import { Group } from "../../src/classes/Group.ts";
 import { User } from "../../src/classes/User.ts";
 import { UserCredential } from "../../src/classes/UserCredential.ts";
 import { Invitation } from "../../src/classes/Invitation.ts";
 import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
+import { DuplicateError } from "../../src/errors/DuplicateError.ts";
+import { ConvertedGroup } from "../../src/types/types.ts";
+import { IdNameMap } from "../../src/classes/IdNameMap.ts";
+import { AllowedGroupServiceMap } from "../../src/classes/AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "../../src/classes/AllowedUserGroupMap.ts";
 
 const userCredential = new UserCredential("Hans Meiser", "abcdef", "");
 
 const user = await FakeObjectGen.createFakeUser("asddh", "hallo");
+const user2 = await FakeObjectGen.createFakeUser("sad", "sa");
 function createTestGroup(): Group {
   return Group.createUserGroup("Schachverein", user);
 }
@@ -24,13 +30,25 @@ Deno.test("Group Class", async (t) => {
     assertEquals(groupname, "Schachverein");
   });
 
+  await t.step("AllowedUsers", async (st) => {
+    const group = createTestGroup();
+    group.giveAuthorizationToUser(user2);
+    await st.step("authorization happened", () => {
+      assertEquals(group.listAllowedUsers(), [user.getId(), user2.getId()]);
+      assertEquals(group.listAllowedUsers(true), [user.getId()]);
+    });
+    await st.step("give authorizationtouser throws duplicate", () => {
+      assertThrows(() => {
+        group.giveAuthorizationToUser(user2);
+      }, DuplicateError);
+    });
+  });
   await t.step("test the method getDisplayName on owner", () => {
     const _group = createTestGroup();
 
     const owner = userCredential.username;
     assertEquals(owner, "Hans Meiser");
   });
-
   await t.step("test whether the list serviceInvitations is empty", () => {
     const group = createTestGroup();
     const list = group.listServiceInvitation();
@@ -73,4 +91,27 @@ Deno.test("Group Class", async (t) => {
       assertEquals([testInvitation], listSentInvitation);
     },
   );
+  await t.step("Showall", () => {
+    const group = new Group(
+      "abc",
+      { displayname: "abc" } as IdNameMap,
+      "1ab",
+      [{ getServicename: "abc" }] as AllowedGroupServiceMap[],
+      [{ toString: () => "abc" }] as Invitation[],
+      [{ toString: () => "abc" }] as Invitation[],
+      [{ getUsername: "abc" }] as AllowedUserGroupMap[],
+    );
+    const convgroup: ConvertedGroup = {
+      groupname: group.getDisplayName(),
+      owner: group.getOwner().displayname,
+      users: group.allowedUser.map((e) => e.getUsername),
+      serviceList: group.serviceList.map((e) => e.getServicename),
+      sentInvitations: group.sentInvitations.map((e) => e.toString()),
+      serviceInvitations: group.listServiceInvitation().map((e) =>
+        e.toString()
+      ),
+    };
+    assertEquals(group.toJson(), convgroup);
+    assertEquals(group.toJsonString(), JSON.stringify(convgroup));
+  });
 });

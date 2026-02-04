@@ -8,6 +8,9 @@ import { Invitation } from "./Invitation.ts";
 import { User } from "./User.ts";
 
 export class Group extends Entity {
+  public get serviceList(): AllowedGroupServiceMap[] {
+    return this._serviceList;
+  }
   public override get sentInvitations(): Invitation[] {
     return [...this._sentInvitations];
   }
@@ -18,7 +21,7 @@ export class Group extends Entity {
     private groupname: string,
     private owner: IdNameMap,
     protected override readonly id: string = crypto.randomUUID(),
-    private serviceList: AllowedGroupServiceMap[] = [],
+    private _serviceList: AllowedGroupServiceMap[] = [],
     private readonly _sentInvitations: Invitation[] = [],
     private serviceInvitations: Invitation[] = [],
     private readonly _allowedUser: AllowedUserGroupMap[] = [],
@@ -29,10 +32,10 @@ export class Group extends Entity {
     return this.groupname;
   }
   giveAuthorizationToUser(user: User): void {
-    if (this.allowedUser.some((e) => e.userId == user.getId())) {
+    if (this.allowedUser.some((e) => e.getUserId == user.getId())) {
       throw new DuplicateError("User is already allowed");
     }
-    this.allowedUser.push(
+    this._allowedUser.push(
       new AllowedUserGroupMap(user.convertToShort(), this.convertToShort()),
     );
   }
@@ -66,7 +69,7 @@ export class Group extends Entity {
     senderReference: User,
     receiverReference: User,
   ) {
-    this.sentInvitations.push(
+    this._sentInvitations.push(
       new Invitation(
         senderReference.convertToShort(),
         this.convertToShort(),
