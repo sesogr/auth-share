@@ -1,11 +1,10 @@
-import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbServiceRepository.ts";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
+import { DbServiceRepository } from "../../../src/classes/Repositories/DenoDB/DbServiceRepository.ts";
+import { FakeObjectGen } from "../../../src/FakeObjectGen.ts";
 import { stub } from "@std/testing/mock";
 import { assert, assertEquals } from "@std/assert";
 
 Deno.test("DbServiceRepository - Save()", async (t) => {
   const fakeService = await FakeObjectGen.createFakeService();
-  const id = fakeService;
   let idReturn: boolean;
   let displaynameReturn: boolean;
 

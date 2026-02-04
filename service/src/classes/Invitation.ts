@@ -2,7 +2,7 @@ import { IdNameMap } from "./IdNameMap.ts";
 import { ValueClass } from "./ValueClass.ts";
 
 export class Invitation extends ValueClass<Invitation> {
-  public get reveicername(): string {
+  public get receivername(): string {
     return this.receiverReference.displayname;
   }
 
@@ -32,6 +32,6 @@ export class Invitation extends ValueClass<Invitation> {
     super();
   }
   override toString() {
-    return `${this.sendername}:${this.objname}:${this.reveicername}`;
+    return `${this.sendername}:${this.objname}:${this.receivername}`;
   }
 }

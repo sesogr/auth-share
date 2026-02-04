@@ -1,9 +1,9 @@
 import { assertArrayIncludes, assertEquals } from "@std/assert";
-import { Group } from "../src/classes/Group.ts";
-import { User } from "../src/classes/User.ts";
-import { UserCredential } from "../src/classes/UserCredential.ts";
-import { Invitation } from "../src/classes/Invitation.ts";
-import { FakeObjectGen } from "../src/FakeObjectGen.ts";
+import { Group } from "../../src/classes/Group.ts";
+import { User } from "../../src/classes/User.ts";
+import { UserCredential } from "../../src/classes/UserCredential.ts";
+import { Invitation } from "../../src/classes/Invitation.ts";
+import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
 
 const userCredential = new UserCredential("Hans Meiser", "abcdef", "");
 

@@ -1,29 +1,29 @@
 import { Database, Model, MySQLConnector } from "@denodb";
-import { DbGroup } from "../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
+import { DbGroup } from "../../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
 import {
   DbGroupService,
-} from "../../src/classes/Repositories/DenoDB/Models/DbGroupService.ts";
+} from "../../../src/classes/Repositories/DenoDB/Models/DbGroupService.ts";
 import {
   DbIdDisplayname,
   DbIdDisplaynameGroups,
   DbIdDisplaynameInvitationsObj,
   DbIdDisplaynameInvitationsSender,
   DbIdDisplaynameService,
-} from "../../src/classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
-import { DbInvitation } from "../../src/classes/Repositories/DenoDB/Models/DbInvitation.ts";
-import { DbService } from "../../src/classes/Repositories/DenoDB/Models/DbService.ts";
-import { DbServiceCredential } from "../../src/classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
-import { DbUser } from "../../src/classes/Repositories/DenoDB/Models/DbUser.ts";
-import { DbUserCredential } from "../../src/classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
+} from "../../../src/classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
+import { DbInvitation } from "../../../src/classes/Repositories/DenoDB/Models/DbInvitation.ts";
+import { DbService } from "../../../src/classes/Repositories/DenoDB/Models/DbService.ts";
+import { DbServiceCredential } from "../../../src/classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
+import { DbUser } from "../../../src/classes/Repositories/DenoDB/Models/DbUser.ts";
+import { DbUserCredential } from "../../../src/classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
 import {
   DbUserGroup,
-} from "../../src/classes/Repositories/DenoDB/Models/DbUserGroup.ts";
+} from "../../../src/classes/Repositories/DenoDB/Models/DbUserGroup.ts";
 import {
   DbUserService,
-} from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
-import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
+} from "../../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
+import { setupManyToMany } from "../../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 //import fakeUser from "../testuser.json" with { type: "json" };
-import { RuntimeError } from "../../src/errors/RuntimeError.ts";
+import { RuntimeError } from "../../../src/errors/RuntimeError.ts";
 const connector = new MySQLConnector({
   database: "authshare",
   host: "localhost",

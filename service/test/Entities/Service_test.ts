@@ -1,9 +1,9 @@
 import { assertArrayIncludes, assertEquals, assertFalse } from "@std/assert";
-import { Service } from "../src/classes/Service.ts";
-import { ServiceCredential } from "../src/classes/ServiceCredential.ts";
-import { FakeObjectGen } from "../src/FakeObjectGen.ts";
-import { Invitation } from "../src/classes/Invitation.ts";
-import { Group } from "../src/classes/Group.ts";
+import { Service } from "../../src/classes/Service.ts";
+import { ServiceCredential } from "../../src/classes/ServiceCredential.ts";
+import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
+import { Invitation } from "../../src/classes/Invitation.ts";
+import { Group } from "../../src/classes/Group.ts";
 
 const serviceCredential = new ServiceCredential("", "");
 const userShort = await FakeObjectGen.createFakeUser(

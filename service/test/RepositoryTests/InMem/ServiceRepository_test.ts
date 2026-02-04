@@ -1,10 +1,10 @@
 import { assertEquals } from "@std/assert";
-import { InMemServiceRepository } from "../src/classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
-import { Service } from "../src/classes/Service.ts";
-import { FakeObjectGen } from "../src/FakeObjectGen.ts";
-import { ServiceRepository } from "../src/interfaceTypes/ServiceRepository.ts";
-import { User } from "../src/classes/User.ts";
-import { UserCredential } from "../src/classes/UserCredential.ts";
+import { InMemServiceRepository } from "../../../src/classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
+import { Service } from "../../../src/classes/Service.ts";
+import { FakeObjectGen } from "../../../src/FakeObjectGen.ts";
+import { ServiceRepository } from "../../../src/interfaceTypes/ServiceRepository.ts";
+import { User } from "../../../src/classes/User.ts";
+import { UserCredential } from "../../../src/classes/UserCredential.ts";
 
 Deno.test("ServiceRepository", async (t) => {
   await t.step("findById", async () => {

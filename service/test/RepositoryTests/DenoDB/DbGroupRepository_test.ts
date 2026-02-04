@@ -1,8 +1,8 @@
 import { stub } from "@std/testing/mock";
-import { Group } from "../../src/classes/Group.ts";
-import { DbGroupRepository } from "../../src/classes/Repositories/DenoDB/DbGroupRepository.ts";
-import { DbGroup } from "../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
+import { Group } from "../../../src/classes/Group.ts";
+import { DbGroupRepository } from "../../../src/classes/Repositories/DenoDB/DbGroupRepository.ts";
+import { DbGroup } from "../../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
+import { IdNameMap } from "../../../src/classes/IdNameMap.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test("DbGroupRepository - Save()", async (t) => {
