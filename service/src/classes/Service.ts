@@ -109,7 +109,7 @@ export class Service extends Entity {
     this._sentInvitations.push(invitation);
   }
 
-  callService() {}
+  //callService() {}
 
   /*serviceIsInList(serviceName: string): boolean{
   return this.services.includes(serviceName);
