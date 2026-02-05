@@ -1,5 +1,5 @@
 import { ValueClass } from "./ValueClass.ts";
-import { bcryptAdapter } from "../deps/bcrypt_adapter.ts";
+import { bcryptAdapter } from "../deps/bcryptAdapter.ts";
 export class UserCredential extends ValueClass<UserCredential> {
   constructor(
     readonly username: string,

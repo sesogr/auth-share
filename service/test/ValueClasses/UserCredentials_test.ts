@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { stub } from "@std/testing/mock";
 import { UserCredential } from "../../src/classes/UserCredential.ts";
-import { bcryptAdapter } from "../../src/deps/bcrypt_adapter.ts";
+import { bcryptAdapter } from "../../src/deps/bcryptAdapter.ts";
 
 Deno.test("Usercredential", async (t) => {
   const username = "asdkflj";
