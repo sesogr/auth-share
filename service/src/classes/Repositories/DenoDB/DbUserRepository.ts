@@ -49,10 +49,10 @@ export class DbUserRepository extends DbRepository implements UserRepository {
       relationsToDelete: sessionsToDelete,
       relationsToSave: sessionsToSave,
     } = this.nTomFilter(_userSessionModel, item.sessions);
-    if (sessionsToDelete) {
+    if (sessionsToDelete.length) {
       await Promise.all(sessionsToDelete.map((e) => e.delete()));
     }
-    if (sessionsToSave) {
+    if (sessionsToSave.length) {
       await DbSessions.create(
         sessionsToSave.map((e) => {
           return {

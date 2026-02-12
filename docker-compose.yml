@@ -44,8 +44,6 @@ services:
       MYSQL_USER: authshare
       MYSQL_PASSWORD: 5ES2#7PhHZplRm
     volumes:
-      # SQL files present in this directory will initialise the DB if it is empty on container start
-      - ./sql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - db:/var/lib/mysql
     ports:
       - "13006:3306"
