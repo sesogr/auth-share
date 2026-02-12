@@ -20,9 +20,10 @@ const UserRedirect: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AuthContext.Consumer>
-        {(user) => user?.isAuthenticated ? <BrowserRouter>
+        <BrowserRouter>
         <Navbar />
+      <AuthContext.Consumer>
+        {(user) => user?.isAuthenticated ? <>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/user" element={<UserRedirect />} />
@@ -30,14 +31,16 @@ const App: React.FC = () => {
           <Route path="/:serviceName" element={<Home />} />
           <Route path="*" element={<div>Missing Page!!</div>} />
         </Routes>
-        </BrowserRouter>
-           : <BrowserRouter>
+        </>
+        
+           : 
            <Routes>
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Login />} />
             </Routes>
-           </BrowserRouter>}
+           }
       </AuthContext.Consumer>
+           </BrowserRouter>
     </AuthProvider>
   );
 };
