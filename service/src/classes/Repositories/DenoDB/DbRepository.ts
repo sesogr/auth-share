@@ -6,6 +6,7 @@ import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { Invitation } from "../../Invitation.ts";
 import { Session } from "../../Session.ts";
+import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
 
 export class DbRepository {
   constructor(
@@ -81,6 +82,16 @@ export class DbRepository {
     } else {
       return false;
     }
+  }
+  async checkIdName(item: Entity):Promise<boolean>{
+    const data = await DbIdDisplayname.where("id", item.getId())
+    .select("id")
+    .select("displayname")
+    .first()
+    if(data.displayname != item.getDisplayName()){
+      return false
+    }
+    return true
   }
   protected async updateInvitation(item: Entity) {
     const _invitationsModel = await DbInvitation.where(
