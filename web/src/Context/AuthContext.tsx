@@ -14,7 +14,7 @@ type AuthContextShape = {
   isAuthenticated: boolean;
 };
 
-const AuthContext = createContext<AuthContextShape | undefined>(undefined);
+export const AuthContext = createContext<AuthContextShape | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
   { children },

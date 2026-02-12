@@ -5,7 +5,7 @@ import User from "./User.tsx";
 import Navbar from "./Navbar.tsx";
 import Register from "./Register.tsx";
 import Login from "./Login.tsx";
-import { AuthProvider, useAuth } from "./Context/AuthContext.tsx";
+import { AuthContext, AuthProvider, useAuth } from "./Context/AuthContext.tsx";
 
 const UserRedirect: React.FC = () => {
   const { user } = useAuth();
@@ -20,18 +20,24 @@ const UserRedirect: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <AuthContext.Consumer>
+        {(user) => user?.isAuthenticated ? <BrowserRouter>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/user" element={<UserRedirect />} />
           <Route path="/user/:displayname" element={<User />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/:serviceName" element={<Home />} />
           <Route path="*" element={<div>Missing Page!!</div>} />
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+           : <BrowserRouter>
+           <Routes>
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Login />} />
+            </Routes>
+           </BrowserRouter>}
+      </AuthContext.Consumer>
     </AuthProvider>
   );
 };
