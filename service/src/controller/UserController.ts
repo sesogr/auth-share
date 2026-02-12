@@ -5,6 +5,7 @@ import { UserCredential } from "../classes/UserCredential.ts";
 import { ConvertedUser } from "../types/types.ts";
 import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
 import { HeadController } from "./HeadController.ts";
+import { Environment } from "../classes/Environment.ts";
 
 export class UserController extends HeadController {
   constructor(
@@ -62,7 +63,7 @@ export class UserController extends HeadController {
         const { token, session } = userToCheck.createSession();
         // Hinweis: domain weglassen, secure/httpOnly/expire setzen nach Bedarf
         setCookie(c, "session", token, {
-          domain: "localhost", //Deno.env.get("FRONT_END_DOMAIN")!,
+          domain: Environment.FRONT_END_URL,
           path: "/",
           secure: true,
           httpOnly: true,

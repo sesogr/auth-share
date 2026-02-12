@@ -27,13 +27,14 @@ import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
 import { getCookie } from "@hono/hono/cookie";
 import { User } from "./classes/User.ts";
 import { UserCredential } from "./classes/UserCredential.ts";
-
+import { Environment } from "./classes/Environment.ts";
+Environment.load();
 const db = new Database(
   new MySQLConnector({
-    database: Deno.env.get("DB_NAME")!,
-    host: Deno.env.get("DB_HOST")!,
-    username: Deno.env.get("DB_USER")!,
-    password: Deno.env.get("DB_PASSWORD")!,
+    database: Environment.DB_NAME,
+    host: Environment.DB_HOST,
+    username: Environment.DB_USER,
+    password: Environment.DB_PASSWORD,
   }),
 );
 setupManyToMany();
@@ -80,7 +81,7 @@ export const app = new Hono();
 app.use(
   "*",
   cors({
-    origin: Deno.env.get("FRONT_END_URL")!,
+    origin: Environment.FRONT_END_URL,
     credentials: true,
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   }),
