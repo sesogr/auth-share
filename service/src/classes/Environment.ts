@@ -70,16 +70,11 @@ export class Environment {
   private static checked: boolean = false;
 
   private static check() {
-    if (
-      Object.keys(this).some((key) =>
-        this[key as keyof Environment] === undefined
-      )
-    ) {
-      throw new EnvError(
-        Object.keys(this).find((key) =>
-          this[key as keyof Environment] === undefined
-        )!,
-      );
+    const undefinedKey = Object.keys(this).find((key) =>
+      this[key as keyof Environment] === undefined
+    );
+    if (undefinedKey) {
+      throw new EnvError(`Environment variable ${undefinedKey} is not set`);
     }
     this.checked = true;
   }
