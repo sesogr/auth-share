@@ -322,13 +322,6 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
   async saveAll(item: Group[]) {
     await Promise.all(item.map(async (e) => await this.save(e)));
   }
-  async save(item: Group) {
-    //first call of existId --> assertEquals(stubExistId.calls[0].arg[0] in Deno.Test)
-    const result = await this.existId(item.getId());
-    if (result !== true) {
-      await this.add(item);
-    }
-  }
   async removeById(id: string): Promise<void> {
     await DbGroup.where("id", id).delete();
   }

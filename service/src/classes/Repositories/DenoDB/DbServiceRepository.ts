@@ -175,16 +175,6 @@ export class DbServiceRepository extends DbRepository
   removeById(_id: string): Promise<void> {
     throw new Error("Method not implemented.");
   }
-  async save(item: Service): Promise<void> {
-    if (
-      (await this.existId(item.getId())) ||
-      (await this.existDisplayname(item.getDisplayName()))
-    ) {
-      return;
-    } else {
-      await this.add(item);
-    }
-  }
 
   async hydrate(searchedId: string): Promise<Service> {
     const queryData = await DbService

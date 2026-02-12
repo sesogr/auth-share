@@ -7,7 +7,8 @@
     "hooks:pre-commit": "deno task check",
     "deno-check": "deno task check-web && deno task check-service",
     "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts",
-    "coverTest": "deno test --coverage --allow-import && deno coverage --lcov > coverage.lcov"
+    "test": "deno test --coverage --allow-import ",
+    "cover": "deno coverage --lcov > coverage/lcov.info"
   },
   "imports": {
     "@bcrypt": "https://deno.land/x/bcrypt/mod.ts",

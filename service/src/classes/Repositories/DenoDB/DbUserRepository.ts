@@ -23,7 +23,6 @@ import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { DbSessions } from "./Models/DbSessions.ts";
 import { Session } from "../../Session.ts";
 import { DbRepository } from "./DbRepository.ts";
-import { DuplicateError } from "../../../errors/DuplicateError.ts";
 
 export class DbUserRepository extends DbRepository implements UserRepository {
   constructor() {
@@ -130,22 +129,6 @@ export class DbUserRepository extends DbRepository implements UserRepository {
     }
   }
 
-  async save(item: User) {
-    const result = await this.existId(item.getId())
-    if (result !== true) {
-      if (await this.existDisplayname(item.getDisplayName())){
-        throw new DuplicateError(item.getDisplayName() + ": already Exists")
-      }
-      await this.add(item);
-    } else {
-      if (!await this.checkIdName(item)){
-        if (await this.existDisplayname(item.getDisplayName())){
-          throw new DuplicateError(item.getDisplayName() + ": is for another user")
-        }
-      }
-      this.update(item);
-    }
-  }
   //User_ID=searchedId
   async hydrate(searchedId: string): Promise<User> {
     const queryData = await DbUser

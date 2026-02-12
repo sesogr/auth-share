@@ -7,8 +7,9 @@ import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { Invitation } from "../../Invitation.ts";
 import { Session } from "../../Session.ts";
 import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
+import { DuplicateError } from "../../../errors/DuplicateError.ts";
 
-export class DbRepository {
+export abstract class DbRepository {
   constructor(
     protected readonly model: typeof Model,
     protected readonly displayname: string,
@@ -83,16 +84,30 @@ export class DbRepository {
       return false;
     }
   }
-  async checkIdName(item: Entity):Promise<boolean>{
-    const data = await DbIdDisplayname.where("id", item.getId())
-    .select("id")
-    .select("displayname")
-    .first()
-    if(data.displayname != item.getDisplayName()){
-      return false
-    }
-    return true
+  async checkIdName(item: Entity): Promise<boolean> {
+    const data = await DbIdDisplayname.where("id", item.getId()).first();
+
+    return data && data.displayname == item.getDisplayName();
   }
+  async save(item: Entity) {
+    const idExists = await this.existId(item.getId());
+    if (!idExists) {
+      if (await this.existDisplayname(item.getDisplayName())) {
+        throw new DuplicateError(item.getDisplayName() + ": already Exists");
+      }
+      await this.add(item);
+    } else {
+      if (!(await this.checkIdName(item))) {
+        if (await this.existDisplayname(item.getDisplayName())) {
+          throw new DuplicateError(item.getDisplayName() + ": already Exists");
+        }
+      }
+      this.update(item);
+    }
+  }
+  abstract update(item: Entity): Promise<void>;
+  abstract add(item: Entity): Promise<void>;
+
   protected async updateInvitation(item: Entity) {
     const _invitationsModel = await DbInvitation.where(
       "obj_reference",

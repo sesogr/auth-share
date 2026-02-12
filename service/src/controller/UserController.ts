@@ -61,9 +61,16 @@ export class UserController extends HeadController {
         await userToCheck.getCredentials().verifyPasswordHash(plainPassword)
       ) {
         const { token, session } = userToCheck.createSession();
-        // Hinweis: domain weglassen, secure/httpOnly/expire setzen nach Bedarf
+
+        const URL = Environment.FRONT_END_URL.replace(/(^\w+:|^)\/\//, "")
+          .replace(
+            /:\d+/g,
+            "",
+          );
+        console.log(userToCheck);
+        await this.userRepository.save(userToCheck);
         setCookie(c, "session", token, {
-          domain: Environment.FRONT_END_URL,
+          domain: URL,
           path: "/",
           secure: true,
           httpOnly: true,
@@ -71,7 +78,6 @@ export class UserController extends HeadController {
           expires: session.expiresAt,
           sameSite: "None" as const,
         });
-        await this.userRepository.save(userToCheck);
         // Gib Id + displayname zurück (Frontend benötigt das)
         return c.json({
           id: userToCheck.getId(),
