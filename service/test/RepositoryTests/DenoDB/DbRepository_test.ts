@@ -7,10 +7,10 @@ import { DbIdDisplayname } from "../../../src/classes/Repositories/DenoDB/Models
 import { DuplicateError } from "../../../src/errors/DuplicateError.ts";
 
 class TestDbrepository extends DbRepository {
-  override async update(item: Entity): Promise<void> {
+  override update(_item: Entity): Promise<void> {
     return Promise.resolve();
   }
-  override async add(item: unknown): Promise<void> {
+  override add(_item: unknown): Promise<void> {
     return Promise.resolve();
   }
 }
