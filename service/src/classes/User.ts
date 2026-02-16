@@ -26,7 +26,14 @@ export class User extends Entity {
     super(id, username);
   }
   private validated: boolean = false;
-
+  setDisplayName(newDisplayName: string) {
+    if (User.stringToLong(newDisplayName)) {
+      throw new NameTooLongError(
+        "Your Username is too long, please use a Name with max 40 characters.",
+      );
+    }
+    this.username = newDisplayName;
+  }
   //controller ver
   validateSession(sessionToken: string) {
     const session = this.findSessionByToken(sessionToken);
