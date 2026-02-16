@@ -26,4 +26,22 @@ Deno.test("UserClass", async (t) => {
       assertEquals(user.getCredentials(), uc);
     });
   });
+  await t.step("change displayname", async (st) => {
+    const user: User = User.createUser(
+      new UserCredential("", "", ""),
+      displayname,
+    );
+    await st.step("displayname too long", () => {
+      assertThrows(() => {
+        user.setDisplayName(
+          "i'mwayyyyytoolongandhave$pecialcharactersasmyname",
+        );
+      });
+    });
+    await st.step("valid change displayname", () => {
+      const newDisplayName = "newDisplayName";
+      user.setDisplayName(newDisplayName);
+      assertEquals(user.getDisplayName(), newDisplayName);
+    });
+  });
 });
