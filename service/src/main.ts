@@ -132,15 +132,22 @@ app.get(
     return userController.read(c);
   },
 );
-// app.put(
-//   "/user/me/password",
-//   (c) => {
-//     return userController.changePassword(
-//       c,
-//     );
-//   },
-// );
-
+app.put(
+  "/user/me/password",
+  (c) => {
+    return userController.changePassword(
+      c,
+    );
+  },
+);
+app.put(
+  "/user/me/displayname",
+  (c) => {
+    return userController.changeDisplayName(
+      c,
+    );
+  },
+);
 const serviceController = new ServiceController(
   serviceRepository,
   userRepository,
