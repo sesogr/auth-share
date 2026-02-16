@@ -1,11 +1,7 @@
 import type { AllOptional } from "./AllOptional.ts";
 
 type ConvertedUser =
-  & {
-    id: string;
-    credentials: string;
-    displayname: string;
-  }
+  & { [k in UserStringProperties]: string }
   & {
     [k in UserListProperties]: string[];
   };
@@ -17,5 +13,6 @@ type UserListProperties =
   | "userGroupInvitations"
   | "ownedGroups";
 
+export type UserStringProperties = "id" | "credentials" | "displayname";
 export type SendingConvertedUser = AllOptional<ConvertedUser>;
 export type ReceivedConvertedUser = ConvertedUser;
