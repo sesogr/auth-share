@@ -25,11 +25,18 @@ export class UserController extends HeadController {
     const me = await this.getMeFromContext(c);
     return c.json(me.toJson());
   }
-
+  private confirmCredentials(
+    requestData: ConvertedUser,
+  ): asserts requestData is ConvertedUser & { credentials: string } {
+    if (!requestData.credentials) {
+      throw new TypeError("Credentials are required");
+    }
+  }
   async changePassword(c: Context) {
     const requestData: ConvertedUser = await c.req.json();
     const me: User = await this.getMeFromContext(c);
-    const newPassword: string = requestData.credentials!.split(":")[1];
+    this.confirmCredentials(requestData);
+    const newPassword: string = requestData.credentials.split(":")[1];
 
     me.changeUserCredentials(
       await me.getCredentials().changePassword(newPassword),
@@ -53,7 +60,8 @@ export class UserController extends HeadController {
   async logIn(c: Context) {
     try {
       const requestData: ConvertedUser = await c.req.json();
-      const [username, plainPassword] = requestData.credentials!.split(":");
+      this.confirmCredentials(requestData);
+      const [username, plainPassword] = requestData.credentials.split(":");
 
       const userToCheck = await this.userRepository.findByUserName(username);
 
@@ -98,7 +106,8 @@ export class UserController extends HeadController {
     try {
       c.res.headers.set("Access-Control-Allow-Origin", "*");
       const requestData: ConvertedUser = await c.req.json();
-      const [username, plainPassword] = requestData.credentials!.split(":");
+      this.confirmCredentials(requestData);
+      const [username, plainPassword] = requestData.credentials.split(":");
 
       const newUser = new User(
         await UserCredential.create(username, plainPassword),
