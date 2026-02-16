@@ -75,7 +75,6 @@ export class UserController extends HeadController {
             /:\d+/g,
             "",
           );
-        console.log(userToCheck);
         await this.userRepository.save(userToCheck);
         setCookie(c, "session", token, {
           domain: URL,
@@ -101,7 +100,16 @@ export class UserController extends HeadController {
       }
     }
   }
-
+  async changeDisplayName(c: Context) {
+    const requestData: ConvertedUser = await c.req.json();
+    const me: User = await this.getMeFromContext(c);
+    if (!requestData.displayname) {
+      return c.body("Displayname is required", 400);
+    }
+    me.setDisplayName(requestData.displayname);
+    await this.userRepository.save(me);
+    return c.body(null, 204);
+  }
   async create(c: Context) {
     try {
       c.res.headers.set("Access-Control-Allow-Origin", "*");
