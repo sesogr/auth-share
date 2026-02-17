@@ -52,13 +52,27 @@ db.link([
   DbSessions,
 ]);
 let ME: User = new User(await UserCredential.create("", ""));
-try {
-  await db.sync();
-} catch (error) {
-  if (error instanceof Error) {
-    if (error.message != "Multiple primary key defined") {
-      throw error; //it throws the multiple keys always when the database is already filled with tables
+let connected = false;
+while (!connected) {
+  try {
+    await db.sync();
+    connected = true;
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message.includes("failed to lookup address information")) {
+        console.error(
+          "Connection to database failed. Retrying in 5 seconds...",
+        );
+      } else if (error.message === "Multiple primary key defined") {
+        // Tables already exist, which is fine
+        connected = true;
+      } else {
+        throw error;
+      }
     }
+  }
+  if (!connected) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }
 //initialize repositories
