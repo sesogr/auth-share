@@ -12,9 +12,12 @@ type AuthContextShape = {
   login: () => void;
   logout: () => void;
   isAuthenticated: boolean;
+  setUser: React.Dispatch<React.SetStateAction<ReceivedConvertedUser | null>>;
 };
 
-export const AuthContext = createContext<AuthContextShape | undefined>(undefined);
+export const AuthContext = createContext<AuthContextShape | undefined>(
+  undefined,
+);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
   { children },
@@ -50,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
   };
 
   const value = useMemo(
-    () => ({ user, login, logout, isAuthenticated: !!user }),
+    () => ({ user, login, logout, isAuthenticated: !!user, setUser }),
     [user],
   );
 

@@ -8,15 +8,18 @@ const Change: React.FC<
 > = (
   { toChange, password },
 ) => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [newValue, setNewValue] = React.useState("");
   const [error, setError] = React.useState<Error | null>(null);
+  const [answer, setAnswer] = React.useState<string | null>(null);
   const submit = async () => {
+    setError(null);
+    setAnswer(null);
     if (!user) return;
     let newCred = newValue;
     let toChangeKey: UserStringProperties | "password" = toChange;
     if (toChange === "credentials") {
-      newCred = user.displayname + ":" + newValue;
+      newCred = user.credentials + ":" + newValue;
       toChangeKey = "password";
     }
     user[toChange] = newCred;
@@ -34,8 +37,11 @@ const Change: React.FC<
       );
       if (!res.ok) {
         throw new Error(
-          `Failed to update user: ${res.status} ${res.statusText}`,
+          `Failed to update user: ${await res.text()}`,
         );
+      } else {
+        setUser(user);
+        setAnswer("User updated successfully");
       }
     } catch (e) {
       setError(e as Error);
@@ -57,6 +63,7 @@ const Change: React.FC<
         Save Changes
       </Button>
       {error && <div style={{ color: "red" }}>Error: {error.message}</div>}
+      {answer && <div style={{ color: "green" }}>{answer}</div>}
     </>
   );
 };
