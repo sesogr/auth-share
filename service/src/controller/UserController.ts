@@ -107,7 +107,13 @@ export class UserController extends HeadController {
       return c.body("Displayname is required", 400);
     }
     me.setDisplayName(requestData.displayname);
-    await this.userRepository.save(me);
+    try {
+      await this.userRepository.save(me);
+    } catch (error) {
+      if (error instanceof Error) {
+        return c.body(error.message, 500);
+      }
+    }
     return c.body(null, 204);
   }
   async create(c: Context) {
