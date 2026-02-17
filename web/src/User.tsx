@@ -30,7 +30,7 @@ const User: React.FC = () => {
   };
   if (!user) return <Navigate to="/login" replace />;
   if (displayname && user.displayname !== displayname) {
-    return <div>Forbidden — das ist nicht dein Profil</div>;
+    return <Navigate to="/user" replace />;
   }
 
   return (

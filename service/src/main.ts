@@ -59,7 +59,10 @@ while (!connected) {
     connected = true;
   } catch (error) {
     if (error instanceof Error) {
-      if (error.message.includes("failed to lookup address information")) {
+      if (
+        error.message.includes("failed to lookup address information") ||
+        error.message.includes("Connection refused")
+      ) {
         console.error(
           "Connection to database failed. Retrying in 5 seconds...",
         );
