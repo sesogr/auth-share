@@ -6,7 +6,6 @@ import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { Invitation } from "../../Invitation.ts";
 import { Session } from "../../Session.ts";
-import { DbIdDisplayname } from "./Models/DbIdDisplayname.ts";
 import { DuplicateError } from "../../../errors/DuplicateError.ts";
 
 export abstract class DbRepository {
@@ -85,9 +84,9 @@ export abstract class DbRepository {
     }
   }
   async checkIdName(item: Entity): Promise<boolean> {
-    const data = await DbIdDisplayname.where("id", item.getId()).first();
+    const data = await this.model.where("id", item.getId()).first();
 
-    return data && data.displayname == item.getDisplayName();
+    return data && data[this.displayname] == item.getDisplayName();
   }
   async save(item: Entity) {
     const idExists = await this.existId(item.getId());

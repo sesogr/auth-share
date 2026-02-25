@@ -1,14 +1,10 @@
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { User } from "../../User.ts";
-import {
-  DbIdDisplayname,
-  DbIdDisplaynameGroups,
-  DbIdDisplaynameInvitationsObj,
-  DbIdDisplaynameInvitationsSender,
-} from "./Models/DbIdDisplayname.ts";
-import { DbIdDisplaynameService } from "./Models/DbService.ts";
-import { DbUser } from "./Models/DbUser.ts";
+
+import { DbGroupJoin, DbGroupObjJoin } from "./Models/DbGroup.ts";
+import { DbServiceJoin } from "./Models/DbService.ts";
+import { DbUser, DbUserSenderJoin } from "./Models/DbUser.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
@@ -30,10 +26,6 @@ export class DbUserRepository extends DbRepository implements UserRepository {
   }
   async update(item: User): Promise<void> {
     await DbUser.where("id", item.getId()).update({
-      displayname: item.getDisplayName(),
-    });
-
-    await DbIdDisplayname.where("id", item.getId()).update({
       displayname: item.getDisplayName(),
     });
 
@@ -120,10 +112,6 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         hash: item.getCredentials().hash,
         salt: item.getCredentials().salt,
       });
-      await DbIdDisplayname.create({
-        id: item.getId(),
-        displayname: item.getDisplayName(),
-      });
     } catch (error) {
       throw error;
     }
@@ -137,14 +125,14 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         DbUserCredential.field("username", "un_cred"),
         DbUserCredential.field("hash", "pw_cred"),
         DbUserCredential.field("salt"),
-        DbIdDisplaynameService.field("servicename", "service"),
-        DbIdDisplaynameService.field("id", "serviceId"),
+        DbServiceJoin.field("servicename", "service"),
+        DbServiceJoin.field("id", "serviceId"),
         DbUserService.field("is_owner", "serviceOwner"),
-        DbIdDisplaynameGroups.field("displayname", "group"),
-        DbIdDisplaynameGroups.field("id", "groupId"),
+        DbGroupJoin.field("groupname", "group"),
+        DbGroupJoin.field("id", "groupId"),
         DbUserGroup.field("is_owner", "groupOwner"),
-        DbIdDisplaynameInvitationsObj.field("displayname", "invObjRefName"),
-        DbIdDisplaynameInvitationsSender.field("displayname", "invSendRefName"),
+        DbGroupObjJoin.field("groupname", "invObjRefName"),
+        DbUserSenderJoin.field("displayname", "invSendRefName"),
         DbInvitation.field("obj_reference", "invObjRef"),
         DbInvitation.field("sender_reference", "invSendRef"),
         DbSessions.field("id", "sessionsId"),
@@ -172,23 +160,23 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         DbUser.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitationsObj,
-        DbIdDisplaynameInvitationsObj.field("id"),
+        DbGroupObjJoin,
+        DbGroupObjJoin.field("id"),
         DbInvitation.field("obj_reference"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitationsSender,
-        DbIdDisplaynameInvitationsSender.field("id"),
+        DbUserSenderJoin,
+        DbUserSenderJoin.field("id"),
         DbInvitation.field("sender_reference"),
       )
       .leftJoin(
-        DbIdDisplaynameService,
-        DbIdDisplaynameService.field("id"),
+        DbServiceJoin,
+        DbServiceJoin.field("id"),
         DbUserService.field("dbservice_id"),
       )
       .leftJoin(
-        DbIdDisplaynameGroups,
-        DbIdDisplaynameGroups.field("id"),
+        DbGroupJoin,
+        DbGroupJoin.field("id"),
         DbUserGroup.field("dbgroup_id"),
       )
       .leftJoin(
