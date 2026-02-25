@@ -32,11 +32,6 @@ export class DbIdDisplaynameUser extends DbIdDisplayname {
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbIdDisplaynameService extends DbIdDisplayname {
-  static override alias = UniqueNumber.next() + "";
-  static override table = super.table + " AS " + this.alias;
-}
-
 export class DbIdDisplaynameGroups extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;

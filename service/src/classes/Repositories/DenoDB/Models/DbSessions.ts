@@ -1,6 +1,7 @@
-import { DataTypes, Model } from "@denodb";
+import { DataTypes } from "@denodb";
+import { DbAliasableModel } from "./DbAliasableModel.ts";
 
-export class DbSessions extends Model {
+export class DbSessions extends DbAliasableModel {
   static override table = "Sessions";
   static override timestamps = true;
   static override fields = {

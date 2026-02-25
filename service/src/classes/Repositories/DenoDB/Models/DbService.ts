@@ -3,7 +3,9 @@ import { DbServiceCredential } from "./DbServiceCredentials.ts";
 import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 import { DbUserService } from "./DbUserService.ts";
 import { DbInvitation } from "./DbInvitation.ts";
-export class DbService extends Model {
+import { DbAliasableModel } from "./DbAliasableModel.ts";
+import { UniqueNumber } from "../UniqueNumber.ts";
+export class DbService extends DbAliasableModel {
   static override table = "Services";
   static override timestamps = true;
   static override fields = {
@@ -43,3 +45,8 @@ export class DbService extends Model {
   id!: string;
 }
 Relationships.belongsTo(DbServiceCredential, DbService);
+
+export class DbIdDisplaynameService extends DbService {
+  static override alias = UniqueNumber.next() + "";
+  static override table = super.table + " AS " + this.alias;
+}

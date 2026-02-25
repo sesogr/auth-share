@@ -8,9 +8,9 @@ import {
   DbIdDisplaynameInvitationsObj,
   DbIdDisplaynameInvitationsReceiver,
   DbIdDisplaynameInvitationsSender,
-  DbIdDisplaynameService,
   DbIdDisplaynameUser,
 } from "./Models/DbIdDisplayname.ts";
+import { DbIdDisplaynameService } from "./Models/DbService.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
@@ -74,7 +74,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbGroup.field("groupname"),
         DbGroup.field("owner"),
         DbGroup.field("id"),
-        DbIdDisplaynameService.field("displayname", "allowedServiceName"),
+        DbIdDisplaynameService.field("servicename", "allowedServiceName"),
         DbIdDisplaynameService.field("id", "allowedServiceId"),
         DbIdDisplaynameInvitationsReceiver.field(
           "displayname",

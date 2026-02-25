@@ -3,7 +3,8 @@ import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 import { DbGroupService } from "./DbGroupService.ts";
 import { DbUserGroup } from "./DbUserGroup.ts";
 import { DbInvitation } from "./DbInvitation.ts";
-export class DbGroup extends Model {
+import { DbAliasableModel } from "./DbAliasableModel.ts";
+export class DbGroup extends DbAliasableModel {
   static override table = "Groups";
   static override timestamps = true;
   static override fields = {

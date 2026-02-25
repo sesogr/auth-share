@@ -6,8 +6,8 @@ import {
   DbIdDisplaynameGroups,
   DbIdDisplaynameInvitationsObj,
   DbIdDisplaynameInvitationsSender,
-  DbIdDisplaynameService,
 } from "./Models/DbIdDisplayname.ts";
+import { DbIdDisplaynameService } from "./Models/DbService.ts";
 import { DbUser } from "./Models/DbUser.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
@@ -137,7 +137,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         DbUserCredential.field("username", "un_cred"),
         DbUserCredential.field("hash", "pw_cred"),
         DbUserCredential.field("salt"),
-        DbIdDisplaynameService.field("displayname", "service"),
+        DbIdDisplaynameService.field("servicename", "service"),
         DbIdDisplaynameService.field("id", "serviceId"),
         DbUserService.field("is_owner", "serviceOwner"),
         DbIdDisplaynameGroups.field("displayname", "group"),
@@ -149,6 +149,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         DbInvitation.field("sender_reference", "invSendRef"),
         DbSessions.field("id", "sessionsId"),
         DbSessions.field("expires_at"),
+        DbUser.field("id"),
       )
       .leftJoin(
         DbUserGroup,

@@ -5,8 +5,9 @@ import { DbUserService } from "./DbUserService.ts";
 import { DbUserGroup } from "./DbUserGroup.ts";
 import { DbInvitation } from "./DbInvitation.ts";
 import { DbSessions } from "./DbSessions.ts";
+import { DbAliasableModel } from "./DbAliasableModel.ts";
 
-export class DbUser extends Model {
+export class DbUser extends DbAliasableModel {
   static override table = "Users";
   static override timestamps = true;
   static override fields = {
