@@ -1,9 +1,10 @@
 import { DataTypes, Model } from "@denodb";
-import { DbIdDisplayname } from "./DbIdDisplayname.ts";
 import { DbGroupService } from "./DbGroupService.ts";
 import { DbUserGroup } from "./DbUserGroup.ts";
 import { DbInvitation } from "./DbInvitation.ts";
-export class DbGroup extends Model {
+import { DbAliasableModel } from "./DbAliasableModel.ts";
+import { UniqueNumber } from "../UniqueNumber.ts";
+export class DbGroup extends DbAliasableModel {
   static override table = "Groups";
   static override timestamps = true;
   static override fields = {
@@ -19,9 +20,6 @@ export class DbGroup extends Model {
   }
   static override all(): Promise<DbGroup[]> {
     return super.all() as Promise<DbGroup[]>;
-  }
-  static displayname() {
-    return this.hasOne(DbIdDisplayname) as Promise<DbIdDisplayname>;
   }
   static knownServices() {
     return this.hasMany(DbGroupService) as Promise<Model[]>;
@@ -44,4 +42,16 @@ export class DbGroup extends Model {
   groupname!: string;
   owner!: string;
   id!: string;
+}
+export class DbGroupJoin extends DbGroup {
+  static override alias = UniqueNumber.next() + "";
+  static override table = super.table + " AS " + this.alias;
+}
+export class DbGroupReceiverJoin extends DbGroup {
+  static override alias = UniqueNumber.next() + "";
+  static override table = super.table + " AS " + this.alias;
+}
+export class DbGroupObjJoin extends DbGroup {
+  static override alias = UniqueNumber.next() + "";
+  static override table = super.table + " AS " + this.alias;
 }

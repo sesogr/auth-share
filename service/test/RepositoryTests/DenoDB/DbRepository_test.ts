@@ -3,7 +3,6 @@ import { Entity } from "../../../src/classes/Entity.ts";
 import { DbRepository } from "../../../src/classes/Repositories/DenoDB/DbRepository.ts";
 import { spy, stub } from "@std/testing/mock";
 import { assert, assertFalse, assertGreater, assertRejects } from "@std/assert";
-import { DbIdDisplayname } from "../../../src/classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
 import { DuplicateError } from "../../../src/errors/DuplicateError.ts";
 
 class TestDbrepository extends DbRepository {
@@ -49,13 +48,6 @@ Deno.test("DbRepository", async (t) => {
     getId: () => "123",
     getDisplayName: () => "Test User",
   } as unknown as Entity;
-  stub(
-    DbIdDisplayname,
-    "first",
-    () => Promise.resolve(mockData) as unknown as Promise<DbIdDisplayname>,
-  );
-  stub(DbIdDisplayname, "where", () => DbIdDisplayname);
-  stub(DbIdDisplayname, "select", () => DbIdDisplayname);
   const updateStub = spy(dbRepository, "update");
   await t.step(
     "checkIdName returns true if id and displayname match",

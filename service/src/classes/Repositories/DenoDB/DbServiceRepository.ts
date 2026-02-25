@@ -4,13 +4,14 @@ import { DbService } from "./Models/DbService.ts";
 import { ServiceCredential } from "../../ServiceCredential.ts";
 import { Model } from "@denodb";
 import { DbUserService } from "./Models/DbUserService.ts";
+
+import { DbGroupJoin } from "./Models/DbGroup.ts";
 import {
-  DbIdDisplayname,
-  DbIdDisplaynameGroups,
-  DbIdDisplaynameInvitationsReceiver,
-  DbIdDisplaynameInvitationsSender,
-  DbIdDisplaynameUser,
-} from "./Models/DbIdDisplayname.ts";
+  DbUserJoin,
+  DbUserReceiverJoin,
+  DbUserSenderJoin,
+} from "./Models/DbUser.ts";
+
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
@@ -66,9 +67,6 @@ export class DbServiceRepository extends DbRepository
     await DbServiceCredential.where("dbservice_id", item.getId()).update({
       username: item.credentials.username!,
       password: item.credentials.password!,
-    });
-    await DbIdDisplayname.where("id", item.getId()).update({
-      displayname: item.getDisplayName(),
     });
     //GroupService --> allowedGroups[]
     //.all gives all rows out
@@ -132,10 +130,7 @@ export class DbServiceRepository extends DbRepository
         username: item.credentials.username,
         password: item.credentials.password,
       });
-      await DbIdDisplayname.create({
-        id: item.getId(),
-        displayname: item.getDisplayName(),
-      });
+
       await DbUserService.create(
         item.allowedUsers.map((allowedUsermap) => {
           return {
@@ -179,16 +174,16 @@ export class DbServiceRepository extends DbRepository
   async hydrate(searchedId: string): Promise<Service> {
     const queryData = await DbService
       .select(
-        DbIdDisplaynameUser.field("displayname", "allowedUserName"),
-        DbIdDisplaynameGroups.field("displayname", "allowedGroupName"),
+        DbUserJoin.field("displayname", "allowedUserName"),
+        DbGroupJoin.field("groupname", "allowedGroupName"),
         DbServiceCredential.field("username", "un_cred"),
         DbServiceCredential.field("password", "pw_cred"),
         DbService.field("servicename", "servicename"),
         DbService.field("service_url"),
-        DbIdDisplaynameInvitationsSender.field("id", "sender_id"),
-        DbIdDisplaynameInvitationsSender.field("displayname", "sender_name"),
-        DbIdDisplaynameInvitationsReceiver.field("id", "receiver_id"),
-        DbIdDisplaynameInvitationsReceiver.field(
+        DbUserSenderJoin.field("id", "sender_id"),
+        DbUserSenderJoin.field("displayname", "sender_name"),
+        DbUserReceiverJoin.field("id", "receiver_id"),
+        DbUserReceiverJoin.field(
           "displayname",
           "receiver_name",
         ),
@@ -217,23 +212,23 @@ export class DbServiceRepository extends DbRepository
         DbService.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitationsSender,
-        DbIdDisplaynameInvitationsSender.field("id"),
+        DbUserSenderJoin,
+        DbUserSenderJoin.field("id"),
         DbInvitation.field("sender_reference"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitationsReceiver,
-        DbIdDisplaynameInvitationsReceiver.field("id"),
+        DbUserReceiverJoin,
+        DbUserReceiverJoin.field("id"),
         DbInvitation.field("receiver_reference"),
       )
       .leftJoin(
-        DbIdDisplaynameUser,
-        DbIdDisplaynameUser.field("id"),
+        DbUserJoin,
+        DbUserJoin.field("id"),
         DbUserService.field("dbuser_id"),
       )
       .leftJoin(
-        DbIdDisplaynameGroups,
-        DbIdDisplaynameGroups.field("id"),
+        DbGroupJoin,
+        DbGroupJoin.field("id"),
         DbGroupService.field("dbgroup_id"),
       )
       .where(DbService.field("id"), searchedId)

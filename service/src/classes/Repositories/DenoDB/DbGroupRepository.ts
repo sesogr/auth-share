@@ -1,16 +1,14 @@
 import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
 import { Group } from "../../Group.ts";
-import { DbGroup } from "./Models/DbGroup.ts";
+import { DbGroup, DbGroupReceiverJoin } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
+
 import {
-  DbIdDisplayname,
-  DbIdDisplaynameInvitations2Sender,
-  DbIdDisplaynameInvitationsObj,
-  DbIdDisplaynameInvitationsReceiver,
-  DbIdDisplaynameInvitationsSender,
-  DbIdDisplaynameService,
-  DbIdDisplaynameUser,
-} from "./Models/DbIdDisplayname.ts";
+  DbUserJoin,
+  DbUserSenderJoin,
+  DbUserSenderJoin2,
+} from "./Models/DbUser.ts";
+import { DbServiceJoin, DbServiceObjJoin } from "./Models/DbService.ts";
 import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
@@ -34,9 +32,6 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
     await DbGroup.where("id", item.getId()).update({
       groupname: item.getDisplayName(),
       owner: item.getOwner().id,
-    });
-    await DbIdDisplayname.where("id", item.getId()).update({
-      displayname: item.getDisplayName(),
     });
 
     const _userGroupModel = await DbUserGroup.where(
@@ -74,27 +69,27 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbGroup.field("groupname"),
         DbGroup.field("owner"),
         DbGroup.field("id"),
-        DbIdDisplaynameService.field("displayname", "allowedServiceName"),
-        DbIdDisplaynameService.field("id", "allowedServiceId"),
-        DbIdDisplaynameInvitationsReceiver.field(
-          "displayname",
+        DbServiceJoin.field("servicename", "allowedServiceName"),
+        DbServiceJoin.field("id", "allowedServiceId"),
+        DbGroupReceiverJoin.field(
+          "groupname",
           "receiver_name",
         ),
-        DbIdDisplaynameInvitationsReceiver.field("id", "receiver_id"),
-        DbIdDisplaynameInvitationsSender.field("displayname", "sender_name"),
-        DbIdDisplaynameInvitationsSender.field("id", "sender_id"),
-        DbIdDisplaynameInvitationsObj.field(
+        DbGroupReceiverJoin.field("id", "receiver_id"),
+        DbUserSenderJoin.field("displayname", "sender_name"),
+        DbUserSenderJoin.field("id", "sender_id"),
+        DbServiceObjJoin.field(
           "displayname",
           "invitedServiceName",
         ),
-        DbIdDisplaynameInvitationsObj.field("id", "invitedServiceId"),
-        DbIdDisplaynameInvitations2Sender.field(
+        DbServiceObjJoin.field("id", "invitedServiceId"),
+        DbUserSenderJoin2.field(
           "displayname",
           "invitedServiceSenderName",
         ),
-        DbIdDisplaynameInvitations2Sender.field("id", "invitedServiceSenderId"),
-        DbIdDisplaynameUser.field("id", "allowedUserId"),
-        DbIdDisplaynameUser.field("displayname", "allowedUserName"),
+        DbUserSenderJoin2.field("id", "invitedServiceSenderId"),
+        DbUserJoin.field("id", "allowedUserId"),
+        DbUserJoin.field("displayname", "allowedUserName"),
         DbUserGroup.field("is_owner"),
       )
       .leftJoin(
@@ -103,8 +98,8 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameUser,
-        DbIdDisplaynameUser.field("id"),
+        DbUserJoin,
+        DbUserJoin.field("id"),
         DbUserGroup.field("dbuser_id"),
       )
       .leftJoin(
@@ -113,8 +108,8 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameService,
-        DbIdDisplaynameService.field("id"),
+        DbServiceJoin,
+        DbServiceJoin.field("id"),
         DbGroupService.field("dbservice_id"),
       )
       .leftJoin(
@@ -123,13 +118,13 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitationsReceiver,
-        DbIdDisplaynameInvitationsReceiver.field("id"),
+        DbGroupReceiverJoin,
+        DbGroupReceiverJoin.field("id"),
         DbInvitationJoinOnObject.field("receiver_reference"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitationsSender,
-        DbIdDisplaynameInvitationsSender.field("id"),
+        DbUserSenderJoin,
+        DbUserSenderJoin.field("id"),
         DbInvitationJoinOnObject.field("sender_reference"),
       )
       .leftJoin(
@@ -138,13 +133,13 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbGroup.field("id"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitationsObj,
-        DbIdDisplaynameInvitationsObj.field("id"),
+        DbServiceObjJoin,
+        DbServiceObjJoin.field("id"),
         DbInvitationJoinOnReceived.field("obj_reference"),
       )
       .leftJoin(
-        DbIdDisplaynameInvitations2Sender,
-        DbIdDisplaynameInvitations2Sender.field("id"),
+        DbUserSenderJoin2,
+        DbUserSenderJoin2.field("id"),
         DbInvitationJoinOnReceived.field("sender_reference"),
       )
       .where(DbGroup.field("id"), searchedId)
@@ -347,10 +342,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         owner: item.getOwner().id,
         id: item.getId(),
       });
-      await DbIdDisplayname.create({
-        id: item.getId(),
-        displayname: item.getDisplayName(),
-      });
+
       if (item.listSentInvitation().length) {
         await DbInvitation.create(
           item.listSentInvitation().map((e) => {

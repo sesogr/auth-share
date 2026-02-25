@@ -1,7 +1,8 @@
-import { DataTypes, Model } from "@denodb";
+import { DataTypes } from "@denodb";
 import { DbUser } from "./DbUser.ts";
+import { DbAliasableModel } from "./DbAliasableModel.ts";
 
-export class DbUserCredential extends Model {
+export class DbUserCredential extends DbAliasableModel {
   static override table = "UserCredentials";
   static override timestamps = true;
   static override fields = {

@@ -15,7 +15,6 @@ import { ServiceController } from "./controller/ServiceController.ts";
 import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
 import { UserRepository } from "./interfaceTypes/UserRepository.ts";
-import { DbIdDisplayname } from "./classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
 import { DbInvitation } from "./classes/Repositories/DenoDB/Models/DbInvitation.ts";
 import { DbServiceCredential } from "./classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
 import { DbUserCredential } from "./classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
@@ -48,7 +47,6 @@ db.link([
   DbUserGroup,
   DbGroupService,
   DbInvitation,
-  DbIdDisplayname,
   DbSessions,
 ]);
 let ME: User = new User(await UserCredential.create("", ""));
