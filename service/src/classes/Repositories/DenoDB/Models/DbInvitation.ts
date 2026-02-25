@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "@denodb";
 import { FieldAlias } from "@denodb/datatypes";
+import { UniqueNumber } from "../UniqueNumber.ts";
 
 export class DbInvitation extends Model {
   static override table = "Invitations";
@@ -44,17 +45,17 @@ class DbJoinHelper extends DbInvitation {
 }
 
 export class DbInvitationJoinOnSender extends DbJoinHelper {
-  protected static override alias = crypto.randomUUID();
+  protected static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
 export class DbInvitationJoinOnReceived extends DbJoinHelper {
-  protected static override alias = crypto.randomUUID();
+  protected static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
 export class DbInvitationJoinOnObject extends DbJoinHelper {
-  protected static override alias = crypto.randomUUID();
+  protected static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 // Relationships.hasMany(DbInvitation, DbUser);

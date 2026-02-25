@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "@denodb";
 import { FieldAlias } from "@denodb/datatypes";
+import { UniqueNumber } from "../UniqueNumber.ts";
 
 export class DbIdDisplayname extends Model {
   static override table = "IdDisplayname";
@@ -46,38 +47,38 @@ class DbAliasHelper extends DbIdDisplayname {
 }
 
 export class DbIdDisplaynameUser extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
 export class DbIdDisplaynameService extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
 export class DbIdDisplaynameGroups extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
 export class DbIdDisplaynameInvitationsObj extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
 export class DbIdDisplaynameInvitationsSender extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 export class DbIdDisplaynameInvitationsReceiver extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 export class DbIdDisplaynameInvitations2Receiver extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 export class DbIdDisplaynameInvitations2Sender extends DbAliasHelper {
-  static override alias = crypto.randomUUID();
+  static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
