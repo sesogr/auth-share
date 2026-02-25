@@ -1,8 +1,8 @@
-import { DataTypes, Model } from "@denodb";
-import { FieldAlias } from "@denodb/datatypes";
+import { DataTypes } from "@denodb";
 import { UniqueNumber } from "../UniqueNumber.ts";
+import { DbAliasableModel } from "./DbAliasableModel.ts";
 
-export class DbIdDisplayname extends Model {
+export class DbIdDisplayname extends DbAliasableModel {
   static override table = "IdDisplayname";
   static override timestamps = true;
   static override fields = {
@@ -26,59 +26,40 @@ export class DbIdDisplayname extends Model {
   id!: string;
   displayname!: string;
 }
-class DbAliasHelper extends DbIdDisplayname {
-  protected static alias = "";
-  static override field(field: string): string;
-  static override field(field: string, nameAs: string): FieldAlias;
-  static override field(field: string, nameAs?: string): string | FieldAlias {
-    const newLocal = `${this.alias}.${
-      field.replace(/[A-Z]/g, (ch) => `_${ch.toLowerCase()}`)
-    }`;
-    field = field.replace(/_([a-z])/g, (_, ch) => ch.toUpperCase());
-    if (!Object.keys(this.fields).includes(field)) {
-      throw new Error("Field does not Exist!");
-    }
 
-    if (nameAs) {
-      return { [nameAs]: newLocal };
-    }
-    return newLocal;
-  }
-}
-
-export class DbIdDisplaynameUser extends DbAliasHelper {
+export class DbIdDisplaynameUser extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbIdDisplaynameService extends DbAliasHelper {
+export class DbIdDisplaynameService extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbIdDisplaynameGroups extends DbAliasHelper {
+export class DbIdDisplaynameGroups extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbIdDisplaynameInvitationsObj extends DbAliasHelper {
+export class DbIdDisplaynameInvitationsObj extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
 
-export class DbIdDisplaynameInvitationsSender extends DbAliasHelper {
+export class DbIdDisplaynameInvitationsSender extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
-export class DbIdDisplaynameInvitationsReceiver extends DbAliasHelper {
+export class DbIdDisplaynameInvitationsReceiver extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
-export class DbIdDisplaynameInvitations2Receiver extends DbAliasHelper {
+export class DbIdDisplaynameInvitations2Receiver extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
-export class DbIdDisplaynameInvitations2Sender extends DbAliasHelper {
+export class DbIdDisplaynameInvitations2Sender extends DbIdDisplayname {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
