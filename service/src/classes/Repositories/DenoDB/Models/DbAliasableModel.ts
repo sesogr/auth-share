@@ -6,7 +6,7 @@ export class DbAliasableModel extends Model {
   static override field(field: string): string;
   static override field(field: string, nameAs: string): FieldAlias;
   static override field(field: string, nameAs?: string): string | FieldAlias {
-    const newLocal = `${this.alias}.${
+    const unambiguousColName = `${this.alias || this.table}.${
       field.replace(/[A-Z]/g, (ch) => `_${ch.toLowerCase()}`)
     }`;
     field = field.replace(/_([a-z])/g, (_, ch) => ch.toUpperCase());
@@ -15,8 +15,8 @@ export class DbAliasableModel extends Model {
     }
 
     if (nameAs) {
-      return { [nameAs]: newLocal };
+      return { [nameAs]: unambiguousColName };
     }
-    return newLocal;
+    return unambiguousColName;
   }
 }
