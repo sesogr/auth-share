@@ -5,6 +5,7 @@ import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts
 import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
 import { stub } from "@std/testing/mock";
 import { User } from "../../src/classes/User.ts";
+import { Service } from "../../src/classes/Service.ts";
 Deno.test("DbServiceController", async (t) => {
   await t.step("listmyService", async () => {
     const { serviceController, mockContext } = buildUp();
@@ -15,11 +16,11 @@ Deno.test("DbServiceController", async (t) => {
   function buildUp() {
     const serviceRepo = {
       findOwnedByUserId: (_a) => {
-        return;
+        return Promise.resolve([] as unknown as Service[]);
       },
     } as ServiceRepository;
     const userRepo = {} as UserRepository;
-    const user = {} as User;
+    const user = { getId: () => "123" } as User;
     const serviceController = new ServiceController(
       serviceRepo,
       userRepo,

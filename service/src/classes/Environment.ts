@@ -78,7 +78,15 @@ export class Environment {
     }
     this.checked = true;
   }
-
+  public static clear() {
+    this._FRONT_END_URL = undefined as unknown as string;
+    this._DB_NAME = undefined as unknown as string;
+    this._DB_USER = undefined as unknown as string;
+    this._DB_PASSWORD = undefined as unknown as string;
+    this._DENO_ENV = undefined as unknown as string;
+    this._DB_HOST = undefined as unknown as string;
+    this.checked = false;
+  }
   public static load(): void {
     Environment.FRONT_END_URL = Deno.env.get("FRONT_END_URL")!;
     Environment.DB_NAME = Deno.env.get("DB_NAME")!;

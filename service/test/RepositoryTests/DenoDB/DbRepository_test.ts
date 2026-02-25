@@ -15,7 +15,6 @@ class TestDbrepository extends DbRepository {
 }
 class TModel extends Model {
 }
-
 Deno.test("DbRepository", async (t) => {
   let modelResponse: boolean[] | undefined[];
   let modelresponsenumber: number = 0;
@@ -35,6 +34,7 @@ Deno.test("DbRepository", async (t) => {
       return newLocal;
     },
   );
+  stub(TModel, "select", () => TModel);
   const dbRepository = new TestDbrepository(
     TModel,
     "displayname",
@@ -54,7 +54,8 @@ Deno.test("DbRepository", async (t) => {
     async () => {
       modelresponsenumber = 0;
       mockData = { id: "123", displayname: "Test User" };
-      // Mock the DbIdDisplayname.where().select().select().first() method
+      //@ts-ignore Type mismatch because of the way we stubbed the model
+      modelResponse = [mockData];
       const result = await dbRepository.checkIdName(item);
       assert(result);
     },
@@ -64,12 +65,15 @@ Deno.test("DbRepository", async (t) => {
     async () => {
       modelresponsenumber = 0;
       mockData = { id: "123", displayname: "Wrong Name" };
+      //@ts-ignore Type mismatch because of the way we stubbed the model
+      modelResponse = [mockData];
       const result = await dbRepository.checkIdName(item);
       assertFalse(result);
     },
   );
   await t.step("checkIdName returns false if id does not exist", async () => {
     modelresponsenumber = 0;
+    modelResponse = [undefined];
     const result = await dbRepository.checkIdName(item);
     assertFalse(result);
   });
@@ -132,6 +136,8 @@ Deno.test("DbRepository", async (t) => {
     async () => {
       modelresponsenumber = 0;
       mockData = { id: "123", displayname: "Test User" };
+      //@ts-ignore Type mismatch because of the way we stubbed the model
+      modelResponse = [mockData];
       const result = await dbRepository.checkIdName(item);
       assert(result);
     },

@@ -7,7 +7,7 @@
     "hooks:pre-commit": "deno task check",
     "deno-check": "deno task check-web && deno task check-service",
     "databasetestsetup": "deno run --allow-all service/test/DenoDbTests/DenoDBTestDatabaseSetup.ts",
-    "test": "deno test --coverage --allow-import ",
+    "test": "deno test --coverage --allow-import --allow-env",
     "cover": "deno coverage --lcov > coverage/lcov.info"
   },
   "imports": {

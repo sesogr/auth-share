@@ -7,18 +7,15 @@ import { User } from "../../../src/classes/User.ts";
 import { UserCredential } from "../../../src/classes/UserCredential.ts";
 
 Deno.test("ServiceRepository", async (t) => {
+  const { serviceList, serviceRepository }: ServiceRepositoryTestsuit =
+    await buildUp();
   await t.step("findById", async () => {
-    const { serviceList, serviceRepository }: ServiceRepositoryTestsuit =
-      await buildUp();
     const testService = await serviceRepository.findById(
       serviceList[0].getId(),
     );
     assertEquals(testService.getId(), serviceList[0].getId());
   });
   await t.step("InMemServiceRepository - save", async () => {
-    const { serviceList, serviceRepository }: ServiceRepositoryTestsuit =
-      await buildUp();
-
     // Test the save method
     // const newService = Service.createService(
     //   { id: "credentials-id", secret: "credentials-secret" },

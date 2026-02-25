@@ -2,7 +2,18 @@ import { Environment } from "../src/classes/Environment.ts";
 import { assertEquals, assertThrows } from "@std/assert";
 import { EnvError } from "../src/errors/EnvError.ts";
 
-Deno.test("Environment variables should be loaded correctly", () => {
+Deno.test("Environment variables should be loaded correctly", (t) => {
+  const testcase = (casename: string) => {
+    Deno.env.delete(casename);
+    assertThrows(
+      () => {
+        Environment.load();
+      },
+      EnvError,
+      casename,
+    );
+    Deno.env.set(casename, "test_value");
+  };
   const environmental = Object.keys(Environment).filter((key) => {
     const hasUnderscore = key.startsWith("_");
     return hasUnderscore;
@@ -31,15 +42,4 @@ Deno.test("Environment variables should be loaded correctly", () => {
   environmental.forEach((variable) => {
     Deno.env.delete(variable);
   });
-  function testcase(casename: string) {
-    Deno.env.delete(casename);
-    assertThrows(
-      () => {
-        Environment.load();
-      },
-      EnvError,
-      casename,
-    );
-    Deno.env.set(casename, "test_value");
-  }
 });
