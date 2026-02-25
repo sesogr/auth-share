@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Form, Input, message, Row, Space } from "antd";
-import type { SendingConvertedService } from "./types/ConvertedService.ts";
+import type {
+  ReceivedConvertedService,
+  SendingConvertedService,
+} from "./types/ConvertedService.ts";
 
-const CreateService: React.FC = () => {
+const CreateService: React.FC<
+  {
+    serviceList: ReceivedConvertedService[];
+  }
+> = ({ serviceList }) => {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const showDrawer = () => {
@@ -43,6 +50,15 @@ const CreateService: React.FC = () => {
       .then((data) => {
         form.resetFields();
         message.success("Service created");
+        serviceList.push({
+          serviceName: servicename,
+          serviceUrl: serviceUrl,
+          credentials: {
+            username: username,
+            password: password,
+          },
+        } as ReceivedConvertedService);
+
         return console.log(data);
       })
       .catch((error) => {

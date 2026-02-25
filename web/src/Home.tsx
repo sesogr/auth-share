@@ -34,7 +34,13 @@ const Home: React.FC = () => {
   }, []);
 
   if (error) return <div>Fehler: {error}</div>;
-  if (!loading && serviceList.length === 0) return <CreateService />;
+  if (!loading && serviceList.length === 0) {
+    return (
+      <CreateService
+        serviceList={serviceList}
+      />
+    );
+  }
 
   const service = serviceName
     ? serviceList.find((s) => serviceName === s.serviceName)
@@ -48,7 +54,9 @@ const Home: React.FC = () => {
         </Col>
       </Row>
 
-      <CreateService />
+      <CreateService
+        serviceList={serviceList}
+      />
 
       <List
         bordered

@@ -3,7 +3,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext.tsx";
 import { Button, List } from "antd";
 import type { UserStringProperties } from "./types/ConvertedUser.ts";
-import Change from "./components/Change.tsx";
+import Change from "./components/UpdateUser.tsx";
 const User: React.FC = () => {
   const { displayname } = useParams();
   const { user } = useAuth();
