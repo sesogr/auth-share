@@ -8,5 +8,6 @@
     "vite": "npm:vite",
     "antd": "npm:antd",
     "@ant-design/icons": "npm:@ant-design/icons"
-  }
+  },
+  "allowScripts": ["npm:cypress@15.11.0", "npm:esbuild@0.25.9"]
 }
