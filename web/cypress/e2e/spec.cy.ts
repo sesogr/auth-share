@@ -1,6 +1,8 @@
-import { SendingConvertedUser } from "../../src/types/ConvertedUser.ts";
 describe("Basic User Follow", () => {
-  const newUserData: SendingConvertedUser = {
+  const newUserData: {
+    displayname: string;
+    credentials: `${string}:${string}`;
+  } = {
     displayname: "hallo",
     credentials: "hallo:hallo",
   };
@@ -8,9 +10,9 @@ describe("Basic User Follow", () => {
     cy.visit("localhost:3000");
     cy.get("#login_form div:nth-child(2) > button.ant-btn > span").click();
     cy.get("#username").click();
-    cy.get("#username").type("hallo");
-    cy.get("#displayname").type("hallo");
-    cy.get("#password").type("hallo");
+    cy.get("#username").type(newUserData.credentials.split(":")[0]);
+    cy.get("#displayname").type(newUserData.displayname);
+    cy.get("#password").type(newUserData.credentials.split(":")[1]);
     cy.get("#root > div:nth-child(2)").click();
     cy.window().then((win) => {
       cy.spy(win, "fetch").as("fetchSpy");

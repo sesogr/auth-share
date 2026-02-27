@@ -27,9 +27,13 @@ export class UserController extends HeadController {
   }
   private confirmCredentials(
     requestData: ConvertedUser,
-  ): asserts requestData is ConvertedUser & { credentials: string } {
-    if (!requestData.credentials) {
-      throw new TypeError("Credentials are required");
+  ): asserts requestData is ConvertedUser & {
+    credentials: `${string}:${string}`;
+  } {
+    if (!requestData.credentials || !requestData.credentials.includes(":")) {
+      throw new TypeError(
+        "Credentials are required and must be in the format 'username:password'",
+      );
     }
   }
   async changePassword(c: Context) {
