@@ -2,7 +2,7 @@ import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { User } from "../../User.ts";
 
-import { DbGroupJoin, DbGroupObjJoin } from "./Models/DbGroup.ts";
+import { DbGroup, DbGroupJoin, DbGroupObjJoin } from "./Models/DbGroup.ts";
 import { DbServiceJoin } from "./Models/DbService.ts";
 import { DbUser, DbUserSenderJoin } from "./Models/DbUser.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
@@ -11,7 +11,7 @@ import { DbUserGroup } from "./Models/DbUserGroup.ts";
 import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
 import { Model } from "@denodb";
-import { DbUserService } from "./Models/DbUserService.ts";
+import { DbUserService, DbUserServiceTable } from "./Models/DbUserService.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
 import { UserCredential } from "../../UserCredential.ts";
 import { Invitation } from "../../Invitation.ts";
@@ -19,10 +19,42 @@ import { RuntimeError } from "../../../errors/RuntimeError.ts";
 import { DbSessions } from "./Models/DbSessions.ts";
 import { Session } from "../../Session.ts";
 import { DbRepository } from "./DbRepository.ts";
+import { Entity } from "../../Entity.ts";
+import { ConflictError } from "../../../errors/ConflictError.ts";
+import { Values } from "@denodb/datatypes";
 
 export class DbUserRepository extends DbRepository implements UserRepository {
   constructor() {
     super(DbUser, "displayname");
+  }
+  override async delete(item: Entity): Promise<void> {
+    DbGroup.where(DbGroup.field("owner"), item.getId()).all().then(
+      (groups) => {
+        throw new ConflictError(
+          `User is owner of the following groups: ${
+            groups.map((g) => g.groupname).join(", ")
+          }. Please transfer ownership or delete these groups before deleting the user.`,
+        );
+      },
+    );
+    const services = (await DbUserService.where({
+      [DbUserService.field("dbuser_id")]: item.getId(),
+      [DbUserService.field("is_owner")]: true,
+    }).all()) as DbUserServiceTable[];
+    const _services = await Promise.all(services.map((s) => {
+      return DbUserService.where({
+        [DbUserService.field("dbservice_id")]: s.dbserviceId,
+        [DbUserService.field("is_owner")]: true,
+      }).all() as Promise<DbUserServiceTable[]>;
+    }));
+    _services.forEach((s) => {
+      const a = s.find((e) => e.dbuserId !== item.getId());
+      if (!a) {
+        throw new ConflictError(
+          `User is the only owner of Services. Please transfer ownership or delete these services before deleting the user.`,
+        );
+      }
+    });
   }
   async update(item: User): Promise<void> {
     await DbUser.where("id", item.getId()).update({
@@ -58,7 +90,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
   }
   async findByUserName(name: string): Promise<User> {
     const aUser = await DbUserCredential.where("username", name).first();
-    if (!aUser.username) {
+    if (!aUser || !aUser.username) {
       throw new Error("User by Username not found!");
     }
     return this.hydrate(aUser.dbuserId);

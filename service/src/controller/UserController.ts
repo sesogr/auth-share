@@ -6,6 +6,7 @@ import { ConvertedUser } from "../types/types.ts";
 import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
 import { HeadController } from "./HeadController.ts";
 import { Environment } from "../classes/Environment.ts";
+import { ConflictError } from "../errors/ConflictError.ts";
 
 export class UserController extends HeadController {
   constructor(
@@ -120,6 +121,21 @@ export class UserController extends HeadController {
     }
     return c.body(null, 204);
   }
+  async delete(c: Context) {
+    const me: User = await this.getMeFromContext(c);
+    try {
+      await this.userRepository.delete(me);
+      deleteCookie(c, "session");
+    } catch (error) {
+      if (error instanceof ConflictError) {
+        return c.body(error.message, 409);
+      }
+      if (error instanceof Error) {
+        return c.body(error.message, 500);
+      }
+    }
+    return c.body(null, 204);
+  }
   async create(c: Context) {
     try {
       c.res.headers.set("Access-Control-Allow-Origin", "*");
@@ -134,6 +150,7 @@ export class UserController extends HeadController {
       );
 
       await this.userRepository.save(newUser);
+      console.log("test");
       return c.body(null, 201);
     } catch (error) {
       if (error instanceof Error) {

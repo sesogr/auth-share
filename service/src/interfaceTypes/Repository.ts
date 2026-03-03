@@ -5,4 +5,5 @@ export type Repository<T> = {
   add(_item: T): Promise<void>;
   removeById(_id: string): Promise<void>;
   save(_item: T): Promise<void>;
+  delete(_item: T): Promise<void>;
 };

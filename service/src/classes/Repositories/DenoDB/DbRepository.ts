@@ -106,7 +106,13 @@ export abstract class DbRepository {
   }
   abstract update(item: Entity): Promise<void>;
   abstract add(item: Entity): Promise<void>;
-
+  async delete(item: Entity) {
+    const idExists = await this.existId(item.getId());
+    if (!idExists) {
+      throw new Error("Item with id: " + item.getId() + " does not exist");
+    }
+    await this.model.where(this.id, item.getId()).delete();
+  }
   protected async updateInvitation(item: Entity) {
     const _invitationsModel = await DbInvitation.where(
       "obj_reference",
