@@ -2,7 +2,7 @@ import type { AllOptional } from "./AllOptional.ts";
 
 type ConvertedUser =
   & { [k in UserStringProperties]: string }
-  & { "credentials": `${string}:${string}` }
+  & { "credentials": `${string}:${string}` | string }
   & {
     [k in UserListProperties]: string[];
   };

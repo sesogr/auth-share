@@ -1,7 +1,7 @@
 export type ConvertedUser =
   & {
     id?: string;
-    credentials?: `${string}:${string}`;
+    credentials?: `${string}:${string}` | string;
     displayname: string;
   }
   & {
