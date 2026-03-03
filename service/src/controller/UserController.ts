@@ -126,6 +126,7 @@ export class UserController extends HeadController {
     try {
       await this.userRepository.delete(me);
       deleteCookie(c, "session");
+      return c.body(null, 204);
     } catch (error) {
       if (error instanceof ConflictError) {
         return c.body(error.message, 409);
@@ -134,7 +135,6 @@ export class UserController extends HeadController {
         return c.body(error.message, 500);
       }
     }
-    return c.body(null, 204);
   }
   async create(c: Context) {
     try {

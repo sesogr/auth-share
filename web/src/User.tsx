@@ -1,14 +1,16 @@
-import React from "react";
-import { Navigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext.tsx";
 import { Button, List } from "antd";
 import type { UserStringProperties } from "./types/ConvertedUser.ts";
 import Change from "./components/UpdateUser.tsx";
 const User: React.FC = () => {
   const { displayname } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const displaynameState = React.useState(false);
   const passwordState = React.useState(false);
+  const [error, setError] = useState("");
   const states: [boolean, React.Dispatch<React.SetStateAction<boolean>>][] = [
     displaynameState,
     passwordState,
@@ -35,6 +37,26 @@ const User: React.FC = () => {
     return <Navigate to="/user" replace />;
   }
 
+  async function deleteUser(): Promise<void> {
+    try {
+      const res = await fetch(import.meta.env.VITE_APIURL + "/user/me", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      if (res.status === 204) {
+        navigate("/login", { replace: true });
+      }
+      if (res.status === 409) {
+        const errorText = await res.text();
+        setError(`Conflict error: ${errorText}`);
+        throw new Error(`Conflict error: ${errorText}`);
+      }
+    } catch (e) {
+      console.error("Error deleting user:", e);
+    }
+  }
+
   return (
     <>
       <h1>Profil: {displayname}</h1>
@@ -59,7 +81,19 @@ const User: React.FC = () => {
         <List.Item>
           Groups: {user.groups.join(", ")}
         </List.Item>
+        <List.Item>
+          <Button
+            danger
+            onClick={() => {
+              deleteUser();
+              return <Navigate to="/login" replace />;
+            }}
+          >
+            Delete Account
+          </Button>
+        </List.Item>
       </List>
+      {error && <div style={{ color: "red" }}>{error}</div>}
     </>
   );
 };

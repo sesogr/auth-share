@@ -22,21 +22,23 @@ import { DbRepository } from "./DbRepository.ts";
 import { Entity } from "../../Entity.ts";
 import { ConflictError } from "../../../errors/ConflictError.ts";
 import { Values } from "@denodb/datatypes";
+import { group } from "node:console";
 
 export class DbUserRepository extends DbRepository implements UserRepository {
   constructor() {
     super(DbUser, "displayname");
   }
   override async delete(item: Entity): Promise<void> {
-    DbGroup.where(DbGroup.field("owner"), item.getId()).all().then(
-      (groups) => {
-        throw new ConflictError(
-          `User is owner of the following groups: ${
-            groups.map((g) => g.groupname).join(", ")
-          }. Please transfer ownership or delete these groups before deleting the user.`,
-        );
-      },
-    );
+    const groups = await DbGroup.where(DbGroup.field("owner"), item.getId())
+      .all();
+    if (groups.length > 0) {
+      throw new ConflictError(
+        `User is owner of the following groups: ${
+          groups.map((g) => g.groupname).join(", ")
+        }. Please transfer ownership or delete these groups before deleting the user.`,
+      );
+    }
+
     const services = (await DbUserService.where({
       [DbUserService.field("dbuser_id")]: item.getId(),
       [DbUserService.field("is_owner")]: true,
@@ -55,6 +57,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         );
       }
     });
+    await DbUser.where("id", item.getId()).delete();
   }
   async update(item: User): Promise<void> {
     await DbUser.where("id", item.getId()).update({
