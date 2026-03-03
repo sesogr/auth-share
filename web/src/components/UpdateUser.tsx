@@ -4,7 +4,7 @@ import { useAuth } from "../Context/AuthContext.tsx";
 import type { UserStringProperties } from "../types/ConvertedUser.ts";
 
 const Change: React.FC<
-  { toChange: UserStringProperties; password?: boolean }
+  { toChange: UserStringProperties | "credentials"; password?: boolean }
 > = (
   { toChange, password },
 ) => {
@@ -17,7 +17,8 @@ const Change: React.FC<
     setAnswer(null);
     if (!user) return;
     let newCred = newValue;
-    let toChangeKey: UserStringProperties | "password" = toChange;
+    let toChangeKey: UserStringProperties | "credentials" | "password" =
+      toChange;
     if (toChange === "credentials") {
       newCred = user.credentials + ":" + newValue;
       toChangeKey = "password";
@@ -27,7 +28,7 @@ const Change: React.FC<
       const res = await fetch(
         import.meta.env.VITE_APIURL + "/user/me/" + toChangeKey,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },

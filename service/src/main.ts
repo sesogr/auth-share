@@ -98,7 +98,7 @@ app.use(
   cors({
     origin: Environment.FRONT_END_URL,
     credentials: true,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   }),
 );
 app.use(
@@ -147,7 +147,7 @@ app.get(
     return userController.read(c);
   },
 );
-app.put(
+app.patch(
   "/user/me/password",
   (c) => {
     return userController.changePassword(
@@ -155,7 +155,7 @@ app.put(
     );
   },
 );
-app.put(
+app.patch(
   "/user/me/displayname",
   (c) => {
     return userController.changeDisplayName(
@@ -175,7 +175,9 @@ app.get(
     );
   }, //TODO!!! Needs to be fixed!
 );
-
+app.delete("/user/me", (c) => {
+  return userController.delete(c);
+});
 app.put();
 
 app.post("/register", (c) => {
