@@ -2,12 +2,14 @@ import { DataTypes, Model, Relationships } from "@denodb";
 import { DbService } from "./DbService.ts";
 import { DbUser } from "./DbUser.ts";
 
-let DbUserService: typeof Model & {
+export type DbUserServiceTable = Model & {
   dbuserId: string;
   dbserviceId: string;
   id: string;
   isOwner: boolean;
 };
+
+let DbUserService: typeof Model;
 
 export function setupUserService() {
   //@ts-ignore we are assigning immediatly after declaration

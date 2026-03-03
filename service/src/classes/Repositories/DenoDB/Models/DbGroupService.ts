@@ -2,11 +2,13 @@ import { DataTypes, Model, Relationships } from "@denodb";
 import { DbGroup } from "./DbGroup.ts";
 import { DbService } from "./DbService.ts";
 
-export let DbGroupService: typeof Model & {
+export type DbGroupServiceTable = Model & {
   dbgroupId: string;
   dbserviceId: string;
   id: string;
 };
+
+export let DbGroupService: typeof Model;
 
 export function setupGroupService() {
   //@ts-ignore we are assigning immediatly after declaration
