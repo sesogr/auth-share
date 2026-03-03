@@ -2,6 +2,8 @@ import { DataTypes, Model, Relationships } from "@denodb";
 import { DbGroup } from "./DbGroup.ts";
 import { DbUser } from "./DbUser.ts";
 export let DbUserGroup: typeof Model & {
+  dbuserId: string;
+  dbgroupId: string;
   id: string;
   isOwner: boolean;
 };

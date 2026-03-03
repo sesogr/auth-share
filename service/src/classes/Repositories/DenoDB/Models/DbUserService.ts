@@ -3,6 +3,8 @@ import { DbService } from "./DbService.ts";
 import { DbUser } from "./DbUser.ts";
 
 let DbUserService: typeof Model & {
+  dbuserId: string;
+  dbserviceId: string;
   id: string;
   isOwner: boolean;
 };

@@ -3,6 +3,8 @@ import { DbGroup } from "./DbGroup.ts";
 import { DbService } from "./DbService.ts";
 
 export let DbGroupService: typeof Model & {
+  dbgroupId: string;
+  dbserviceId: string;
   id: string;
 };
 
