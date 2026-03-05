@@ -1,21 +1,11 @@
-describe("Registration and Deletion", () => {
+describe("Registration and Deletion", async () => {
   const userInfo = {
     displayname: "hallo123",
     username: "hallo123",
     password: "hallo123",
   };
-  it("create", () => {
-    cy.visit("http://localhost:3000");
-    cy.get("#login_form div:nth-child(2) > button.ant-btn > span").click();
-    cy.get("#username").click();
-    cy.get("#username").type(userInfo.username);
-    cy.get("#displayname").type(userInfo.displayname);
-    cy.get("#password").type(userInfo.password);
-    cy.get("#root button.ant-btn span").click();
-    cy.get("#username").should("have.value", "");
-    cy.get("#displayname").should("have.value", "");
-    cy.get("#password").should("have.value", "");
-  });
+  const createFlow = (await import("./createFlow.ts")).default;
+  it("create", createFlow);
   it("login", () => {
     cy.visit("http://localhost:3000");
 
