@@ -9,8 +9,6 @@ import { DbService } from "./classes/Repositories/DenoDB/Models/DbService.ts";
 import { DbUser } from "./classes/Repositories/DenoDB/Models/DbUser.ts";
 import { DbUserGroup } from "./classes/Repositories/DenoDB/Models/DbUserGroup.ts";
 import { UserController } from "./controller/UserController.ts";
-import { DataController } from "./controller/DataController.ts";
-import { RootController } from "./controller/RootController.ts";
 import { ServiceController } from "./controller/ServiceController.ts";
 import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
 import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
@@ -107,15 +105,6 @@ app.use(
     await next();
   }),
 );
-//Endpoints
-const rootController = new RootController("Trees");
-app.get("/", (c) => {
-  return rootController.sayHelloFromTrees(c);
-});
-const dataController = new DataController();
-app.get("/data", (c) => {
-  return dataController.getData(c);
-});
 
 const userController = new UserController(userRepository);
 
