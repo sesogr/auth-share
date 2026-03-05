@@ -1,4 +1,3 @@
-import { RuntimeError } from "../errors/RuntimeError.ts";
 import { OnlyProperties } from "../types/OnlyProperties.ts";
 
 export abstract class ValueClass<T extends ValueClass<T>> {
@@ -39,7 +38,7 @@ export abstract class ValueClass<T extends ValueClass<T>> {
         )
       )
     ) {
-      throw new RuntimeError(
+      throw new TypeError(
         `${JSON.stringify(newData)} is not applicable to ${
           JSON.stringify(this)
         }`,

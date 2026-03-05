@@ -3,18 +3,17 @@ import {
   ensureConvertedServiceIntegrity,
 } from "../types/ConvertedService.ts";
 import { ServiceRepository } from "../interfaceTypes/ServiceRepository.ts";
-import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { Context } from "@hono/hono";
 import { Service } from "../classes/Service.ts";
 import { ServiceCredential } from "../classes/ServiceCredential.ts";
 import { HeadController } from "./HeadController.ts";
+import { AuthorizationError } from "../errors/controllerErrors/UnauthorizedError.ts";
 
 export class ServiceController extends HeadController {
   constructor(
     private readonly serviceRepository: ServiceRepository,
-    userRepository: UserRepository,
   ) {
-    super(userRepository);
+    super();
   }
 
   async listMyServices(
@@ -29,9 +28,8 @@ export class ServiceController extends HeadController {
         e.toJson()
       );
       return c.json(convertedList);
-    } catch (e) {
-      console.log(e);
-      return c.json({ error: "no data", details: e });
+    } catch (error) {
+      this.errorHandle(error, c);
     }
   }
   async add(c: Context) {
@@ -55,15 +53,7 @@ export class ServiceController extends HeadController {
       await this.serviceRepository.save(service);
       return c.body!(null, 201);
     } catch (error) {
-      console.log(error);
-      if (error instanceof Error) {
-        return c.json!({
-          error: "Fehler beim Speichern des Services",
-          message: error.message,
-          name: error.name,
-          cause: error.cause,
-        });
-      }
+      this.errorHandle(error, c);
     }
   }
   async delete(c: Context) {
@@ -78,16 +68,14 @@ export class ServiceController extends HeadController {
         return c.json({ error: "Service not found" }, 404);
       }
       if (!service.listAllowedUsers(true).includes(ME.getDisplayName())) {
-        return c.json({ error: "Unauthorized" }, 403);
+        throw new AuthorizationError(
+          "You are not allowed to delete this service",
+        );
       }
       await this.serviceRepository.delete(service);
       return c.body(null, 204);
     } catch (error) {
-      console.log(error);
-      return c.json({
-        error: "Fehler beim Löschen des Services",
-        details: error,
-      }, 500);
+      this.errorHandle(error, c);
     }
   }
 }

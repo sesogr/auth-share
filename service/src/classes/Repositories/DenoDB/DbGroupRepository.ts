@@ -192,7 +192,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
             g?.userId === record.allowedUserId?.toString()
           ) || record.allowedUserId == undefined;
         }
-        throw new RuntimeError();
+        throw new RuntimeError("DbGroupRepository.exists");
       };
       if (!exists("serviceList")) {
         tempData[searchedId].serviceList.push({
@@ -312,7 +312,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       }));
       return groups;
     }
-    throw new RuntimeError();
+    throw new RuntimeError("DbGroupRepository.findOwnedByUserId");
   }
   async saveAll(item: Group[]) {
     await Promise.all(item.map(async (e) => await this.save(e)));

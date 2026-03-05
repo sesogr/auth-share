@@ -20,7 +20,7 @@ import { DbSessions } from "./Models/DbSessions.ts";
 import { Session } from "../../Session.ts";
 import { DbRepository } from "./DbRepository.ts";
 import { Entity } from "../../Entity.ts";
-import { ConflictError } from "../../../errors/ConflictError.ts";
+import { ConflictError } from "../../../errors/controllerErrors/ConflictError.ts";
 
 export class DbUserRepository extends DbRepository implements UserRepository {
   constructor() {

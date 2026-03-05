@@ -7,6 +7,7 @@ import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { Invitation } from "../../Invitation.ts";
 import { Session } from "../../Session.ts";
 import { DuplicateError } from "../../../errors/DuplicateError.ts";
+import { NotFoundError } from "../../../errors/NotFoundError.ts";
 
 export abstract class DbRepository {
   constructor(
@@ -109,7 +110,9 @@ export abstract class DbRepository {
   async delete(item: Entity) {
     const idExists = await this.existId(item.getId());
     if (!idExists) {
-      throw new Error("Item with id: " + item.getId() + " does not exist");
+      throw new NotFoundError(
+        "Item with id: " + item.getId() + " does not exist",
+      );
     }
     await this.model.where(this.id, item.getId()).delete();
   }

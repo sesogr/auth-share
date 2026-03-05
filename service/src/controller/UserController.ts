@@ -6,14 +6,32 @@ import { ConvertedUser } from "../types/types.ts";
 import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
 import { HeadController } from "./HeadController.ts";
 import { Environment } from "../classes/Environment.ts";
-import { ConflictError } from "../errors/ConflictError.ts";
 import { ensureConvertedUserIntegrity } from "../types/ConvertedUser.ts";
+import { ControllerError } from "../errors/controllerErrors/ControllerError.ts";
+import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 
 export class UserController extends HeadController {
   constructor(
-    userRepository: UserRepository,
+    readonly userRepository: UserRepository,
   ) {
-    super(userRepository);
+    super();
+  }
+
+  async authMiddleware(c: Context, next: () => Promise<void>) {
+    try {
+      const sessiontoken = getCookie(c, "session");
+      if (!sessiontoken) {
+        throw new SessionError("No session token");
+      }
+      const currentUser = await this.userRepository.findBySessionToken(
+        sessiontoken,
+      );
+      currentUser.validateSession(sessiontoken);
+      c.set("currentUser", currentUser);
+    } catch (error) {
+      return this.errorHandle(error, c);
+    }
+    await next();
   }
   listMyServices(
     c: Context,
@@ -66,10 +84,9 @@ export class UserController extends HeadController {
     try {
       const requestData: ConvertedUser = await c.req.json();
       ensureConvertedUserIntegrity(requestData, "credentials");
+
       const { username, password } = requestData.credentials;
-
       const userToCheck = await this.userRepository.findByUserName(username);
-
       if (
         await userToCheck.getCredentials().verifyPasswordHash(password)
       ) {
@@ -98,15 +115,10 @@ export class UserController extends HeadController {
         return c.body(null, 401);
       }
     } catch (error) {
-      if (error instanceof TypeError) {
-        return c.body(error.message, 400);
-      }
-      if (error instanceof Error) {
-        console.log(error);
-        return c.json(error, 500);
-      }
+      return this.errorHandle(error, c);
     }
   }
+
   async changeDisplayName(c: Context) {
     const requestData: ConvertedUser = await c.req.json();
     const me: User = this.getMeFromContext(c);
@@ -121,26 +133,25 @@ export class UserController extends HeadController {
         return c.body(error.message, 400);
       }
       if (error instanceof Error) {
-        return c.json(error, 500);
+        console.log(error);
+        return c.body(null, 500);
       }
     }
     return c.body(null, 204);
   }
   async delete(c: Context) {
-    const me: User = await this.getMeFromContext(c);
+    const me: User = this.getMeFromContext(c);
     try {
       await this.userRepository.delete(me);
       deleteCookie(c, "session");
       return c.body(null, 204);
     } catch (error) {
-      if (error instanceof ConflictError) {
-        return c.json(error, 409);
-      }
-      if (error instanceof TypeError) {
-        return c.json(error, 400);
+      if (error instanceof ControllerError) {
+        return c.json(error, error.errorcode);
       }
       if (error instanceof Error) {
-        return c.json(error, 500);
+        console.log(error);
+        return c.body(null, 500);
       }
     }
   }

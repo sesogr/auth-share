@@ -8,6 +8,7 @@ import { ConvertedUser } from "../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
 import { Session } from "./Session.ts";
+import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 export class User extends Entity {
   public get sessions(): Session[] {
     return [...this._sessions];
@@ -39,7 +40,7 @@ export class User extends Entity {
     const session = this.findSessionByToken(sessionToken);
     if (Date.now() >= session.expiresAt.getTime()) {
       this.deleteSession(session);
-      throw new Error("Session is expired");
+      throw new SessionError("Session is expired");
     }
     // if 15 days are left until the session expires, refresh the session
     if (
@@ -53,7 +54,7 @@ export class User extends Entity {
     const sessionId = Session.fromSessionTokenToSessionId(sessionToken);
     const session = this.sessions.find((e) => sessionId == e.id);
     if (session == undefined) {
-      throw new Error("Session not found!");
+      throw new SessionError("Session not found!");
     }
     return session;
   }

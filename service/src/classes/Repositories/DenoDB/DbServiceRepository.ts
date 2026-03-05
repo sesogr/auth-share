@@ -280,7 +280,7 @@ export class DbServiceRepository extends DbRepository
             g?.groupId === record.groupId?.toString()
           ) || record.groupId == undefined;
         }
-        throw new RuntimeError();
+        throw new RuntimeError("DbServiceRepository exists");
       };
       if (!exists("authorizedUser")) {
         tempData[searchedId].authorizedUsers.push({

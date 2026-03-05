@@ -21,7 +21,6 @@ import { setupManyToMany } from "./classes/Repositories/DenoDB/Models/setupManyT
 import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepository.ts";
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
-import { getCookie } from "@hono/hono/cookie";
 import { Environment } from "./classes/Environment.ts";
 Environment.load();
 const db = new Database(
@@ -75,7 +74,10 @@ while (!connected) {
 const serviceRepository: ServiceRepository = new DbServiceRepository();
 const _groupRepository: GroupRepository = new DbGroupRepository();
 const userRepository: UserRepository = new DbUserRepository();
-
+const userController = new UserController(userRepository);
+const serviceController = new ServiceController(
+  serviceRepository,
+);
 export const app = new Hono();
 app.use(
   "*",
@@ -87,26 +89,10 @@ app.use(
 );
 app.use(
   "*",
-  except(["/register", "/login"], async (c, next) => {
-    try {
-      const sessiontoken = getCookie(c, "session");
-      if (!sessiontoken) {
-        throw new Error("No session token");
-      }
-      const currentUser = await userRepository.findBySessionToken(sessiontoken);
-      currentUser.validateSession(sessiontoken);
-      c.set("currentUser", currentUser);
-    } catch (error) {
-      return c.json({
-        error: "Unauthorized",
-        details: error instanceof Error ? error.message : error,
-      }, 401);
-    }
-    await next();
+  except(["/register", "/login"], (c, next) => {
+    return userController.authMiddleware(c, next);
   }),
 );
-
-const userController = new UserController(userRepository);
 
 app.post(
   "/login",
@@ -140,10 +126,7 @@ app.patch(
     );
   },
 );
-const serviceController = new ServiceController(
-  serviceRepository,
-  userRepository,
-);
+
 app.get(
   "/user/owned",
   (c) => {
