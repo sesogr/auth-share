@@ -76,22 +76,11 @@ while (!connected) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }
-//initialize repositories
+
 const serviceRepository: ServiceRepository = new DbServiceRepository();
 const _groupRepository: GroupRepository = new DbGroupRepository();
 const userRepository: UserRepository = new DbUserRepository();
-// Promise.all(FakeObjectGen.generateFakeUsers().map(async (e) =>
-//   await userRepository.save(e))
-// );
-// Promise.all(
-//   FakeObjectGen.generateFakeGroups().map((e) => groupRepository.save(e)),
-// );
-// Promise.all(
-//   FakeObjectGen.generateFakeServices().map((e) => serviceRepository.save(e)),
-// );
-// userRepository.findAll().forEach((e) => {
-//   serviceRepository.save(FakeObjectGen.createFakeService(e.convertToShort()));
-// });
+
 export const app = new Hono();
 app.use(
   "*",
@@ -108,14 +97,14 @@ app.use(
       const sessiontoken = getCookie(c, "session")!;
       ME = await userRepository.findBySessionToken(sessiontoken);
       ME.validateSession(sessiontoken);
-      await next();
-    } catch (_error) {
+    } catch (error) {
       return new Response(null, {
         headers: c.res.headers,
         status: 403,
-        statusText: "Session Expired",
+        statusText: error instanceof Error ? error.message : "Session Expired",
       });
     }
+    await next();
   }),
 );
 //Endpoints
@@ -173,10 +162,13 @@ app.get(
     return serviceController.listMyServices(
       c,
     );
-  }, //TODO!!! Needs to be fixed!
+  },
 );
 app.delete("/user/me", (c) => {
   return userController.delete(c);
+});
+app.delete("/service", (c) => {
+  return serviceController.delete(c);
 });
 app.put();
 
