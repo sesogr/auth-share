@@ -7,6 +7,7 @@ import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
 import { HeadController } from "./HeadController.ts";
 import { Environment } from "../classes/Environment.ts";
 import { ConflictError } from "../errors/ConflictError.ts";
+import { ensureConvertedUserIntegrity } from "../types/ConvertedUser.ts";
 
 export class UserController extends HeadController {
   constructor(
@@ -26,28 +27,27 @@ export class UserController extends HeadController {
     const me = await this.getMeFromContext(c);
     return c.json(me.toJson());
   }
-  private confirmCredentials(
-    requestData: ConvertedUser,
-  ): asserts requestData is ConvertedUser & {
-    credentials: `${string}:${string}`;
-  } {
-    if (!requestData.credentials || !requestData.credentials.includes(":")) {
-      throw new TypeError(
-        "Credentials are required and must be in the format 'username:password'",
-      );
-    }
-  }
-  async changePassword(c: Context) {
-    const requestData: ConvertedUser = await c.req.json();
-    const me: User = await this.getMeFromContext(c);
-    this.confirmCredentials(requestData);
-    const newPassword: string = requestData.credentials.split(":")[1];
 
-    me.changeUserCredentials(
-      await me.getCredentials().changePassword(newPassword),
-    );
-    await this.userRepository.save(me);
-    return c.body(null, 204);
+  async changePassword(c: Context) {
+    try {
+      const requestData: ConvertedUser = await c.req.json();
+      const me: User = await this.getMeFromContext(c);
+      ensureConvertedUserIntegrity(requestData, "credentials");
+      const newPassword: string = requestData.credentials.password;
+
+      me.changeUserCredentials(
+        await me.getCredentials().changePassword(newPassword),
+      );
+      await this.userRepository.save(me);
+      return c.body(null, 204);
+    } catch (error) {
+      if (error instanceof TypeError) {
+        return c.body(error.message, 400);
+      }
+      if (error instanceof Error) {
+        return c.json(error, 500);
+      }
+    }
   }
 
   async logOut(c: Context) {
@@ -65,13 +65,13 @@ export class UserController extends HeadController {
   async logIn(c: Context) {
     try {
       const requestData: ConvertedUser = await c.req.json();
-      this.confirmCredentials(requestData);
-      const [username, plainPassword] = requestData.credentials.split(":");
+      ensureConvertedUserIntegrity(requestData, "credentials");
+      const { username, password } = requestData.credentials;
 
       const userToCheck = await this.userRepository.findByUserName(username);
 
       if (
-        await userToCheck.getCredentials().verifyPasswordHash(plainPassword)
+        await userToCheck.getCredentials().verifyPasswordHash(password)
       ) {
         const { token, session } = userToCheck.createSession();
 
@@ -90,7 +90,6 @@ export class UserController extends HeadController {
           expires: session.expiresAt,
           sameSite: "None" as const,
         });
-        // Gib Id + displayname zurück (Frontend benötigt das)
         return c.json({
           id: userToCheck.getId(),
           displayname: userToCheck.getDisplayName(),
@@ -99,9 +98,12 @@ export class UserController extends HeadController {
         return c.body(null, 401);
       }
     } catch (error) {
+      if (error instanceof TypeError) {
+        return c.body(error.message, 400);
+      }
       if (error instanceof Error) {
         console.log(error);
-        return c.body(error.message, 500);
+        return c.json(error, 500);
       }
     }
   }
@@ -115,8 +117,11 @@ export class UserController extends HeadController {
     try {
       await this.userRepository.save(me);
     } catch (error) {
+      if (error instanceof TypeError) {
+        return c.body(error.message, 400);
+      }
       if (error instanceof Error) {
-        return c.body(error.message, 500);
+        return c.json(error, 500);
       }
     }
     return c.body(null, 204);
@@ -129,30 +134,36 @@ export class UserController extends HeadController {
       return c.body(null, 204);
     } catch (error) {
       if (error instanceof ConflictError) {
-        return c.body(error.message, 409);
+        return c.json(error, 409);
+      }
+      if (error instanceof TypeError) {
+        return c.json(error, 400);
       }
       if (error instanceof Error) {
-        return c.body(error.message, 500);
+        return c.json(error, 500);
       }
     }
   }
   async create(c: Context) {
     try {
-      c.res.headers.set("Access-Control-Allow-Origin", "*");
       const requestData: ConvertedUser = await c.req.json();
-      this.confirmCredentials(requestData);
-      const [username, plainPassword] = requestData.credentials.split(":");
-
+      ensureConvertedUserIntegrity(requestData, [
+        "credentials",
+        "displayname",
+      ]);
+      const { username, password } = requestData.credentials;
       const newUser = new User(
-        await UserCredential.create(username, plainPassword),
+        await UserCredential.create(username, password),
         requestData.displayname,
-        requestData.id,
       );
 
       await this.userRepository.save(newUser);
       console.log("test");
       return c.body(null, 201);
     } catch (error) {
+      if (error instanceof TypeError) {
+        return c.body(error.message, 400);
+      }
       if (error instanceof Error) {
         return c.body(error.message, 500);
       }

@@ -1,4 +1,7 @@
-import { ConvertedService } from "../types/ConvertedService.ts";
+import {
+  ConvertedService,
+  ensureConvertedServiceIntegrity,
+} from "../types/ConvertedService.ts";
 import { ServiceRepository } from "../interfaceTypes/ServiceRepository.ts";
 import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { Context } from "@hono/hono";
@@ -34,7 +37,12 @@ export class ServiceController extends HeadController {
   async add(c: Context) {
     try {
       const ME = await this.getMeFromContext(c);
-      const convertedService: ConvertedService = await c.req!.json!();
+      const convertedService: ConvertedService = await c.req.json();
+      ensureConvertedServiceIntegrity(convertedService, [
+        "credentials",
+        "serviceUrl",
+        "serviceName",
+      ]);
       const service = Service.createService(
         new ServiceCredential(
           convertedService.credentials.username,
@@ -56,6 +64,30 @@ export class ServiceController extends HeadController {
           cause: error.cause,
         });
       }
+    }
+  }
+  async delete(c: Context) {
+    try {
+      const ME = await this.getMeFromContext(c);
+      const convertedService: ConvertedService = await c.req.json();
+      ensureConvertedServiceIntegrity(convertedService);
+      const service = await this.serviceRepository.findById(
+        convertedService.id,
+      );
+      if (!service) {
+        return c.json({ error: "Service not found" }, 404);
+      }
+      if (!service.listAllowedUsers(true).includes(ME.getDisplayName())) {
+        return c.json({ error: "Unauthorized" }, 403);
+      }
+      await this.serviceRepository.delete(service);
+      return c.body(null, 204);
+    } catch (error) {
+      console.log(error);
+      return c.json({
+        error: "Fehler beim Löschen des Services",
+        details: error,
+      }, 500);
     }
   }
 }
