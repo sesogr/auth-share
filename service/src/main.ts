@@ -24,8 +24,6 @@ import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepo
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
 import { getCookie } from "@hono/hono/cookie";
-import { User } from "./classes/User.ts";
-import { UserCredential } from "./classes/UserCredential.ts";
 import { Environment } from "./classes/Environment.ts";
 Environment.load();
 const db = new Database(
@@ -49,7 +47,6 @@ db.link([
   DbInvitation,
   DbSessions,
 ]);
-let ME: User = new User(await UserCredential.create("", ""));
 let connected = false;
 while (!connected) {
   try {
@@ -94,15 +91,18 @@ app.use(
   "*",
   except(["/register", "/login"], async (c, next) => {
     try {
-      const sessiontoken = getCookie(c, "session")!;
-      ME = await userRepository.findBySessionToken(sessiontoken);
-      ME.validateSession(sessiontoken);
+      const sessiontoken = getCookie(c, "session");
+      if (!sessiontoken) {
+        throw new Error("No session token");
+      }
+      const currentUser = await userRepository.findBySessionToken(sessiontoken);
+      currentUser.validateSession(sessiontoken);
+      c.set("currentUser", currentUser);
     } catch (error) {
-      return new Response(null, {
-        headers: c.res.headers,
-        status: 403,
-        statusText: error instanceof Error ? error.message : "Session Expired",
-      });
+      return c.json({
+        error: "Unauthorized",
+        details: error instanceof Error ? error.message : error,
+      }, 401);
     }
     await next();
   }),
@@ -112,7 +112,6 @@ const rootController = new RootController("Trees");
 app.get("/", (c) => {
   return rootController.sayHelloFromTrees(c);
 });
-
 const dataController = new DataController();
 app.get("/data", (c) => {
   return dataController.getData(c);

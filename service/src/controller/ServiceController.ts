@@ -21,7 +21,7 @@ export class ServiceController extends HeadController {
     c: Context,
   ) {
     try {
-      const ME = await this.getMeFromContext(c);
+      const ME = this.getMeFromContext(c);
       const serviceList = await this.serviceRepository.findOwnedByUserId(
         ME.getId(),
       );
@@ -36,7 +36,7 @@ export class ServiceController extends HeadController {
   }
   async add(c: Context) {
     try {
-      const ME = await this.getMeFromContext(c);
+      const ME = this.getMeFromContext(c);
       const convertedService: ConvertedService = await c.req.json();
       ensureConvertedServiceIntegrity(convertedService, [
         "credentials",
@@ -68,7 +68,7 @@ export class ServiceController extends HeadController {
   }
   async delete(c: Context) {
     try {
-      const ME = await this.getMeFromContext(c);
+      const ME = this.getMeFromContext(c);
       const convertedService: ConvertedService = await c.req.json();
       ensureConvertedServiceIntegrity(convertedService);
       const service = await this.serviceRepository.findById(

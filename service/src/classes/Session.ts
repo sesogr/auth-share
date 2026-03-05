@@ -41,6 +41,9 @@ export class Session {
   static readonly fromSessionTokenToSessionId = (
     sessionToken: string,
   ) => {
+    if (!(typeof sessionToken === "string")) {
+      throw new TypeError("Session token is Missing");
+    }
     const sha = new Sha256();
     sha.update([...new TextEncoder().encode(sessionToken)]);
     const digest = sha.digest(); // Uint8Array

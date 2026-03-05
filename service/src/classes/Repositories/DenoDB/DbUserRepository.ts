@@ -21,8 +21,6 @@ import { Session } from "../../Session.ts";
 import { DbRepository } from "./DbRepository.ts";
 import { Entity } from "../../Entity.ts";
 import { ConflictError } from "../../../errors/ConflictError.ts";
-import { Values } from "@denodb/datatypes";
-import { group } from "node:console";
 
 export class DbUserRepository extends DbRepository implements UserRepository {
   constructor() {

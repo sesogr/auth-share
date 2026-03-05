@@ -15,23 +15,23 @@ export class UserController extends HeadController {
   ) {
     super(userRepository);
   }
-  async listMyServices(
+  listMyServices(
     c: Context,
   ) {
-    const me = await this.getMeFromContext(c);
+    const me = this.getMeFromContext(c);
     const list = me.listServices();
     return c.json(list);
   }
 
-  async read(c: Context) {
-    const me = await this.getMeFromContext(c);
+  read(c: Context) {
+    const me = this.getMeFromContext(c);
     return c.json(me.toJson());
   }
 
   async changePassword(c: Context) {
     try {
       const requestData: ConvertedUser = await c.req.json();
-      const me: User = await this.getMeFromContext(c);
+      const me: User = this.getMeFromContext(c);
       ensureConvertedUserIntegrity(requestData, "credentials");
       const newPassword: string = requestData.credentials.password;
 
@@ -109,7 +109,7 @@ export class UserController extends HeadController {
   }
   async changeDisplayName(c: Context) {
     const requestData: ConvertedUser = await c.req.json();
-    const me: User = await this.getMeFromContext(c);
+    const me: User = this.getMeFromContext(c);
     if (!requestData.displayname) {
       return c.body("Displayname is required", 400);
     }
