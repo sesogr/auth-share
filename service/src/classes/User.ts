@@ -140,7 +140,7 @@ export class User extends Entity {
     return {
       displayname: this.username,
       owned: this.listServices(true),
-      credentials: this.credentials.username,
+      credentials: { username: this.credentials.username },
       callable: this.listServices(),
       userGroupInvitations: this.userGroupInvitations.map((e) => e.toString()),
       ownedGroups: this.listJoinedGroups(true),

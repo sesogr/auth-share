@@ -5,14 +5,14 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import type { ReceivedConvertedUser } from "../types/ConvertedUser.ts";
+import type { ReceivingConvertedUser } from "../types/types.ts";
 
 type AuthContextShape = {
-  user: ReceivedConvertedUser | null;
+  user: ReceivingConvertedUser | null;
   login: () => void;
   logout: () => void;
   isAuthenticated: boolean;
-  setUser: React.Dispatch<React.SetStateAction<ReceivedConvertedUser | null>>;
+  setUser: React.Dispatch<React.SetStateAction<ReceivingConvertedUser | null>>;
 };
 
 export const AuthContext = createContext<AuthContextShape | undefined>(
@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
       .then((data) => setUser(data))
       .catch(() => null);
   };
-  const [user, setUser] = useState<ReceivedConvertedUser | null>(null);
+  const [user, setUser] = useState<ReceivingConvertedUser | null>(null);
 
   useEffect(() => {
     refreshUser();
@@ -45,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
   };
   const logout = () => {
     setUser(null);
-    // optional: call backend logout endpoint to clear session cookie
     fetch(`${import.meta.env.VITE_APIURL}/logout`, {
       method: "POST",
       credentials: "include",

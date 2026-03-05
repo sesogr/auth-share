@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext.tsx";
 import { Button, List } from "antd";
-import type { UserStringProperties } from "./types/ConvertedUser.ts";
+import type { ConvertedUser, StringKeys } from "./types/types.ts";
 import Change from "./components/UpdateUser.tsx";
 const User: React.FC = () => {
   const { displayname } = useParams();
@@ -18,7 +18,7 @@ const User: React.FC = () => {
   const [displaynameEdit, setDisplaynameEdit] = displaynameState;
   const [passwordEdit, setPasswordEdit] = passwordState;
   const toggleEditBox = (
-    which: UserStringProperties | "credentials",
+    which: StringKeys<ConvertedUser>,
   ) => {
     states.forEach(([_, setState]) => {
       setState(false);

@@ -12,8 +12,8 @@ import {
   Typography,
 } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import type { SendingConvertedUser } from "./types/ConvertedUser.ts";
 import { useAuth } from "./Context/AuthContext.tsx";
+import type { ConvertedUser } from "./types/types.ts";
 
 const { Title } = Typography;
 
@@ -41,8 +41,8 @@ export default function Login(): JSX.Element {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
 
-      const data: SendingConvertedUser = {
-        credentials: values.username + ":" + values.password,
+      const data: ConvertedUser = {
+        credentials: { username: values.username, password: values.password },
       };
       const res = await fetch(import.meta.env.VITE_APIURL + "/login", {
         method: "POST",

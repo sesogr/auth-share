@@ -94,6 +94,7 @@ export class Service extends Entity {
       users: this.listAllowedUsers(),
       owners: this.listAllowedUsers(true),
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
+      id: this.id,
     };
   }
 

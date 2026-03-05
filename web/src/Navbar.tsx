@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
       {user
         ? (
           <>
-            <span style={{ marginLeft: 12 }}>{user.credentials}</span>
+            <span style={{ marginLeft: 12 }}>{user.credentials.username}</span>
             <button type="submit" onClick={logout} style={{ marginLeft: 8 }}>
               Logout
             </button>

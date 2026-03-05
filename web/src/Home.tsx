@@ -1,34 +1,37 @@
-//LIST Version
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Service from "./Service.tsx";
 import { useNavigate } from "react-router-dom";
 import CreateService from "./CreateService.tsx";
 import { Button, Col, List, Row, Typography } from "antd";
-import type { ReceivedConvertedService } from "./types/ConvertedService.ts";
+import { type ReceivingConvertedService } from "./types/types.ts";
+import { useAuth } from "./Context/AuthContext.tsx";
 
 const Home: React.FC = () => {
-  const [serviceList, setServiceList] = useState<ReceivedConvertedService[]>(
+  const [serviceList, setServiceList] = useState<ReceivingConvertedService[]>(
     [],
   );
   const [error, setError] = useState<string | null>(null);
-
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { serviceName } = useParams();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+
     fetch(import.meta.env.VITE_APIURL + "/user/owned", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
     })
-      .then((res): Promise<ReceivedConvertedService[]> => {
+      .then((res): Promise<ReceivingConvertedService[]> => {
         if (!res.ok) throw new Error("Netzwerkfehler");
         return res.json();
       })
-      .then((data) => setServiceList(data))
+      .then((data) => {
+        return setServiceList(data);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -62,46 +65,86 @@ const Home: React.FC = () => {
         bordered
         loading={loading}
         dataSource={serviceList}
-        renderItem={(item: ReceivedConvertedService) => {
-          const urlLink = `https://${item.serviceName}`;
-          const urlPath = `/${item.serviceName}`;
-          return (
-            <List.Item
-              actions={[
-                <a key="launch" href={urlLink} target="_blank" rel="noreferrer">
-                  Launch
-                </a>,
-                <Button
-                  key="settings"
-                  type="default"
-                  onClick={() => navigate(urlPath)}
-                  aria-label={`Settings for ${item.serviceName}`}
-                >
-                  Settings
-                </Button>,
-                <Button
-                  key="password"
-                  type="default"
-                  onClick={() =>
-                    navigator.clipboard.writeText(item.credentials.password)}
-                  aria-label={`Password for ${item.serviceName}`}
-                >
-                  Password
-                </Button>,
-                <Button
-                  key="username"
-                  type="default"
-                  onClick={() =>
-                    navigator.clipboard.writeText(item.credentials.username)}
-                  aria-label={`Username for ${item.serviceName}`}
-                >
-                  Username
-                </Button>,
-              ]}
-            >
-              {item.serviceName}
-            </List.Item>
-          );
+        renderItem={(item: ReceivingConvertedService) => {
+          try {
+            const urlLink = `https://${item.serviceName}`;
+            const urlPath = `/${item.serviceName}`;
+            return (
+              <List.Item
+                actions={[
+                  <a
+                    key="launch"
+                    href={urlLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Launch
+                  </a>,
+                  <Button
+                    key="settings"
+                    type="default"
+                    onClick={() => navigate(urlPath)}
+                    aria-label={`Settings for ${item.serviceName}`}
+                  >
+                    Settings
+                  </Button>,
+                  <Button
+                    key="password"
+                    type="default"
+                    onClick={() =>
+                      navigator.clipboard.writeText(item.credentials.password)}
+                    aria-label={`Password for ${item.serviceName}`}
+                  >
+                    Password
+                  </Button>,
+                  <Button
+                    key="username"
+                    type="default"
+                    onClick={() =>
+                      navigator.clipboard.writeText(item.credentials.username)}
+                    aria-label={`Username for ${item.serviceName}`}
+                  >
+                    Username
+                  </Button>,
+                ]}
+              >
+                {item.serviceName}
+                {item.owners.includes(user!.displayname) &&
+                  (
+                    <Button
+                      key="DELETE"
+                      type="default"
+                      aria-label={`DELETE ${item.serviceName}`}
+                      onClick={() => {
+                        fetch(import.meta.env.VITE_APIURL + "/service", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          credentials: "include",
+                          body: JSON.stringify(item),
+                        }).then((res) => {
+                          console.log(res);
+                          console.log(item);
+                        });
+                      }}
+                    >
+                      DELETE
+                    </Button>
+                  )}
+              </List.Item>
+            );
+          } catch (err) {
+            return (err instanceof Error)
+              ? (
+                <List.Item>
+                  Fehler bei Service "{item.serviceName}": {err.message}
+                </List.Item>
+              )
+              : (
+                <List.Item>
+                  Unbekannter Fehler bei Service "{item.serviceName}"
+                </List.Item>
+              );
+          }
         }}
       />
 

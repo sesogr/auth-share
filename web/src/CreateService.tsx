@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Form, Input, message, Row, Space } from "antd";
-import type {
-  ReceivedConvertedService,
-  SendingConvertedService,
-} from "./types/ConvertedService.ts";
+import type { ConvertedService } from "./types/types.ts";
 
 const CreateService: React.FC<
   {
-    serviceList: ReceivedConvertedService[];
+    serviceList: ConvertedService[];
   }
 > = ({ serviceList }) => {
   const [open, setOpen] = useState(false);
@@ -29,7 +26,7 @@ const CreateService: React.FC<
     // Handle form submission here, e.g. send data to server
     console.log(values);
 
-    const newServiceData: SendingConvertedService = {
+    const newServiceData: ConvertedService = {
       "serviceName": servicename,
       "serviceUrl": serviceUrl,
       "credentials": {
@@ -57,7 +54,7 @@ const CreateService: React.FC<
             username: username,
             password: password,
           },
-        } as ReceivedConvertedService);
+        });
 
         return console.log(data);
       })
