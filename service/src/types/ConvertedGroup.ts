@@ -1,5 +1,9 @@
 import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
-import { assertIsStringRecord } from "./types.ts";
+import {
+  assertIsStringRecord,
+  FilterForValues,
+  indepthTypeCheck,
+} from "./types.ts";
 
 export type ConvertedGroup = {
   groupname?: string;
@@ -21,25 +25,15 @@ export function ensureConvertedGroupIntegrity<
   ? { [P in keyof ConvertedGroup]-?: Exclude<ConvertedGroup[P], undefined> }
   : ConvertedGroup & { [P in K]-?: Exclude<ConvertedGroup[P], undefined> } {
   assertIsStringRecord(obj);
-
-  if (assertion && typeof assertion === "string") {
-    if (
-      (obj as Record<string, unknown>)[assertion] === undefined ||
-      (obj as Record<string, unknown>)[assertion] === null
-    ) {
-      throw new MissingDataError(`Missing property: ${assertion}`);
-    }
-  } else if (Array.isArray(assertion)) {
-    for (const prop of assertion) {
-      if (
-        (obj as Record<string, unknown>)[prop] === undefined ||
-        (obj as Record<string, unknown>)[prop] === null
-      ) {
-        throw new MissingDataError(`Missing property: ${prop}`);
-      }
-    }
-  }
-
+  const stringKeys: FilterForValues<ConvertedGroup, string | undefined>[] = [
+    "groupname",
+    "owner",
+  ];
+  const stringArrayKeys: FilterForValues<
+    ConvertedGroup,
+    string[] | undefined
+  >[] = ["sentInvitations", "serviceInvitations", "serviceList", "users"];
+  if (assertion) indepthTypeCheck(assertion, stringKeys, obj, stringArrayKeys);
   if (!assertion) {
     const requiredProperties: (keyof ConvertedGroup)[] = [
       "groupname",

@@ -1,6 +1,10 @@
-import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
 import { assertIsCredentials, Credentials } from "./Credentials.ts";
-import { assertIsStringRecord } from "./types.ts";
+import {
+  assertIsStringRecord,
+  FilterForValues,
+  indepthTypeCheck,
+  typeCheck,
+} from "./types.ts";
 export type ConvertedService =
   & {
     id?: string;
@@ -56,8 +60,20 @@ function ensureConvertedServiceIntegrity(
   };
 function ensureConvertedServiceIntegrity(
   obj: unknown,
-  assertion?: unknown,
+  assertion?: keyof ConvertedService | (keyof ConvertedService)[],
 ) {
+  const stringKeys: Exclude<
+    FilterForValues<ConvertedService, (string | undefined)>,
+    undefined
+  >[] = ["id", "serviceName", "serviceUrl"];
+  const stringArrayKeys: Exclude<
+    FilterForValues<
+      ConvertedService,
+      (string[] | undefined)
+    >,
+    undefined
+  >[] = ["groups", "owners", "sentInvitations", "users"];
+
   assertIsStringRecord(obj);
   if (assertion === "credentials") {
     assertIsCredentials(obj["credentials"]);
@@ -67,47 +83,19 @@ function ensureConvertedServiceIntegrity(
       assertIsCredentials(obj["credentials"]);
     }
   }
-  if (assertion && typeof assertion === "string") {
-    if (
-      obj[assertion] === undefined ||
-      obj[assertion] === null
-    ) {
-      throw new MissingDataError(`Missing property: ${assertion}`);
+  if (assertion) indepthTypeCheck(assertion, stringKeys, obj, stringArrayKeys);
+  else {
+    assertIsCredentials(obj["credentials"]);
+    for (const prop of stringKeys) {
+      typeCheck(obj, prop);
     }
-  } else if (Array.isArray(assertion)) {
-    for (const prop of assertion) {
-      if (
-        obj[prop] === undefined ||
-        obj[prop] === null
-      ) {
-        throw new MissingDataError(`Missing property: ${prop}`);
-      }
-    }
-  }
-
-  if (!assertion) {
-    const requiredProperties: (keyof ConvertedService)[] = [
-      "id",
-      "credentials",
-      "serviceName",
-      "serviceUrl",
-      "users",
-      "owners",
-      "groups",
-      "sentInvitations",
-    ];
-    for (const prop of requiredProperties) {
-      if (prop === "credentials") {
-        assertIsCredentials(obj["credentials"]);
-
-        continue;
-      }
-      if (
-        obj[prop] === undefined ||
-        obj[prop] === null
-      ) {
-        throw new MissingDataError(`Missing property: ${prop}`);
-      }
+    for (const prop of stringArrayKeys) {
+      typeCheck<[]>(obj, prop, "object", true);
+      obj[prop].forEach((e) => {
+        if (typeof e !== "string") {
+          throw new TypeError(`${obj}:${prop}:${e} is not a string`);
+        }
+      });
     }
   }
 }

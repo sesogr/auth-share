@@ -1,6 +1,10 @@
 import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
 import { assertIsCredentials, Credentials } from "./Credentials.ts";
-import { assertIsStringRecord } from "./types.ts";
+import {
+  assertIsStringRecord,
+  FilterForValues,
+  indepthTypeCheck,
+} from "./types.ts";
 
 export type ConvertedUser =
   & {
@@ -61,8 +65,16 @@ function ensureConvertedUserIntegrity(
   };
 function ensureConvertedUserIntegrity(
   obj: unknown,
-  assertion?: unknown,
+  assertion?: keyof ConvertedUser | (keyof ConvertedUser)[],
 ) {
+  const stringKeys: FilterForValues<ConvertedUser, (string | undefined)>[] = [
+    "displayname",
+    "id",
+  ];
+  const stringArrayKeys: FilterForValues<
+    ConvertedUser,
+    (string[] | undefined)
+  >[] = ["callable", "groups", "owned", "ownedGroups", "userGroupInvitations"];
   assertIsStringRecord(obj);
   if (assertion === "credentials") {
     assertIsCredentials(obj["credentials"]);
@@ -72,23 +84,7 @@ function ensureConvertedUserIntegrity(
       assertIsCredentials(obj["credentials"]);
     }
   }
-  if (assertion && typeof assertion === "string") {
-    if (
-      obj[assertion] === undefined ||
-      obj[assertion] === null
-    ) {
-      throw new MissingDataError(`Missing property: ${assertion}`);
-    }
-  } else if (Array.isArray(assertion)) {
-    for (const prop of assertion) {
-      if (
-        obj[prop] === undefined ||
-        obj[prop] === null
-      ) {
-        throw new MissingDataError(`Missing property: ${prop}`);
-      }
-    }
-  }
+  if (assertion) indepthTypeCheck(assertion, stringKeys, obj, stringArrayKeys);
 
   if (!assertion) {
     const requiredProperties: (keyof ConvertedUser)[] = [
