@@ -55,7 +55,7 @@ export function typeCheck<T extends JsTypeofString | [] = "string">(
 }
 
 export function checkForAdditionalKeys(obj: object, allKeys: string[]) {
-  if (Object.keys(obj).some((e) => allKeys.some((f) => e !== f))) {
+  if (!Object.keys(obj).every((e) => allKeys.some((f) => e === f))) {
     throw new FormlessError();
   }
 }

@@ -40,7 +40,7 @@ export class UserController extends HeadController {
       const list = me.listServices();
       return c.json(list);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
 
@@ -79,7 +79,7 @@ export class UserController extends HeadController {
       deleteCookie(c, "session");
       return c.body(null, 200);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
 
@@ -124,7 +124,7 @@ export class UserController extends HeadController {
       await this.userRepository.save(me);
       return c.body(null, 204);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
   async delete(c: Context) {
@@ -134,7 +134,7 @@ export class UserController extends HeadController {
       deleteCookie(c, "session");
       return c.body(null, 204);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
   async create(c: Context) {
@@ -154,7 +154,7 @@ export class UserController extends HeadController {
       console.log("test");
       return c.body(null, 201);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
 }
