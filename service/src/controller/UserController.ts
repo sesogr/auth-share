@@ -145,7 +145,7 @@ export class UserController extends HeadController {
         "displayname",
       ]);
       const { username, password } = requestData.credentials;
-      const newUser = new User(
+      const newUser = User.createUser(
         await UserCredential.create(username, password),
         requestData.displayname,
       );
