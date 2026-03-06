@@ -1,3 +1,4 @@
+import { FormlessError } from "../errors/controllerErrors/FormlessError.ts";
 import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
 import { ConvertedGroup } from "./ConvertedGroup.ts";
 import { ConvertedService } from "./ConvertedService.ts";
@@ -53,6 +54,11 @@ export function typeCheck<T extends JsTypeofString | [] = "string">(
   }
 }
 
+export function checkForAdditionalKeys(obj: object, allKeys: string[]) {
+  if (Object.keys(obj).some((e) => allKeys.some((f) => e !== f))) {
+    throw new FormlessError();
+  }
+}
 export function indepthTypeCheck(
   assertion: string | string[],
   stringKeys: string[],

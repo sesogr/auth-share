@@ -1,6 +1,7 @@
 import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
 import {
   assertIsStringRecord,
+  checkForAdditionalKeys,
   FilterForValues,
   indepthTypeCheck,
 } from "./types.ts";
@@ -33,6 +34,8 @@ export function ensureConvertedGroupIntegrity<
     ConvertedGroup,
     string[] | undefined
   >[] = ["sentInvitations", "serviceInvitations", "serviceList", "users"];
+  const allKeys: (keyof ConvertedGroup)[] = [...stringKeys, ...stringArrayKeys];
+  checkForAdditionalKeys(obj, allKeys);
   if (assertion) indepthTypeCheck(assertion, stringKeys, obj, stringArrayKeys);
   if (!assertion) {
     const requiredProperties: (keyof ConvertedGroup)[] = [

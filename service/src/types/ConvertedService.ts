@@ -1,6 +1,7 @@
 import { assertIsCredentials, Credentials } from "./Credentials.ts";
 import {
   assertIsStringRecord,
+  checkForAdditionalKeys,
   FilterForValues,
   indepthTypeCheck,
   typeCheck,
@@ -62,19 +63,19 @@ function ensureConvertedServiceIntegrity(
   obj: unknown,
   assertion?: keyof ConvertedService | (keyof ConvertedService)[],
 ) {
-  const stringKeys: Exclude<
-    FilterForValues<ConvertedService, (string | undefined)>,
-    undefined
-  >[] = ["id", "serviceName", "serviceUrl"];
-  const stringArrayKeys: Exclude<
-    FilterForValues<
-      ConvertedService,
-      (string[] | undefined)
-    >,
-    undefined
+  const stringKeys: FilterForValues<ConvertedService, (string | undefined)>[] =
+    ["id", "serviceName", "serviceUrl"];
+  const stringArrayKeys: FilterForValues<
+    ConvertedService,
+    (string[] | undefined)
   >[] = ["groups", "owners", "sentInvitations", "users"];
-
+  const allKeys: (keyof ConvertedService)[] = [
+    ...stringKeys,
+    ...stringArrayKeys,
+    "credentials",
+  ];
   assertIsStringRecord(obj);
+  checkForAdditionalKeys(obj, allKeys);
   if (assertion === "credentials") {
     assertIsCredentials(obj["credentials"]);
   }

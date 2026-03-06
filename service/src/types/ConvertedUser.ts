@@ -2,6 +2,7 @@ import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts
 import { assertIsCredentials, Credentials } from "./Credentials.ts";
 import {
   assertIsStringRecord,
+  checkForAdditionalKeys,
   FilterForValues,
   indepthTypeCheck,
 } from "./types.ts";
@@ -75,7 +76,13 @@ function ensureConvertedUserIntegrity(
     ConvertedUser,
     (string[] | undefined)
   >[] = ["callable", "groups", "owned", "ownedGroups", "userGroupInvitations"];
+  const allkeys: (keyof ConvertedUser)[] = [
+    ...stringKeys,
+    ...stringArrayKeys,
+    "credentials",
+  ];
   assertIsStringRecord(obj);
+  checkForAdditionalKeys(obj, allkeys);
   if (assertion === "credentials") {
     assertIsCredentials(obj["credentials"]);
   }
