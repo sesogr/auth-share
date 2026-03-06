@@ -99,7 +99,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
 
   async findByDisplayName(name: string): Promise<User> {
     const aUser = await DbUser.where("displayname", name).first();
-    if (!aUser.displayname) {
+    if (!aUser || !aUser.displayname) {
       throw new NotFoundError("user", "displayname", name);
     }
     return this.hydrate(aUser.id);
@@ -146,6 +146,11 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         salt: item.getCredentials().salt,
       });
     } catch (error) {
+      try {
+        await DbUser.deleteById(item.getId());
+      } catch {
+        //try to cleanup
+      }
       throw error;
     }
   }
