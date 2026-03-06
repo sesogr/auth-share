@@ -111,7 +111,9 @@ export abstract class DbRepository {
     const idExists = await this.existId(item.getId());
     if (!idExists) {
       throw new NotFoundError(
-        "Item with id: " + item.getId() + " does not exist",
+        item.type,
+        "id",
+        item.getId(),
       );
     }
     await this.model.where(this.id, item.getId()).delete();

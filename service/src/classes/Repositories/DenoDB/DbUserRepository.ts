@@ -92,7 +92,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
   async findByUserName(name: string): Promise<User> {
     const aUser = await DbUserCredential.where("username", name).first();
     if (!aUser || !aUser.username) {
-      throw new Error("User by Username not found!");
+      throw new NotFoundError("user", "username", name);
     }
     return this.hydrate(aUser.dbuserId);
   }
@@ -100,7 +100,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
   async findByDisplayName(name: string): Promise<User> {
     const aUser = await DbUser.where("displayname", name).first();
     if (!aUser.displayname) {
-      throw new Error("User by Displayname not found!");
+      throw new NotFoundError("user", "displayname", name);
     }
     return this.hydrate(aUser.id);
   }
@@ -114,7 +114,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
   }
   async findById(id: string): Promise<User> {
     if (!(await this.existId(id))) {
-      throw new NotFoundError("");
+      throw new NotFoundError("user", "id", id);
     }
     return this.hydrate(id);
   }

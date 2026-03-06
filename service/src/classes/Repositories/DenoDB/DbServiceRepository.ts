@@ -49,7 +49,7 @@ export class DbServiceRepository extends DbRepository
   }
   async findById(id: string): Promise<Service> {
     if ((await DbService.where("id", id).first()) === undefined) {
-      throw new NotFoundError("Service not found");
+      throw new NotFoundError("service", "id", id);
     }
     return this.hydrate(id);
   }
