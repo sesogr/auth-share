@@ -24,7 +24,7 @@ export class User extends Entity {
     private joinedGroups: AllowedUserGroupMap[] = [],
     private _sessions: Session[] = [],
   ) {
-    super(id, username);
+    super(id, username, "user");
   }
   private validated: boolean = false;
   setDisplayName(newDisplayName: string) {

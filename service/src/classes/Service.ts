@@ -33,7 +33,7 @@ export class Service extends Entity {
     private _allowedUsers: AllowedUserServiceMap[] = [],
     private _allowedGroups: AllowedGroupServiceMap[] = [],
   ) {
-    super(id, serviceName);
+    super(id, serviceName, "service");
   }
   giveAuthorizationToGroup(group: Group): void {
     this._allowedGroups.push(

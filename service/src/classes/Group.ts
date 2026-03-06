@@ -26,7 +26,7 @@ export class Group extends Entity {
     private serviceInvitations: Invitation[] = [],
     private readonly _allowedUser: AllowedUserGroupMap[] = [],
   ) {
-    super(id, groupname);
+    super(id, groupname, "group");
   }
   override getDisplayName(): string {
     return this.groupname;

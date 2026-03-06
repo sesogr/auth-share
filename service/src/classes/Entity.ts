@@ -9,6 +9,7 @@ export class Entity implements DisplayableEntity {
   constructor(
     protected readonly id: string,
     protected readonly displayname: string,
+    readonly type: string,
   ) {}
   getDisplayName(): string {
     return this.displayname;
