@@ -77,6 +77,7 @@ const userRepository: UserRepository = new DbUserRepository();
 const userController = new UserController(userRepository);
 const serviceController = new ServiceController(
   serviceRepository,
+  userRepository,
 );
 export const app = new Hono();
 app.use(
@@ -105,7 +106,7 @@ app.post("/logout", (c) => {
 });
 
 app.get(
-  "/user",
+  "/user/me",
   (c) => {
     return userController.read(c);
   },
@@ -141,7 +142,9 @@ app.delete("/user/me", (c) => {
 app.delete("/service", (c) => {
   return serviceController.delete(c);
 });
-app.put();
+app.patch("/service/users", (c) => {
+  return serviceController.addUsersToService(c);
+});
 
 app.post("/register", (c) => {
   return userController.create(c);
