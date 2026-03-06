@@ -80,15 +80,17 @@ export class DbServiceRepository extends DbRepository
       relationsToSave: groupRelationsToSave,
     } = this.nTomFilter(_groupServiceModel, item.allowedGroups);
     await Promise.all(groupRelationsToDelete.map((e) => e.delete()));
-    await DbGroupService.create(
-      groupRelationsToSave.map((e) => {
-        return {
-          id: e.toString(),
-          dbserviceId: e.getServiceId,
-          dbgroupId: e.getGroupId,
-        };
-      }),
-    );
+    if (groupRelationsToSave.length) {
+      await DbGroupService.create(
+        groupRelationsToSave.map((e) => {
+          return {
+            id: e.toString(),
+            dbserviceId: e.getServiceId,
+            dbgroupId: e.getGroupId,
+          };
+        }),
+      );
+    }
     //UserService
     const _userServiceModel = await DbUserService.where(
       "dbservice_id",
@@ -103,14 +105,16 @@ export class DbServiceRepository extends DbRepository
       item.allowedUsers,
     );
     await Promise.all(userRelationToDelete.map((e) => e.delete()));
-    await DbUserService.create(userRelationsToSave.map((e) => {
-      return {
-        id: e.toString(),
-        dbuserId: e.getUserId,
-        dbserviceId: e.getServiceId,
-        is_owner: e.isOwner,
-      };
-    }));
+    if (userRelationsToSave.length) {
+      await DbUserService.create(userRelationsToSave.map((e) => {
+        return {
+          id: e.toString(),
+          dbuserId: e.getUserId,
+          dbserviceId: e.getServiceId,
+          is_owner: e.isOwner,
+        };
+      }));
+    }
     //Invitations //N:M
     //sender_reference=user, reciever_reference=group, obj_reference=whole invitation ->
     await this.updateInvitation(item);

@@ -130,12 +130,14 @@ export abstract class DbRepository {
     } = this.nTomFilter(_invitationsModel, item.sentInvitations);
 
     await Promise.all(invitationsToDelete.map((e) => e.delete()));
-    await DbInvitation.create(invitationsToSave.map((e) => {
-      return {
-        sender_reference: e.senderId,
-        obj_reference: e.objId,
-        receiver_reference: e.receiverId,
-      };
-    }));
+    if (invitationsToSave.length) {
+      await DbInvitation.create(invitationsToSave.map((e) => {
+        return {
+          sender_reference: e.senderId,
+          obj_reference: e.objId,
+          receiver_reference: e.receiverId,
+        };
+      }));
+    }
   }
 }
