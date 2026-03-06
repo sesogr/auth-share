@@ -1,3 +1,4 @@
+import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
 import { DuplicateError } from "../errors/DuplicateError.ts";
 import { ConvertedGroup } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
@@ -6,6 +7,7 @@ import { Entity } from "./Entity.ts";
 import { IdNameMap } from "./IdNameMap.ts";
 import { Invitation } from "./Invitation.ts";
 import { User } from "./User.ts";
+type ownedGroups = Group & { zzz: never };
 
 export class Group extends Entity {
   public get serviceList(): AllowedGroupServiceMap[] {
@@ -30,6 +32,11 @@ export class Group extends Entity {
   }
   override getDisplayName(): string {
     return this.groupname;
+  }
+  checkOwner(user: User): asserts this is ownedGroups {
+    if (this.owner.id !== user.getId()) {
+      throw new AuthorizationError("You dont own this Group");
+    }
   }
   giveAuthorizationToUser(user: User): void {
     if (this.allowedUser.some((e) => e.getUserId == user.getId())) {

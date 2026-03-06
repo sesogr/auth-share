@@ -1,3 +1,5 @@
+import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
+import { ItemAlreadyExistsError } from "../errors/ItemAlreadyExistsError.ts";
 import { ConvertedService } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
@@ -5,8 +7,8 @@ import { Entity } from "./Entity.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
-import { User } from "./User.ts";
-
+import { User, ValidatedUser } from "./User.ts";
+export type OwnedService = { zzz: never } & Service;
 export class Service extends Entity {
   public get serviceUrl(): string {
     return this._serviceUrl;
@@ -39,6 +41,11 @@ export class Service extends Entity {
     this._allowedGroups.push(
       new AllowedGroupServiceMap(group.convertToShort(), this.convertToShort()),
     );
+  }
+  checkOwner(user: ValidatedUser): asserts this is OwnedService {
+    if (!this.allowedUsers.find((e) => e.getUserId == user.getId())) {
+      throw new AuthorizationError(`You are not an Owner`);
+    }
   }
   static createService(
     credentials: ServiceCredential,
@@ -75,8 +82,14 @@ export class Service extends Entity {
     return this.allowedGroups.map(mapCallback);
   }
   giveAuthorizationToUser(user: User): void {
+    const userMap = user.convertToShort();
+    if (this.allowedUsers.some((e) => userMap.displayname === e.getUsername)) {
+      throw new ItemAlreadyExistsError(
+        userMap.displayname + "already authorized",
+      );
+    }
     this._allowedUsers.push(
-      new AllowedUserServiceMap(user.convertToShort(), this.convertToShort()),
+      new AllowedUserServiceMap(userMap, this.convertToShort()),
     );
   }
   toJsonString(): string {

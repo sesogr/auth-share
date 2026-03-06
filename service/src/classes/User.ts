@@ -8,7 +8,7 @@ import { Entity } from "./Entity.ts";
 import { Session } from "./Session.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ValidationError } from "../errors/ValidationError.ts";
-export type ValidatedUser = User & { _: never };
+export type ValidatedUser = User & { zzz: never };
 
 export class User extends Entity {
   private validated: boolean = false;
@@ -35,18 +35,25 @@ export class User extends Entity {
         "Your Username is too long, please use a Name with max 40 characters.",
       );
     }
-    return new User(credentials, displayName);
+    const user: User = new User(credentials, displayName);
+    user.validated = true;
+    user.checkValidation();
+    return user;
   }
   private static stringToLong(displayName: string) {
     return displayName.length > 40;
   }
   setDisplayName(newDisplayName: string) {
+    this.checkValidation();
     if (User.stringToLong(newDisplayName)) {
       throw new NameTooLongError(
         "Your Username is too long, please use a Name with max 40 characters.",
       );
     }
     this.username = newDisplayName;
+  }
+  getCredentials() {
+    return this.credentials;
   }
   //controller ver
   validateSession(sessionToken: string): asserts this is ValidatedUser {
@@ -90,10 +97,6 @@ export class User extends Entity {
   }
   override getDisplayName(): string {
     return this.username;
-  }
-  getCredentials() {
-    this.checkValidation();
-    return this.credentials;
   }
   listServices(owned = false): string[] {
     this.checkValidation();
