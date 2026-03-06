@@ -1,5 +1,4 @@
 import { Invitation } from "./Invitation.ts";
-import { Service } from "./Service.ts";
 import { UserCredential } from "./UserCredential.ts";
 //import { ConvertedUser } from "../types/types.ts";
 import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
@@ -9,7 +8,10 @@ import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
 import { Entity } from "./Entity.ts";
 import { Session } from "./Session.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
+import { ValidationError } from "../errors/ValidationError.ts";
+import { ValidatedUser } from "../interfaceTypes/ValidatedUser.ts";
 export class User extends Entity {
+  private validated: boolean = false;
   public get sessions(): Session[] {
     return [...this._sessions];
   }
@@ -26,7 +28,18 @@ export class User extends Entity {
   ) {
     super(id, username, "user");
   }
-  private validated: boolean = false;
+  // exception! Unique Username(rules like lenght, what kind of special characters, ..)
+  static createUser(credentials: UserCredential, displayName: string) {
+    if (User.stringToLong(displayName)) {
+      throw new NameTooLongError(
+        "Your Username is too long, please use a Name with max 40 characters.",
+      );
+    }
+    return new User(credentials, displayName);
+  }
+  private static stringToLong(displayName: string) {
+    return displayName.length > 40;
+  }
   setDisplayName(newDisplayName: string) {
     if (User.stringToLong(newDisplayName)) {
       throw new NameTooLongError(
@@ -70,14 +83,20 @@ export class User extends Entity {
   override getId(): string {
     return this.id;
   }
-  // Entry Guards because of validatesession == true/false?
-  getCredentials() {
-    return this.credentials;
+  private checkValidation(): asserts this is ValidatedUser {
+    if (!this.validated) {
+      throw new ValidationError(`${this.getDisplayName()} is not validated`);
+    }
   }
   override getDisplayName(): string {
     return this.username;
   }
+  getCredentials() {
+    this.checkValidation();
+    return this.credentials;
+  }
   listServices(owned = false): string[] {
+    this.checkValidation();
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
       currentElement.getServicename;
     if (owned) {
@@ -88,6 +107,7 @@ export class User extends Entity {
     return this.callableService.map(mapCallback);
   }
   listJoinedGroups(owned = false): string[] {
+    this.checkValidation();
     const mapCallback = (currentElement: AllowedUserGroupMap): string =>
       currentElement.getGroupname;
     if (owned) {
@@ -98,19 +118,6 @@ export class User extends Entity {
     return this.joinedGroups.map(mapCallback);
   }
 
-  // exception! Unique Username(rules like lenght, what kind of special characters, ..)
-  static createUser(credentials: UserCredential, displayName: string) {
-    if (User.stringToLong(displayName)) {
-      throw new NameTooLongError(
-        "Your Username is too long, please use a Name with max 40 characters.",
-      );
-    }
-    return new User(credentials, displayName);
-  }
-  private static stringToLong(displayName: string) {
-    return displayName.length > 40;
-  }
-
   createSession() {
     const token = Session.generateRandomSessionToken();
     const session = Session.create(token, this.id);
@@ -119,6 +126,7 @@ export class User extends Entity {
   }
 
   removeInvitation(invite: Invitation) {
+    this.checkValidation();
     this.userGroupInvitations = this.userGroupInvitations.filter(
       (currInvitation) => {
         return currInvitation.equals(invite);
@@ -126,26 +134,34 @@ export class User extends Entity {
     );
   }
   changeUserCredentials(_newCredentials: UserCredential) {
+    this.checkValidation();
     this.credentials = _newCredentials;
   }
 
   listUserGroupInvitation(): Invitation[] {
+    this.checkValidation();
     return [...this.userGroupInvitations];
   }
-  requestAuthorization(_newService: Service) {}
 
   toJsonString(): string {
     return JSON.stringify(this.toConvertedUser());
   }
   private toConvertedUser(): ConvertedUser {
+    if (this.validated) {
+      return {
+        displayname: this.username,
+        owned: this.listServices(true),
+        credentials: { username: this.credentials.username },
+        callable: this.listServices(),
+        userGroupInvitations: this.userGroupInvitations.map((e) =>
+          e.toString()
+        ),
+        ownedGroups: this.listJoinedGroups(true),
+        groups: this.listJoinedGroups(),
+      };
+    }
     return {
       displayname: this.username,
-      owned: this.listServices(true),
-      credentials: { username: this.credentials.username },
-      callable: this.listServices(),
-      userGroupInvitations: this.userGroupInvitations.map((e) => e.toString()),
-      ownedGroups: this.listJoinedGroups(true),
-      groups: this.listJoinedGroups(),
     };
   }
 
