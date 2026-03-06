@@ -1,6 +1,5 @@
 import { Invitation } from "./Invitation.ts";
 import { UserCredential } from "./UserCredential.ts";
-//import { ConvertedUser } from "../types/types.ts";
 import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { ConvertedUser } from "../types/ConvertedUser.ts";
@@ -9,7 +8,8 @@ import { Entity } from "./Entity.ts";
 import { Session } from "./Session.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ValidationError } from "../errors/ValidationError.ts";
-import { ValidatedUser } from "../interfaceTypes/ValidatedUser.ts";
+export type ValidatedUser = User & { _: never };
+
 export class User extends Entity {
   private validated: boolean = false;
   public get sessions(): Session[] {
@@ -49,7 +49,7 @@ export class User extends Entity {
     this.username = newDisplayName;
   }
   //controller ver
-  validateSession(sessionToken: string) {
+  validateSession(sessionToken: string): asserts this is ValidatedUser {
     const session = this.findSessionByToken(sessionToken);
     if (Date.now() >= session.expiresAt.getTime()) {
       this.deleteSession(session);
