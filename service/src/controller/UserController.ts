@@ -22,7 +22,7 @@ export class UserController extends HeadController {
       if (!sessiontoken) {
         throw new SessionError("No session token");
       }
-      const currentUser = await this.userRepository.findBySessionToken(
+      const currentUser: User = await this.userRepository.findBySessionToken(
         sessiontoken,
       );
       currentUser.validateSession(sessiontoken);
@@ -49,7 +49,7 @@ export class UserController extends HeadController {
       const me = this.getMeFromContext(c);
       return c.json(me.toJson());
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
 

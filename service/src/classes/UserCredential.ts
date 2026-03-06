@@ -1,6 +1,6 @@
 import { ValueClass } from "./ValueClass.ts";
 import { bcryptAdapter } from "../deps/bcryptAdapter.ts";
-import { AuthorizationError } from "../errors/controllerErrors/UnauthorizedError.ts";
+import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
 export class UserCredential extends ValueClass<UserCredential> {
   constructor(
     readonly username: string,

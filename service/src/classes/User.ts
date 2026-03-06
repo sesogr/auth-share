@@ -83,7 +83,7 @@ export class User extends Entity {
   override getId(): string {
     return this.id;
   }
-  private checkValidation(): asserts this is ValidatedUser {
+  checkValidation(): asserts this is ValidatedUser {
     if (!this.validated) {
       throw new ValidationError(`${this.getDisplayName()} is not validated`);
     }
