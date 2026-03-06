@@ -1,3 +1,4 @@
+import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
 import { assertIsCredentials, Credentials } from "./Credentials.ts";
 import { assertIsStringRecord } from "./types.ts";
 
@@ -76,7 +77,7 @@ function ensureConvertedUserIntegrity(
       obj[assertion] === undefined ||
       obj[assertion] === null
     ) {
-      throw new TypeError(`Missing property: ${assertion}`);
+      throw new MissingDataError(`Missing property: ${assertion}`);
     }
   } else if (Array.isArray(assertion)) {
     for (const prop of assertion) {
@@ -84,7 +85,7 @@ function ensureConvertedUserIntegrity(
         obj[prop] === undefined ||
         obj[prop] === null
       ) {
-        throw new TypeError(`Missing property: ${prop}`);
+        throw new MissingDataError(`Missing property: ${prop}`);
       }
     }
   }
@@ -109,7 +110,7 @@ function ensureConvertedUserIntegrity(
         obj[prop] === undefined ||
         obj[prop] === null
       ) {
-        throw new TypeError(`Missing property: ${prop}`);
+        throw new MissingDataError(`Missing property: ${prop}`);
       }
     }
   }

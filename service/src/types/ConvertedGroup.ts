@@ -1,3 +1,4 @@
+import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
 import { assertIsStringRecord } from "./types.ts";
 
 export type ConvertedGroup = {
@@ -26,7 +27,7 @@ export function ensureConvertedGroupIntegrity<
       (obj as Record<string, unknown>)[assertion] === undefined ||
       (obj as Record<string, unknown>)[assertion] === null
     ) {
-      throw new TypeError(`Missing property: ${assertion}`);
+      throw new MissingDataError(`Missing property: ${assertion}`);
     }
   } else if (Array.isArray(assertion)) {
     for (const prop of assertion) {
@@ -34,7 +35,7 @@ export function ensureConvertedGroupIntegrity<
         (obj as Record<string, unknown>)[prop] === undefined ||
         (obj as Record<string, unknown>)[prop] === null
       ) {
-        throw new TypeError(`Missing property: ${prop}`);
+        throw new MissingDataError(`Missing property: ${prop}`);
       }
     }
   }
@@ -53,7 +54,7 @@ export function ensureConvertedGroupIntegrity<
         (obj as Record<string, unknown>)[prop] === undefined ||
         (obj as Record<string, unknown>)[prop] === null
       ) {
-        throw new TypeError(`Missing property: ${prop}`);
+        throw new MissingDataError(`Missing property: ${prop}`);
       }
     }
   }

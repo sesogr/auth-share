@@ -1,5 +1,6 @@
 import { ValueClass } from "./ValueClass.ts";
 import { bcryptAdapter } from "../deps/bcryptAdapter.ts";
+import { AuthorizationError } from "../errors/controllerErrors/UnauthorizedError.ts";
 export class UserCredential extends ValueClass<UserCredential> {
   constructor(
     readonly username: string,
@@ -9,11 +10,19 @@ export class UserCredential extends ValueClass<UserCredential> {
     super();
     Object.freeze(this);
   }
-  public async verifyPasswordHash(plainPassword: string) {
-    return await bcryptAdapter.compare(
+  assertsVerification(b: boolean): asserts b is true {
+    if (!b) {
+      throw new AuthorizationError("Password or Username incorrect");
+    }
+  }
+  public async verifyPasswordHash(
+    plainPassword: string,
+  ): Promise<void> {
+    const b = await bcryptAdapter.compare(
       plainPassword,
       this.hash,
     );
+    this.assertsVerification(b);
   }
   public async changePassword(newPassword: string) {
     //neuen usercred --> alles alt außer hash neu!!
