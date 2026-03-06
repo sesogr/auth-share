@@ -16,13 +16,11 @@ export class HeadController {
     if (error instanceof ControllerError) {
       return c.json(error, error.errorcode);
     }
-    if (error instanceof TypeError) {
-      return c.json(error, 400);
-    }
     if (error instanceof Error) {
       console.error(error);
       return c.body(null, 500);
     }
+    console.log(error);
     return c.body(null, 500);
   }
 }
