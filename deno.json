@@ -39,5 +39,11 @@
       "https://deno.land/std/node/stream.ts": "node:stream",
       "https://deno.land/std/node/util.ts": "node:util"
     }
+  },
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "dom"
+    ]
   }
 }
