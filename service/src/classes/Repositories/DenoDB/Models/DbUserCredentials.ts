@@ -10,15 +10,7 @@ export class DbUserCredential extends DbAliasableModel {
     hash: DataTypes.STRING,
     salt: DataTypes.STRING,
   };
-  static override get(): Promise<DbUserCredential | DbUserCredential[]> {
-    return super.get() as Promise<DbUserCredential | DbUserCredential[]>;
-  }
-  static override first(): Promise<DbUserCredential> {
-    return super.first() as Promise<DbUserCredential>;
-  }
-  static override all(): Promise<DbUserCredential[]> {
-    return super.all() as Promise<DbUserCredential[]>;
-  }
+
   dbuserId!: string;
   username!: string;
   hash!: string;

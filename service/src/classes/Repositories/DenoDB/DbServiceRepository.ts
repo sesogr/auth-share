@@ -1,5 +1,5 @@
 import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
-import { Service } from "../../Service.ts";
+import { OwnedService, Service } from "../../Service.ts";
 import { DbService } from "./Models/DbService.ts";
 import { ServiceCredential } from "../../ServiceCredential.ts";
 import { Model } from "@denodb";
@@ -22,6 +22,7 @@ import { Invitation } from "../../Invitation.ts";
 import { DbServiceCredential } from "./Models/DbServiceCredentials.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
 import { DbRepository } from "./DbRepository.ts";
+import { Values } from "@denodb/datatypes";
 
 export class DbServiceRepository extends DbRepository
   implements ServiceRepository {
@@ -59,7 +60,7 @@ export class DbServiceRepository extends DbRepository
   findAll(): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
-  async update(item: Service): Promise<void> {
+  async update(item: OwnedService): Promise<void> {
     await DbService.where("id", item.getId()).update({
       servicename: item.getDisplayName(),
       serviceUrl: item.serviceUrl,
@@ -129,11 +130,10 @@ export class DbServiceRepository extends DbRepository
         serviceUrl: item.serviceUrl,
       });
       await DbServiceCredential.create({
-        //@ts-ignore dbservice_id doesnt get typed, but dbuser_id does get typed, so i am not sure where the issue is yet.
-        dbservice_id: item.getId(),
+        dbserviceId: item.getId(),
         username: item.credentials.username,
         password: item.credentials.password,
-      });
+      } as Values);
 
       await DbUserService.create(
         item.allowedUsers.map((allowedUsermap) => {

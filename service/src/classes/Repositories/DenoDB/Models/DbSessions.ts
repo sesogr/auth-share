@@ -11,13 +11,4 @@ export class DbSessions extends DbAliasableModel {
   id!: string;
   expiresAt!: string;
   dbuserId!: string;
-  static override get(): Promise<DbSessions | DbSessions[]> {
-    return super.get() as Promise<DbSessions | DbSessions[]>;
-  }
-  static override first(): Promise<DbSessions> {
-    return super.first() as Promise<DbSessions>;
-  }
-  static override all(): Promise<DbSessions[]> {
-    return super.all() as Promise<DbSessions[]>;
-  }
 }

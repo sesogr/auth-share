@@ -19,4 +19,20 @@ export class DbAliasableModel extends Model {
     }
     return unambiguousColName;
   }
+
+  static override get<T extends typeof DbAliasableModel>(
+    this: T,
+  ): Promise<InstanceType<T> | InstanceType<T>[]> {
+    return super.get() as Promise<InstanceType<T> | InstanceType<T>[]>;
+  }
+  static override first<T extends typeof DbAliasableModel>(
+    this: T,
+  ): Promise<InstanceType<T>> {
+    return super.first() as Promise<InstanceType<T>>;
+  }
+  static override all<T extends typeof DbAliasableModel>(
+    this: T,
+  ): Promise<InstanceType<T>[]> {
+    return super.all() as Promise<InstanceType<T>[]>;
+  }
 }
