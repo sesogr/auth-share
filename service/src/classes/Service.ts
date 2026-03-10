@@ -8,6 +8,8 @@ import { Group } from "./Group.ts";
 import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
 import { User, ValidatedUser } from "./User.ts";
+import { NotFoundError } from "../errors/NotFoundError.ts";
+
 export type OwnedService = { zzz: never } & Service;
 export class Service extends Entity {
   public get serviceUrl(): string {
@@ -67,6 +69,19 @@ export class Service extends Entity {
   override getDisplayName(): string {
     return this.serviceName;
   }
+  promoteUser(user: string) {
+    const toPromoteI = this._allowedUsers.findIndex((allowedUser) =>
+      allowedUser.getUsername === user
+    );
+    const toPromote = this._allowedUsers[toPromoteI];
+    if (!toPromote) {
+      throw new NotFoundError("allowed User", "display name", user);
+    }
+    if (!toPromote.isOwner) {
+      throw new ItemAlreadyExistsError(user + " already Owner");
+    }
+    this._allowedUsers[toPromoteI] = toPromote.with({ isOwner: true });
+  }
   listAllowedUsers(onlyOwners = false): string[] {
     const mapCallback = (currentElement: AllowedUserServiceMap): string =>
       currentElement.getUsername;
@@ -93,9 +108,9 @@ export class Service extends Entity {
     );
   }
   toJsonString(): string {
-    return JSON.stringify(this.convertToSerializeableObj());
+    return JSON.stringify(this.convertToSerializableObj());
   }
-  private convertToSerializeableObj(): ConvertedService {
+  private convertToSerializableObj(): ConvertedService {
     return {
       credentials: {
         username: this._credentials.username!,
@@ -112,7 +127,7 @@ export class Service extends Entity {
   }
 
   toJson() {
-    return this.convertToSerializeableObj();
+    return this.convertToSerializableObj();
   }
   sendInvitation(receiver: Group, sender: User) {
     const invitation = new Invitation(
@@ -122,10 +137,4 @@ export class Service extends Entity {
     );
     this._sentInvitations.push(invitation);
   }
-
-  //callService() {}
-
-  /*serviceIsInList(serviceName: string): boolean{
-  return this.services.includes(serviceName);
-} */
 }
