@@ -12,7 +12,7 @@ export type DbUserServiceTable = Model & {
 let DbUserService: typeof Model;
 
 export function setupUserService() {
-  //@ts-ignore we are assigning immediatly after declaration
+  //@ts-ignore we are assigning immediately after declaration
   DbUserService = Relationships.manyToMany(
     DbUser,
     DbService,

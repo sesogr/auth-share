@@ -19,7 +19,7 @@ export class DbAliasableModel extends Model {
     }
     return unambiguousColName;
   }
-
+  //section of type related overrides, used to narrow down the return types for children using these methods
   static override get<T extends typeof DbAliasableModel>(
     this: T,
   ): Promise<InstanceType<T> | InstanceType<T>[]> {
