@@ -71,18 +71,10 @@ export abstract class DbRepository {
   }
 
   async existId(id: string): Promise<boolean> {
-    if ((await this.model.where(this.id, id).first())) {
-      return true;
-    } else {
-      return false;
-    }
+    return !!(await this.model.where(this.id, id).first());
   }
   async existDisplayname(displayname: string): Promise<boolean> {
-    if ((await this.model.where(this.displayname, displayname).first())) {
-      return true;
-    } else {
-      return false;
-    }
+    return !!(await this.model.where(this.displayname, displayname).first());
   }
   async checkIdName(item: Entity): Promise<boolean> {
     const data = await this.model.where("id", item.getId()).first();
@@ -102,7 +94,7 @@ export abstract class DbRepository {
           throw new DuplicateError(item.getDisplayName() + ": already Exists");
         }
       }
-      this.update(item);
+      await this.update(item);
     }
   }
   abstract update(item: Entity): Promise<void>;
