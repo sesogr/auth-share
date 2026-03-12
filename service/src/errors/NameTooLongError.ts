@@ -1,6 +1,6 @@
-export class NameTooLong extends Error {
+export class NameTooLongError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "NameTooLong";
+    this.name = "NameTooLongError";
   }
 }

@@ -47,5 +47,3 @@ export class DbGroupObjJoin extends DbGroup {
   static override alias = UniqueNumber.next() + "";
   static override table = super.table + " AS " + this.alias;
 }
-
-DbGroup.get();

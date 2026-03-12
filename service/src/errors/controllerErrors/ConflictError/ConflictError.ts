@@ -1,4 +1,4 @@
-import { ControllerError } from "./ControllerError.ts";
+import { ControllerError } from "../ControllerError.ts";
 
 export class ConflictError extends ControllerError {
   constructor(message: string) {

@@ -1,33 +1,33 @@
-import { assertIsStringRecord, FilterForValues, typeCheck } from "./types.ts";
+import {assertIsStringRecord, FilterForValues, typeCheck} from "./types.ts";
 
 export type Credentials = {
-  username?: string;
-  password?: string;
+    username?: string;
+    password?: string;
 };
 
 export function assertIsCredentials<K extends keyof Credentials = never>(
-  obj: unknown,
-  assertion?: K[] | K,
+    obj: unknown,
+    assertion?: K[] | K,
 ): asserts obj is {
-  [k in keyof Credentials]-?: Exclude<Credentials[k], undefined>;
+    [k in keyof Credentials]-?: Exclude<Credentials[k], undefined>;
 }[keyof Credentials] {
-  assertIsStringRecord(obj);
-  const allKeys: FilterForValues<Credentials, (string | undefined)>[] = [
-    "password",
-    "username",
-  ];
-  if (assertion) {
-    if (Array.isArray(assertion)) {
-      for (const key of assertion) {
-        typeCheck(obj, key);
-      }
+    assertIsStringRecord(obj);
+    const allKeys: FilterForValues<Credentials, (string | undefined)>[] = [
+        "password",
+        "username",
+    ];
+    if (assertion) {
+        if (Array.isArray(assertion)) {
+            for (const key of assertion) {
+                typeCheck(obj, key);
+            }
+        } else {
+            typeCheck(obj, assertion);
+        }
     } else {
-      typeCheck(obj, assertion);
+        for (const prop of allKeys) {
+            typeCheck(obj, prop, "object", true);
+            
+        }
     }
-  } else {
-    for (const prop of allKeys) {
-      typeCheck(obj, prop, "object", true);
-      obj[prop];
-    }
-  }
 }

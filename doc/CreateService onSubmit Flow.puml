@@ -66,8 +66,8 @@ alt Validierung erfolgreich
         
     else Insert fehlgeschlagen (Duplicate)
         DB --> DbServiceRepo: Error: Duplicate Key
-        DbServiceRepo --> ServiceRepo: ItemAlreadyExistsError
-        ServiceRepo --> ServiceController: ItemAlreadyExistsError
+        DbServiceRepo --> ServiceRepo: AlreadyTakenError
+        ServiceRepo --> ServiceController: AlreadyTakenError
         ServiceController --> Fetch: 409 Conflict
         Fetch --> CreateService: Error Response
         CreateService -> CreateService: Fehlermeldung anzeigen\n"Service existiert bereits"

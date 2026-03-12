@@ -11,7 +11,7 @@ import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { User } from "../classes/User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { PromisesUtil } from "../services/PromissesUtil.ts";
-import { ItemAlreadyExistsError } from "../errors/ItemAlreadyExistsError.ts";
+import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 import { ConvertedUser } from "../types/types.ts";
 
 export class ServiceController extends HeadController {
@@ -90,7 +90,7 @@ export class ServiceController extends HeadController {
           service.giveAuthorizationToUser(u);
           fulfilledUsers.push(u.toJson());
         } catch (error) {
-          if (error instanceof ItemAlreadyExistsError) {
+          if (error instanceof AlreadyTakenError) {
             alreadyAuthorized.push(u.toJson());
           }
         }
@@ -123,7 +123,7 @@ export class ServiceController extends HeadController {
           service.promoteUser(toPromote);
           promotedUsers.push(toPromote);
         } catch (error) {
-          if (error instanceof ItemAlreadyExistsError) {
+          if (error instanceof AlreadyTakenError) {
             alreadyIn.push(toPromote);
           }
           if (error instanceof NotFoundError) {

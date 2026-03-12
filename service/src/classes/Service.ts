@@ -1,5 +1,4 @@
 import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
-import { ItemAlreadyExistsError } from "../errors/ItemAlreadyExistsError.ts";
 import { ConvertedService } from "../types/types.ts";
 import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
@@ -9,6 +8,7 @@ import { Invitation } from "./Invitation.ts";
 import { ServiceCredential } from "./ServiceCredential.ts";
 import { User, ValidatedUser } from "./User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
+import { DuplicateError } from "../errors/DuplicateError.ts";
 
 export type OwnedService = { zzz: never } & Service;
 export class Service extends Entity {
@@ -78,7 +78,7 @@ export class Service extends Entity {
       throw new NotFoundError("allowed User", "display name", user);
     }
     if (!toPromote.isOwner) {
-      throw new ItemAlreadyExistsError(user + " already Owner");
+      throw new DuplicateError(user + " already Owner");
     }
     this._allowedUsers[toPromoteI] = toPromote.with({ isOwner: true });
   }
@@ -99,7 +99,7 @@ export class Service extends Entity {
   giveAuthorizationToUser(user: User): void {
     const userMap = user.convertToShort();
     if (this.allowedUsers.some((e) => userMap.displayname === e.getUsername)) {
-      throw new ItemAlreadyExistsError(
+      throw new DuplicateError(
         userMap.displayname + "already authorized",
       );
     }

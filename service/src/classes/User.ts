@@ -1,6 +1,6 @@
 import { Invitation } from "./Invitation.ts";
 import { UserCredential } from "./UserCredential.ts";
-import { NameTooLong as NameTooLongError } from "../errors/NameTooLongError.ts";
+import { NameTooLongError } from "../errors/NameTooLongError.ts";
 import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { ConvertedUser } from "../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
@@ -19,16 +19,16 @@ export class User extends Entity {
     private credentials: UserCredential,
     private username: string = "",
     protected override readonly id: string = crypto.randomUUID(),
-    //callableService includes owned and used Services of an User
+    //callableService includes owned and used Services of a User
     private callableService: AllowedUserServiceMap[] = [],
     private userGroupInvitations: Invitation[] = [],
-    //..includes owned and used
+    //...includes owned and used
     private joinedGroups: AllowedUserGroupMap[] = [],
     private _sessions: Session[] = [],
   ) {
     super(id, username, "user");
   }
-  // exception! Unique Username(rules like lenght, what kind of special characters, ..)
+  // exception! Unique Username(rules like length, what kind of special characters, ..)
   static createUser(credentials: UserCredential, displayName: string) {
     if (User.stringToLong(displayName)) {
       throw new NameTooLongError(

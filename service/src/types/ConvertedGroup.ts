@@ -9,6 +9,7 @@ import {
 export type ConvertedGroup = {
   groupname?: string;
   owner?: string;
+  id?: string;
 } & { [k in GroupListProperties]?: string[] };
 
 type GroupListProperties =

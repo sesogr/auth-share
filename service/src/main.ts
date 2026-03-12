@@ -22,6 +22,7 @@ import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepo
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
 import { Environment } from "./classes/Environment.ts";
+import { GroupController } from "./controller/GroupController.ts";
 Environment.load();
 const db = new Database(
   new MySQLConnector({
@@ -44,6 +45,7 @@ db.link([
   DbInvitation,
   DbSessions,
 ]);
+
 let connected = false;
 while (!connected) {
   try {
@@ -72,12 +74,17 @@ while (!connected) {
 }
 
 const serviceRepository: ServiceRepository = new DbServiceRepository();
-const _groupRepository: GroupRepository = new DbGroupRepository();
+const groupRepository: GroupRepository = new DbGroupRepository();
 const userRepository: UserRepository = new DbUserRepository();
 const userController = new UserController(userRepository);
 const serviceController = new ServiceController(
   serviceRepository,
   userRepository,
+);
+const groupController = new GroupController(
+  groupRepository,
+  userRepository,
+  serviceRepository,
 );
 export const app = new Hono();
 app.use(
@@ -90,71 +97,29 @@ app.use(
 );
 app.use(
   "*",
-  except(["/register", "/login"], (c, next) => {
-    return userController.authMiddleware(c, next);
-  }),
+  except(
+    ["/register", "/login"],
+    (c, next) => userController.authMiddleware(c, next),
+  ),
 );
 
-app.post(
-  "/login",
-  (c) => {
-    return userController.logIn(c);
-  },
-);
-app.post("/logout", (c) => {
-  return userController.logOut(c);
-});
-
-app.get(
-  "/user/me",
-  (c) => {
-    return userController.read(c);
-  },
-);
+app.post("/login", (c) => userController.logIn(c));
+app.post("/logout", (c) => userController.logOut(c));
+app.get("/user/me", (c) => userController.read(c));
+app.patch("/user/me/password", (c) => userController.changePassword(c));
+app.patch("/user/me/displayname", (c) => userController.changeDisplayName(c));
+app.get("/user/owned", (c) => serviceController.listMyServices(c));
+app.delete("/user/me", (c) => userController.delete(c));
+app.delete("/service", (c) => serviceController.delete(c));
+app.patch("/service/users", (c) => serviceController.addUsersToService(c));
 app.patch(
-  "/user/me/password",
-  (c) => {
-    return userController.changePassword(
-      c,
-    );
-  },
+  "/service/users/promote",
+  (c) => serviceController.promoteUsersOfService(c),
 );
-app.patch(
-  "/user/me/displayname",
-  (c) => {
-    return userController.changeDisplayName(
-      c,
-    );
-  },
-);
+app.post("/register", (c) => userController.create(c));
+app.post("/service/create", (c) => serviceController.add(c));
 
-app.get(
-  "/user/owned",
-  (c) => {
-    return serviceController.listMyServices(
-      c,
-    );
-  },
-);
-app.delete("/user/me", (c) => {
-  return userController.delete(c);
-});
-app.delete("/service", (c) => {
-  return serviceController.delete(c);
-});
-app.patch("/service/users", (c) => {
-  return serviceController.addUsersToService(c);
-});
+app.get("/group/create", (c) => groupController.createGroup(c));
 
-app.post("/register", (c) => {
-  return userController.create(c);
-});
-
-app.post("/service/create", (c) => {
-  return serviceController.add(c);
-});
-
-//app.get("/group", groupController);
-
-// Server starten
+// Server start
 Deno.serve(app.fetch);

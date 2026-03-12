@@ -14,7 +14,7 @@ export class HeadController {
   }
   errorHandle(error: unknown, c: Context) {
     if (error instanceof ControllerError) {
-      return c.json(error, error.errorcode);
+      return c.json(error, error.errorCode);
     }
     if (error instanceof Error) {
       console.error(error);

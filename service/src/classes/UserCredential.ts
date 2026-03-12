@@ -25,7 +25,7 @@ export class UserCredential extends ValueClass<UserCredential> {
     this.assertsVerification(b);
   }
   public async changePassword(newPassword: string) {
-    //neuen usercred --> alles alt außer hash neu!!
+    //new usercred --> alles alt außer hash neu!!
     const { hashedPassword } = await UserCredential.hashPassword(
       newPassword,
       this.salt,

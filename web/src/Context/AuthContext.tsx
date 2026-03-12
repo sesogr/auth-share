@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
   { children },
 ) => {
   const refreshUser = () => {
-    return fetch(`${import.meta.env.VITE_APIURL}/user/me`, {
+    fetch(`${import.meta.env.VITE_APIURL}/user/me`, {
       method: "GET",
       credentials: "include",
     })

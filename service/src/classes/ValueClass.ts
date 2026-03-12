@@ -1,7 +1,7 @@
 import { OnlyProperties } from "../types/OnlyProperties.ts";
 
 export abstract class ValueClass<T extends ValueClass<T>> {
-  //every key is a string --> that mapps to a primitive type. RecursiveValueClass is ValueClass<RecursiveValueClass>
+  //every key is a string --> that maps to a primitive type. RecursiveValueClass is ValueClass<RecursiveValueClass>
   [key: string]:
     | string
     | number
@@ -11,8 +11,7 @@ export abstract class ValueClass<T extends ValueClass<T>> {
     | RecursiveValueClass
     | ((...args: never[]) => unknown)
     | boolean;
-  constructor() {
-  }
+
   equals(that: T): boolean {
     return this.toString() === that.toString() &&
       this.constructor === that.constructor;

@@ -1,111 +1,111 @@
-import { assertArrayIncludes, assertEquals, assertFalse } from "@std/assert";
-import { Service } from "../../src/classes/Service.ts";
-import { ServiceCredential } from "../../src/classes/ServiceCredential.ts";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
-import { Invitation } from "../../src/classes/Invitation.ts";
-import { Group } from "../../src/classes/Group.ts";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
-import { AllowedGroupServiceMap } from "../../src/classes/AllowedGroupServiceMap.ts";
-import { AllowedUserServiceMap } from "../../src/classes/AllowedUserServiceMap.ts";
+import {assertArrayIncludes, assertEquals, assertFalse} from "@std/assert";
+import {Service} from "../../src/classes/Service.ts";
+import {ServiceCredential} from "../../src/classes/ServiceCredential.ts";
+import {FakeObjectGen} from "../../src/FakeObjectGen.ts";
+import {Invitation} from "../../src/classes/Invitation.ts";
+import {Group} from "../../src/classes/Group.ts";
+import {IdNameMap} from "../../src/classes/IdNameMap.ts";
+import {AllowedGroupServiceMap} from "../../src/classes/AllowedGroupServiceMap.ts";
+import {AllowedUserServiceMap} from "../../src/classes/AllowedUserServiceMap.ts";
 
 const serviceCredential = new ServiceCredential("", "");
 const userShort = await FakeObjectGen.createFakeUser(
-  undefined,
-  undefined,
-  "uwe",
+    undefined,
+    undefined,
+    "uwe",
 );
 const user2Short = await FakeObjectGen.createFakeUser(
-  undefined,
-  undefined,
-  "swe",
+    undefined,
+    undefined,
+    "swe",
 );
 const user = await FakeObjectGen.createFakeUser();
 const user2 = await FakeObjectGen.createFakeUser();
 const service = Service.createService(
-  serviceCredential,
-  "sag",
-  "asdf",
-  userShort,
+    serviceCredential,
+    "sag",
+    "asdf",
+    userShort,
 );
 Deno.test("Service Class", async (t) => {
-  await t.step("Service Creates", () => {
-    const owners: string[] = service.listAllowedUsers(true);
-    assertArrayIncludes(owners, [userShort.getDisplayName()]);
-    assertEquals(service.serviceUrl, "asdf");
-    assertEquals(service.credentials, serviceCredential);
-  });
+    await t.step("Service Creates", () => {
+        const owners: string[] = service.listAllowedUsers(true);
+        assertArrayIncludes(owners, [userShort.getDisplayName()]);
+        assertEquals(service.serviceUrl, "asdf");
+        assertEquals(service.credentials, serviceCredential);
+    });
 
-  await t.step("lists that should be empty are empty", () => {
-    assertEquals(
-      service.listAllowedGroups().length +
-        service.listAllowedUsers().length - 1,
-      0,
-    );
-  });
+    await t.step("lists that should be empty are empty", () => {
+        assertEquals(
+            service.listAllowedGroups().length +
+            service.listAllowedUsers().length - 1,
+            0,
+        );
+    });
 
-  await t.step(
-    "Service Authorize new User successfully puts User into owners",
-    () => {
-      service.giveAuthorizationToUser(user2Short);
-      assertArrayIncludes(service.listAllowedUsers(), [
-        user2Short.getDisplayName(),
-      ]);
-    },
-  );
-  await t.step("send invitation", () => {
-    const testInvite = new Invitation(
-      user.convertToShort(),
-      service.convertToShort(),
-      user2.convertToShort(),
+    await t.step(
+        "Service Authorize new User successfully puts User into owners",
+        () => {
+            service.giveAuthorizationToUser(user2Short);
+            assertArrayIncludes(service.listAllowedUsers(), [
+                user2Short.getDisplayName(),
+            ]);
+        },
     );
-    service.sendInvitation(user2 as unknown as Group, user);
-    assertFalse(!service.sentInvitations.some((e) => e.equals(testInvite)));
-  });
+    await t.step("send invitation", () => {
+        const testInvite = new Invitation(
+            user.convertToShort(),
+            service.convertToShort(),
+            user2.convertToShort(),
+        );
+        service.sendInvitation(user2 as unknown as Group, user);
+        assertFalse(!service.sentInvitations.some((e) => e.equals(testInvite)));
+    });
 
-  await t.step("group autorization", () => {
-    const fakegroup = {
-      convertToShort: () => {
-        return { displayname: "ha" } as IdNameMap;
-      },
-    } as Group;
-    service.giveAuthorizationToGroup(fakegroup);
-    assertEquals(
-      service.listAllowedGroups(),
-      [fakegroup.convertToShort().displayname],
-    );
-  });
+    await t.step("group authorization", () => {
+        const fakeGroup = {
+            convertToShort: () => {
+                return {displayname: "ha"} as IdNameMap;
+            },
+        } as Group;
+        service.giveAuthorizationToGroup(fakeGroup);
+        assertEquals(
+            service.listAllowedGroups(),
+            [fakeGroup.convertToShort().displayname],
+        );
+    });
 
-  await t.step("showall", () => {
-    const service = new Service(
-      { username: "ha", password: "ha" } as ServiceCredential,
-      "abc",
-      "asd",
-      "adc",
-      [{ toString: () => "adjf" }] as Invitation[],
-      [{
-        getUsername: "asd",
-        isOwner: true,
-      }, {
-        getUsername: "asdc",
-        isOwner: false,
-      }] as AllowedUserServiceMap[],
-      [{
-        getGroupname: "asd",
-      }] as AllowedGroupServiceMap[],
-    );
-    const data = {
-      credentials: {
-        username: service.credentials.username!,
-        password: service.credentials.password!,
-      },
-      serviceName: service.getDisplayName(),
-      serviceUrl: service.serviceUrl,
-      groups: service.listAllowedGroups(),
-      users: service.listAllowedUsers(),
-      owners: service.listAllowedUsers(true),
-      sentInvitations: service.sentInvitations.map((e) => e.toString()),
-    };
-    assertEquals(service.toJson(), data);
-    assertEquals(service.toJsonString(), JSON.stringify(data));
-  });
+    await t.step("show all", () => {
+        const service = new Service(
+            {username: "ha", password: "ha"} as ServiceCredential,
+            "abc",
+            "asd",
+            "adc",
+            [{toString: () => "adjf"}] as Invitation[],
+            [{
+                getUsername: "asd",
+                isOwner: true,
+            }, {
+                getUsername: "asdc",
+                isOwner: false,
+            }] as AllowedUserServiceMap[],
+            [{
+                getGroupname: "asd",
+            }] as AllowedGroupServiceMap[],
+        );
+        const data = {
+            credentials: {
+                username: service.credentials.username!,
+                password: service.credentials.password!,
+            },
+            serviceName: service.getDisplayName(),
+            serviceUrl: service.serviceUrl,
+            groups: service.listAllowedGroups(),
+            users: service.listAllowedUsers(),
+            owners: service.listAllowedUsers(true),
+            sentInvitations: service.sentInvitations.map((e) => e.toString()),
+        };
+        assertEquals(service.toJson(), data);
+        assertEquals(service.toJsonString(), JSON.stringify(data));
+    });
 });
