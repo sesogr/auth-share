@@ -1,73 +1,73 @@
 import React from "react";
-import {Button, Input} from "antd";
-import {useAuth} from "../Context/AuthContext.tsx";
-import type {UserStringProperties} from "../types/ConvertedUser.ts";
+import { Button, Input } from "antd";
+import { useAuth } from "../Context/AuthContext.tsx";
+import type { UserStringProperties } from "../types/ConvertedUser.ts";
 
 const Change: React.FC<
-    { toChange: UserStringProperties | "credentials"; password?: boolean }
+  { toChange: UserStringProperties | "credentials"; password?: boolean }
 > = (
-    {toChange, password},
+  { toChange, password },
 ) => {
-    const {user, setUser} = useAuth();
-    const [newValue, setNewValue] = React.useState("");
-    const [error, setError] = React.useState<Error | null>(null);
-    const [answer, setAnswer] = React.useState<string | null>(null);
-    const submit = async () => {
-        setError(null);
-        setAnswer(null);
-        if (!user) return;
-        let newCred = newValue;
-        let toChangeKey: UserStringProperties | "credentials" | "password" =
-            toChange;
-        if (toChange === "credentials") {
-            newCred = user.credentials + ":" + newValue;
-            toChangeKey = "password";
-        }
-        user[toChange] = newCred;
-        try {
-            const res = await fetch(
-                import.meta.env.VITE_APIURL + "/user/me/" + toChangeKey,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include",
-                    body: JSON.stringify(user),
-                },
-            );
-            if (!res.ok) {
-                setError(
-                    `Failed to update user: ${await res.text()}`,
-                );
-                console.error("Error updating user:" + await res.text())
-            } else {
-                setUser(user);
-                setAnswer("User updated successfully");
-            }
-        } catch (e) {
-            setError(e as Error);
-            console.error("Error updating user:", e);
-        }
-    };
-    return (
-        <>
-            <Input
-                type={password ? "password" : "text"}
-                placeholder={`New ${toChange}`}
-                onChange={(e) => setNewValue(e.target.value)}
-            />
-            <Button
-                onClick={() => submit()}
-                type="primary"
-                style={{marginTop: 8}}
-            >
-                Save Changes
-            </Button>
-            {error && <div style={{color: "red"}}>Error: {error.message}</div>}
-            {answer && <div style={{color: "green"}}>{answer}</div>}
-        </>
-    );
+  const { user, setUser } = useAuth();
+  const [newValue, setNewValue] = React.useState("");
+  const [error, setError] = React.useState<Error | null>(null);
+  const [answer, setAnswer] = React.useState<string | null>(null);
+  const submit = async () => {
+    setError(null);
+    setAnswer(null);
+    if (!user) return;
+    let newCred = newValue;
+    let toChangeKey: UserStringProperties | "credentials" | "password" =
+      toChange;
+    if (toChange === "credentials") {
+      newCred = user.credentials + ":" + newValue;
+      toChangeKey = "password";
+    }
+    user[toChange] = newCred;
+    try {
+      const res = await fetch(
+        import.meta.env.VITE_APIURL + "/user/me/" + toChangeKey,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(user),
+        },
+      );
+      if (!res.ok) {
+        setError(
+          `Failed to update user: ${await res.text()}`,
+        );
+        console.error("Error updating user:" + await res.text());
+      } else {
+        setUser(user);
+        setAnswer("User updated successfully");
+      }
+    } catch (e) {
+      setError(e as Error);
+      console.error("Error updating user:", e);
+    }
+  };
+  return (
+    <>
+      <Input
+        type={password ? "password" : "text"}
+        placeholder={`New ${toChange}`}
+        onChange={(e) => setNewValue(e.target.value)}
+      />
+      <Button
+        onClick={() => submit()}
+        type="primary"
+        style={{ marginTop: 8 }}
+      >
+        Save Changes
+      </Button>
+      {error && <div style={{ color: "red" }}>Error: {error.message}</div>}
+      {answer && <div style={{ color: "green" }}>{answer}</div>}
+    </>
+  );
 };
 
 export default Change;

@@ -15,7 +15,7 @@ services:
       - ./service:/app
     ports:
       - "8000:8000"
-    entrypoint: ["deno", "run" ,"--allow-all", "--watch" ,"src/main.ts"]
+    entrypoint: ["deno", "run", "--allow-all", "--watch", "src/main.ts"]
 
   web-dev:
     container_name: dev-web
