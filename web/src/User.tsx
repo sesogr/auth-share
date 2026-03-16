@@ -19,7 +19,7 @@ const User: React.FC = () => {
   const [displaynameEdit, setDisplaynameEdit] = displaynameState;
   const [passwordEdit, setPasswordEdit] = passwordState;
   const toggleEditBox = (
-    which: StringKeys<ConvertedUser>,
+    which: StringKeys<ConvertedUser> | "credentials",
   ) => {
     states.forEach(([_, setState]) => {
       setState(false);
