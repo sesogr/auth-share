@@ -25,7 +25,7 @@ export function ensureConvertedGroupIntegrity<
   assertion?: K[] | K,
 ): asserts obj is [K] extends [never]
   ? { [P in keyof ConvertedGroup]-?: Exclude<ConvertedGroup[P], undefined> }
-  : ConvertedGroup & { [P in K]-?: Exclude<ConvertedGroup[P], undefined> } {
+  : { [P in K]: Exclude<ConvertedGroup[P],undefined> } {
   assertIsStringRecord(obj);
   const stringKeys: FilterForValues<ConvertedGroup, string | undefined>[] = [
     "groupname",
