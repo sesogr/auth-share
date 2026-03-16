@@ -6,8 +6,8 @@ import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
 import { Entity } from "./Entity.ts";
 import { IdNameMap } from "./IdNameMap.ts";
 import { Invitation } from "./Invitation.ts";
-import {User, ValidatedUser} from "./User.ts";
-import {AlreadyTakenError} from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { User, ValidatedUser } from "./User.ts";
+import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 
 export type OwnedGroups = Group & { zzz: never };
 
@@ -47,12 +47,12 @@ export class Group extends Entity {
   }
 
   giveAuthorizationToUser(user: IdNameMap | User): void {
-      let userinfo:IdNameMap
-      if (user instanceof User){
-          userinfo = user.convertToShort()
-      }else{
-      userinfo = user
-      }
+    let userinfo: IdNameMap;
+    if (user instanceof User) {
+      userinfo = user.convertToShort();
+    } else {
+      userinfo = user;
+    }
     if (this.allowedUser.some((e) => e.getUserId == userinfo.id)) {
       throw new DuplicateError("User is already allowed");
     }
@@ -73,13 +73,17 @@ export class Group extends Entity {
   listServiceInvitation(): Invitation[] {
     return [...this.serviceInvitations];
   }
-    acceptInvitation(invitation: Invitation): void {
-      const realInviteIndex = this._sentInvitations.findIndex((e)=> e.equals(invitation))
-        if (realInviteIndex === -1){
-            throw new AuthorizationError("The Invitation is Invalid")
-        }
-        this.giveAuthorizationToUser(this._sentInvitations[realInviteIndex].receiverReference)
-        this._sentInvitations.splice(realInviteIndex, 1)
+  acceptInvitation(invitation: Invitation): void {
+    const realInviteIndex = this._sentInvitations.findIndex((e) =>
+      e.equals(invitation)
+    );
+    if (realInviteIndex === -1) {
+      throw new AuthorizationError("The Invitation is Invalid");
+    }
+    this.giveAuthorizationToUser(
+      this._sentInvitations[realInviteIndex].receiverReference,
+    );
+    this._sentInvitations.splice(realInviteIndex, 1);
   }
   listSentInvitation(): Invitation[] {
     return [...this.sentInvitations];
@@ -100,7 +104,7 @@ export class Group extends Entity {
     senderReference: ValidatedUser,
     receiverReference: User,
   ) {
-      this.checkOwner(senderReference)
+    this.checkOwner(senderReference);
     const invitation = new Invitation(
       senderReference.convertToShort(),
       this.convertToShort(),
@@ -112,21 +116,26 @@ export class Group extends Entity {
     }
     this._sentInvitations.push(invitation);
   }
-  sendMultipleInvitations(senderReference: ValidatedUser, receiverReferences: User[]): {fulfilled: User[], alreadyIn: User[]} {
-      this.checkOwner(senderReference)
-      const result: {fulfilled: User[], alreadyIn: User[]} = {fulfilled: [], alreadyIn: []}
-      receiverReferences.forEach((user) => {
-          try {
-              this.sendInvitation(senderReference, user);
-              result.fulfilled.push(user);
-          } catch (e) {
-              if (e instanceof AlreadyTakenError) {
-                  result.alreadyIn.push(user);
-              }
-          }
-      });
-      return result
-
+  sendMultipleInvitations(
+    senderReference: ValidatedUser,
+    receiverReferences: User[],
+  ): { fulfilled: User[]; alreadyIn: User[] } {
+    this.checkOwner(senderReference);
+    const result: { fulfilled: User[]; alreadyIn: User[] } = {
+      fulfilled: [],
+      alreadyIn: [],
+    };
+    receiverReferences.forEach((user) => {
+      try {
+        this.sendInvitation(senderReference, user);
+        result.fulfilled.push(user);
+      } catch (e) {
+        if (e instanceof AlreadyTakenError) {
+          result.alreadyIn.push(user);
+        }
+      }
+    });
+    return result;
   }
   getOwner(): IdNameMap {
     return this.owner;
