@@ -46,22 +46,33 @@ export class GroupController extends HeadController {
       const settledResults = await Promise.allSettled(
         userData.userGroupInvitations.map(async (invitationStr) => {
           const [sender, obj, receiver] = invitationStr.split(":");
-            if(receiver !== ME.getDisplayName()){
-                throw new Error()
-            }
-            const object:Group = await this.groupRepository.findByDisplayName(obj)
-            const senderUser:User = await this.userRepository.findByDisplayName(sender)
-            object.checkOwner(senderUser)
-            const realInvite = new Invitation(senderUser.convertToShort(),object.convertToShort(),ME.convertToShort())
-            object.acceptInvitation(realInvite)
-            return Promise.resolve(realInvite)
+          if (receiver !== ME.getDisplayName()) {
+            throw new Error();
+          }
+          const object: Group = await this.groupRepository.findByDisplayName(
+            obj,
+          );
+          const senderUser: User = await this.userRepository.findByDisplayName(
+            sender,
+          );
+          object.checkOwner(senderUser);
+          const realInvite = new Invitation(
+            senderUser.convertToShort(),
+            object.convertToShort(),
+            ME.convertToShort(),
+          );
+          object.acceptInvitation(realInvite);
+          return Promise.resolve(realInvite);
         }),
       );
-        const {fulfilled, rejected} = PromisesUtil.splitSettled<Invitation,Error>(settledResults)
-        return c.json({
-          fulfilled: fulfilled.map((e)=>e.toString())
-            ,rejected: rejected.map((e)=>e.message)
-        })
+      const { fulfilled, rejected } = PromisesUtil.splitSettled<
+        Invitation,
+        Error
+      >(settledResults);
+      return c.json({
+        fulfilled: fulfilled.map((e) => e.toString()),
+        rejected: rejected.map((e) => e.message),
+      });
     } catch (error) {
       this.errorHandle(error, c);
     }
