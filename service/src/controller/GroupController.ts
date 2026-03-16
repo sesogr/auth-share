@@ -11,13 +11,17 @@ import { ServiceRepository } from "../interfaceTypes/ServiceRepository.ts";
 import { PromisesUtil } from "../services/PromissesUtil.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { User } from "../classes/User.ts";
-import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import {
+  ConvertedUser,
+  ensureConvertedUserIntegrity,
+} from "../types/ConvertedUser.ts";
+import { Invitation } from "../classes/Invitation.ts";
 
 export class GroupController extends HeadController {
   constructor(
     private readonly groupRepository: GroupRepository,
     private readonly userRepository: UserRepository,
-    private readonly _serviceRepository: ServiceRepository,
+    private readonly serviceRepository: ServiceRepository,
   ) {
     super();
   }
@@ -34,11 +38,38 @@ export class GroupController extends HeadController {
       return this.errorHandle(error, c);
     }
   }
-
+  async acceptInvitation(c: Context) {
+    try {
+      const ME = this.getMeFromContext(c);
+      const userData: ConvertedUser = await c.req.json();
+      ensureConvertedUserIntegrity(userData, ["userGroupInvitations"]);
+      const settledResults = await Promise.allSettled(
+        userData.userGroupInvitations.map(async (invitationStr) => {
+          const [sender, obj, receiver] = invitationStr.split(":");
+            if(receiver !== ME.getDisplayName()){
+                throw new Error()
+            }
+            const object:Group = await this.groupRepository.findByDisplayName(obj)
+            const senderUser:User = await this.userRepository.findByDisplayName(sender)
+            object.checkOwner(senderUser)
+            const realInvite = new Invitation(senderUser.convertToShort(),object.convertToShort(),ME.convertToShort())
+            object.acceptInvitation(realInvite)
+            return Promise.resolve(realInvite)
+        }),
+      );
+        const {fulfilled, rejected} = PromisesUtil.splitSettled<Invitation,Error>(settledResults)
+        return c.json({
+          fulfilled: fulfilled.map((e)=>e.toString())
+            ,rejected: rejected.map((e)=>e.message)
+        })
+    } catch (error) {
+      this.errorHandle(error, c);
+    }
+  }
   async inviteUsers(c: Context) {
     try {
       const ME = this.getMeFromContext(c);
-      const groupData = await c.req.json();
+      const groupData: ConvertedGroup = await c.req.json();
       ensureConvertedGroupIntegrity(groupData, ["id", "sentInvitations"]);
       const group: Group = await this.groupRepository.findById(groupData.id);
       group.checkOwner(ME);
@@ -49,23 +80,13 @@ export class GroupController extends HeadController {
       );
       const { rejected: notFound, fulfilled: userlist } = PromisesUtil
         .splitSettled<User, NotFoundError>(settledUsers);
-      const fulfilled: string[] = [];
-      const alreadyIn: string[] = [];
-      userlist.forEach((user) => {
-        try {
-          group.sendInvitation(ME, user);
-          fulfilled.push(user.getDisplayName());
-        } catch (e) {
-          if (e instanceof AlreadyTakenError) {
-            alreadyIn.push(user.getDisplayName());
-          } else {
-            throw e;
-          }
-        }
-      });
+      const { fulfilled, alreadyIn } = group.sendMultipleInvitations(
+        ME,
+        userlist,
+      );
       return c.json({
-        fulfilled: fulfilled,
-        alreadyIn: alreadyIn,
+        fulfilled: fulfilled.map((e) => e.getDisplayName()),
+        alreadyIn: alreadyIn.map((e) => e.getDisplayName()),
         rejected: notFound.map((e) => e.target),
       });
     } catch (error) {
