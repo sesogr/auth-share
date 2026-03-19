@@ -81,7 +81,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         DbUserSenderJoin.field("displayname", "sender_name"),
         DbUserSenderJoin.field("id", "sender_id"),
         DbServiceObjJoin.field(
-          "displayname",
+          "servicename",
           "invitedServiceName",
         ),
         DbServiceObjJoin.field("id", "invitedServiceId"),
@@ -304,11 +304,10 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
     const searchedList = await DbUserGroup.where({
       dbuser_id: userId,
       is_owner: true,
-    }).get();
-
+    }).get() as unknown as { dbgroupId: string }[];
     if (Array.isArray(searchedList)) {
       return await Promise.all(searchedList.map((group) => {
-        return this.hydrate(group.dbgroup_id?.toString() ?? "");
+        return this.hydrate(group.dbgroupId);
       }));
     }
     throw new RuntimeError("DbGroupRepository.findOwnedByUserId");
