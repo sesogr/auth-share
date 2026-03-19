@@ -129,7 +129,6 @@ export abstract class DbRepository {
       "obj_reference",
       item.getId(),
     ).all();
-
     const {
       relationsToDelete: invitationsToDelete,
       relationsToSave: invitationsToSave,
@@ -139,6 +138,7 @@ export abstract class DbRepository {
     if (invitationsToSave.length) {
       await DbInvitation.create(invitationsToSave.map((e) => {
         return {
+          id: e.toString(),
           sender_reference: e.senderId,
           obj_reference: e.objId,
           receiver_reference: e.receiverId,
