@@ -80,6 +80,7 @@ const userController = new UserController(userRepository);
 const serviceController = new ServiceController(
   serviceRepository,
   userRepository,
+  groupRepository,
 );
 const groupController = new GroupController(
   groupRepository,
@@ -118,8 +119,19 @@ app.patch(
 );
 app.post("/register", (c) => userController.create(c));
 app.post("/service/create", (c) => serviceController.add(c));
-
-app.get("/group/create", (c) => groupController.createGroup(c));
-
+app.post(
+  "/service/invitation/create",
+  (c) => serviceController.inviteGroupsToService(c),
+);
+app.patch(
+  "/service/invitation/accept",
+  (c) => serviceController.acceptInvitation(c),
+);
+app.post("/group/create", (c) => groupController.createGroup(c));
+app.post("/group/invitation/create", (c) => groupController.inviteUsers(c));
+app.patch(
+  "/group/invitation/accept",
+  (c) => groupController.acceptInvitation(c),
+);
 // Server start
 Deno.serve(app.fetch);
