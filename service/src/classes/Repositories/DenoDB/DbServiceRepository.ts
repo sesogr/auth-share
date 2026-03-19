@@ -5,12 +5,8 @@ import { ServiceCredential } from "../../ServiceCredential.ts";
 import { Model } from "@denodb";
 import { DbUserService } from "./Models/DbUserService.ts";
 
-import { DbGroupJoin } from "./Models/DbGroup.ts";
-import {
-  DbUserJoin,
-  DbUserReceiverJoin,
-  DbUserSenderJoin,
-} from "./Models/DbUser.ts";
+import { DbGroupJoin, DbGroupReceiverJoin } from "./Models/DbGroup.ts";
+import { DbUserJoin, DbUserSenderJoin } from "./Models/DbUser.ts";
 
 import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
 import { IdNameMap } from "../../IdNameMap.ts";
@@ -122,7 +118,7 @@ export class DbServiceRepository extends DbRepository
         };
       }));
     }
-    //Invitations //N:M
+    //Invitations N:M
     //sender_reference=user, receiver_reference=group, obj_reference=whole invitation ->
     await this.updateInvitation(item);
     //end of update!!
@@ -193,9 +189,10 @@ export class DbServiceRepository extends DbRepository
         DbService.field("service_url"),
         DbUserSenderJoin.field("id", "sender_id"),
         DbUserSenderJoin.field("displayname", "sender_name"),
-        DbUserReceiverJoin.field("id", "receiver_id"),
-        DbUserReceiverJoin.field(
-          "displayname",
+        DbInvitation.field("obj_reference"),
+        DbGroupReceiverJoin.field("id", "receiver_id"),
+        DbGroupReceiverJoin.field(
+          "groupname",
           "receiver_name",
         ),
         DbUserService.field("dbuser_id", "userId"),
@@ -228,8 +225,8 @@ export class DbServiceRepository extends DbRepository
         DbInvitation.field("sender_reference"),
       )
       .leftJoin(
-        DbUserReceiverJoin,
-        DbUserReceiverJoin.field("id"),
+        DbGroupReceiverJoin,
+        DbGroupReceiverJoin.field("id"),
         DbInvitation.field("receiver_reference"),
       )
       .leftJoin(
@@ -306,19 +303,19 @@ export class DbServiceRepository extends DbRepository
           groupname: record.allowedGroupName?.toString()!,
         });
       }
-      if (record.obj_reference == undefined) continue;
+      if (record.objReference == undefined) continue;
       //unique Key
-      const invKey = record.sender_id?.toString()! + //556656 5576878
-        record.receiver_id?.toString()!;
+      const invKey = record.senderId?.toString()! + //556656 5576878
+        record.receiverId?.toString()!;
       if (!tempData[searchedId].sentGroupInvites[invKey]) {
         tempData[searchedId].sentGroupInvites[invKey] = {
           "senderRef": {
-            "displayname": record.sender_name?.toString()!,
-            "id": record.sender_id?.toString()!,
+            "displayname": record.senderName?.toString()!,
+            "id": record.senderId?.toString()!,
           },
           "receiverRef": {
-            "displayname": record.receiver_name?.toString()!,
-            "id": record.receiver_id?.toString()!,
+            "displayname": record.senderName?.toString()!,
+            "id": record.senderId?.toString()!,
           },
         };
       }
@@ -366,7 +363,6 @@ export class DbServiceRepository extends DbRepository
         serviceRef,
       )
     );
-
     return new Service(
       credentials,
       servicename,
