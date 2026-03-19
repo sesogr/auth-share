@@ -127,6 +127,8 @@ app.patch(
   "/service/invitation/accept",
   (c) => serviceController.acceptInvitation(c),
 );
+app.delete("/group", (c) => groupController.delete(c));
+app.get("/group/owned", (c) => groupController.listMyGroups(c));
 app.post("/group/create", (c) => groupController.createGroup(c));
 app.post("/group/invitation/create", (c) => groupController.inviteUsers(c));
 app.patch(

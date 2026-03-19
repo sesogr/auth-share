@@ -25,6 +25,24 @@ export class GroupController extends HeadController {
   ) {
     super();
   }
+  async delete(c: Context) {
+    try {
+      await c.req.json();
+      return c.body("not implemented", 500);
+    } catch (error) {
+      this.errorHandle(error, c);
+    }
+  }
+  async listMyGroups(c: Context) {
+    try {
+      const ME = this.getMeFromContext(c);
+      const groups = (await this.groupRepository.findOwnedByUserId(ME.getId()))
+        .map((e) => e.toJson());
+      return c.json(groups);
+    } catch (error) {
+      return this.errorHandle(error, c);
+    }
+  }
 
   async createGroup(c: Context) {
     try {
@@ -38,6 +56,7 @@ export class GroupController extends HeadController {
       return this.errorHandle(error, c);
     }
   }
+
   async acceptInvitation(c: Context) {
     try {
       const ME = this.getMeFromContext(c);
@@ -77,6 +96,7 @@ export class GroupController extends HeadController {
       this.errorHandle(error, c);
     }
   }
+
   async inviteUsers(c: Context) {
     try {
       const ME = this.getMeFromContext(c);
