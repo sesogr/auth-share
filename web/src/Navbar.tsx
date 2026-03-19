@@ -14,6 +14,7 @@ const Navbar: React.FC = () => {
   return (
     <nav style={{ padding: 12, borderBottom: "1px solid #eee" }}>
       <NavLink to="/" style={linkStyle}>Home</NavLink>
+      <NavLink to="/groups" style={linkStyle}>Groups</NavLink>
       <NavLink
         to={user?.displayname
           ? `/user/${encodeURIComponent(user.displayname)}`

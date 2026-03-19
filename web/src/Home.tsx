@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Service from "./Service.tsx";
 import { useNavigate } from "react-router-dom";
-import CreateService from "./CreateService.tsx";
+import CreateService from "./components/CreateService.tsx";
 import { Button, Col, List, Row, Typography } from "antd";
 import { type ReceivingConvertedService } from "./types/types.ts";
 import { useAuth } from "./Context/AuthContext.tsx";
