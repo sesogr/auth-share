@@ -3,6 +3,7 @@ import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts
 import { ConvertedGroup } from "./ConvertedGroup.ts";
 import { ConvertedService } from "./ConvertedService.ts";
 import { ConvertedUser } from "./ConvertedUser.ts";
+import { Credentials } from "./Credentials.ts";
 type FilterForValues<T, Value> = Exclude<
   ({
     [F in keyof T]: T[F] extends (Value) ? F : never;
@@ -23,6 +24,7 @@ export type {
   ConvertedGroup,
   ConvertedService,
   ConvertedUser,
+  Credentials,
   FilterForValues,
 };
 export function assertIsStringRecord(

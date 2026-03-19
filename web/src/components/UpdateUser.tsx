@@ -1,10 +1,10 @@
 import React from "react";
 import { Button, Input } from "antd";
 import { useAuth } from "../Context/AuthContext.tsx";
-import type { UserStringProperties } from "../types/ConvertedUser.ts";
+import type { ConvertedUser, StringKeys } from "../types/types.ts";
 
 const Change: React.FC<
-  { toChange: UserStringProperties | "credentials"; password?: boolean }
+  { toChange: keyof ConvertedUser; password?: boolean }
 > = (
   { toChange, password },
 ) => {
@@ -17,12 +17,14 @@ const Change: React.FC<
     setAnswer(null);
     if (!user) return;
     let newCred = newValue;
-    let toChangeKey: UserStringProperties | "credentials" | "password" =
-      toChange;
+    let toChangeKey: StringKeys<ConvertedUser> = toChange as StringKeys<
+      ConvertedUser
+    >;
     if (toChange === "credentials") {
       newCred = user.credentials + ":" + newValue;
       toChangeKey = "password";
     }
+    //@ts-ignore asdjk
     user[toChange] = newCred;
     try {
       const res = await fetch(
@@ -38,7 +40,7 @@ const Change: React.FC<
       );
       if (!res.ok) {
         setError(
-          `Failed to update user: ${await res.text()}`,
+          new Error(`Failed to update user: ${await res.text()}`),
         );
         console.error("Error updating user:" + await res.text());
       } else {
@@ -64,7 +66,7 @@ const Change: React.FC<
       >
         Save Changes
       </Button>
-      {error && <div style={{ color: "red" }}>Error: {error.message}</div>}
+      {error && <div style={{ color: "red" }}>{error.message}</div>}
       {answer && <div style={{ color: "green" }}>{answer}</div>}
     </>
   );
