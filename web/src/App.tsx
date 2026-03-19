@@ -6,7 +6,7 @@ import Navbar from "./Navbar.tsx";
 import Register from "./Register.tsx";
 import Login from "./Login.tsx";
 import { AuthContext, AuthProvider, useAuth } from "./Context/AuthContext.tsx";
-import CreateGroup from "./components/CreateGroup.tsx";
+import GroupPage from "./GroupPage.tsx";
 
 const UserRedirect: React.FC = () => {
   const { user } = useAuth();
@@ -32,7 +32,8 @@ const App: React.FC = () => {
                   <Route path="/user" element={<UserRedirect />} />
                   <Route path="/user/:displayname" element={<User />} />
                   <Route path="/:serviceName" element={<Home />} />
-                  <Route path="/groups" element={<CreateGroup />} />
+                  <Route path="/groups" element={<GroupPage />} />
+                  <Route path="/groups/:groupname" element={<GroupPage />} />
                   <Route path="*" element={<div>Missing Page!!</div>} />
                 </Routes>
               )
