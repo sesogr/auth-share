@@ -13,11 +13,14 @@ import { NotFoundError } from "../errors/NotFoundError.ts";
 import { PromisesUtil } from "../services/PromissesUtil.ts";
 import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 import { ConvertedUser } from "../types/types.ts";
+import { GroupRepository } from "../interfaceTypes/GroupRepository.ts";
+import { Group } from "../classes/Group.ts";
 
 export class ServiceController extends HeadController {
   constructor(
     private readonly serviceRepository: ServiceRepository,
     private readonly userRepository: UserRepository,
+    private readonly groupRepository: GroupRepository,
   ) {
     super();
   }
@@ -60,7 +63,7 @@ export class ServiceController extends HeadController {
       await this.serviceRepository.save(service);
       return c.body!(null, 201);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
   async addUsersToService(c: Context) {
@@ -141,14 +144,60 @@ export class ServiceController extends HeadController {
       return this.errorHandle(error, c);
     }
   }
-
+  async acceptInvitation(c: Context) {
+    try {
+      await Promise.all([() => {
+        console.log("not implemented yet");
+        return Promise.resolve();
+      }]);
+      return c.body(null, 500);
+    } catch (error) {
+      return this.errorHandle(error, c);
+    }
+  }
+  async inviteGroupsToService(c: Context) {
+    try {
+      const ME = this.getMeFromContext(c);
+      const serviceData: ConvertedService = await c.req.json();
+      ensureConvertedServiceIntegrity(serviceData, ["id", "sentInvitations"]);
+      const service: Service = await this.serviceRepository.findById(
+        serviceData.id,
+      );
+      service.checkOwner(ME);
+      const settled = await Promise.allSettled(
+        serviceData.sentInvitations.map((invitation) => {
+          return this.groupRepository.findByDisplayName(invitation);
+        }),
+      );
+      const { fulfilled: groups, rejected: notfound } = PromisesUtil
+        .splitSettled<Group, NotFoundError>(settled);
+      const alreadyIn: string[] = [];
+      const fulfilledGroups: string[] = [];
+      groups.forEach((g) => {
+        try {
+          service.sendInvitation(g, ME);
+          fulfilledGroups.push(g.getDisplayName());
+        } catch {
+          alreadyIn.push(g.getDisplayName());
+        }
+      });
+      await this.serviceRepository.save(service);
+      return c.json({
+        rejected: notfound.map((e) => e.key),
+        fulfilled: fulfilledGroups,
+        alreadyIn: alreadyIn,
+      });
+    } catch (error) {
+      return this.errorHandle(error, c);
+    }
+  }
   async delete(c: Context) {
     try {
       const ME = this.getMeFromContext(c);
-      const convertedService: ConvertedService = await c.req.json();
-      ensureConvertedServiceIntegrity(convertedService, "id");
+      const serviceData: ConvertedService = await c.req.json();
+      ensureConvertedServiceIntegrity(serviceData, "id");
       const service: Service = await this.serviceRepository.findById(
-        convertedService.id,
+        serviceData.id,
       );
       service.checkOwner(ME);
       await this.serviceRepository.delete(service);
