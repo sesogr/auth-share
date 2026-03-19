@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Collapse, Input, List, Typography } from "antd";
 import type { ReceivingConvertedService } from "./types/types.ts";
+import ServiceInvitation from "./components/ServiceInvitation.tsx";
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -36,6 +37,7 @@ const Service: React.FC<{ service: ReceivingConvertedService }> = (
             dataSource={service.sentInvitations}
             renderItem={(item) => <List.Item>{item}</List.Item>}
           />
+          <ServiceInvitation service={service} />
         </Panel>
 
         <Panel header={`Users (${service.users.length})`} key="users">
