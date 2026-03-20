@@ -7,7 +7,7 @@ Deno.test("Invitations", async (t) => {
   const obj = new IdNameMap("id1234", "1234");
   const receiver = new IdNameMap("id1235", "12345");
   await t.step("creation", () => {
-    const invite = new Invitation(inviter, obj, receiver);
+    const invite = new Invitation(inviter, obj, receiver, "service");
     assertEquals(invite.receiverName, receiver.displayname);
     assertEquals(invite.receiverId, receiver.id);
     assertEquals(invite.objName, obj.displayname);
@@ -16,7 +16,7 @@ Deno.test("Invitations", async (t) => {
     assertEquals(invite.senderId, inviter.id);
     assertEquals(
       invite.toString(),
-      `${inviter.displayname}:${obj.displayname}:${receiver.displayname}`,
+      `${inviter.displayname}:${obj.displayname}:${receiver.displayname}:s`,
     );
   });
 });

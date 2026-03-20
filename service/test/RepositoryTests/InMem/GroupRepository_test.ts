@@ -40,13 +40,14 @@ Deno.test("Group Repository", async (t) => {
       }, AlreadyTakenError);
     });
     await st.step("correct save", async (sst) => {
-      const idmap1: User = await FakeObjectGen.createFakeUser();
-      const idmap2: User = await FakeObjectGen.createFakeUser();
+      const idmap1 = await FakeObjectGen.createFakeUser();
+      const idmap2 = await FakeObjectGen.createFakeUser();
       await sst.step("Invitations", async () => {
         const invitation: Invitation = new Invitation(
           idmap1.convertToShort(),
           groupList[0].convertToShort(),
           idmap2.convertToShort(),
+          "group",
         );
         groupList[0].sendInvitation(
           idmap1,
@@ -116,6 +117,7 @@ function createServiceRepository(
           user.convertToShort(),
           service,
           e.convertToShort(),
+          "service",
         );
       });
     }),

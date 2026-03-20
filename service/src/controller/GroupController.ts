@@ -79,6 +79,7 @@ export class GroupController extends HeadController {
             senderUser.convertToShort(),
             object.convertToShort(),
             ME.convertToShort(),
+            "group",
           );
           object.acceptInvitation(realInvite);
           return Promise.resolve(realInvite);

@@ -109,6 +109,7 @@ export class Group extends Entity {
       senderReference.convertToShort(),
       this.convertToShort(),
       receiverReference.convertToShort(),
+      "group",
     );
 
     if (this.sentInvitations.find((e) => e.equals(invitation))) {

@@ -260,7 +260,6 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       temp.sentInvitations,
     ).map((e) => {
       const currData = temp.sentInvitations[e];
-      //is the sequence important? new Invitation(sender, obj, receiver) --> below we have receiver, sender, obj
       return new Invitation(
         new IdNameMap(currData.senderRef.id, currData.senderRef.displayname),
         groupRef,
@@ -268,6 +267,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
           currData.receiverRef.id,
           currData.receiverRef.displayname,
         ),
+        "group",
       );
     });
 
@@ -279,6 +279,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
         new IdNameMap(currData.senderRef.id, currData.senderRef.displayname),
         new IdNameMap(currData.objRef.id, currData.objRef.displayname),
         groupRef,
+        "service",
       );
     });
 

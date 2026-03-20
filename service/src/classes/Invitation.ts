@@ -30,12 +30,15 @@ export class Invitation extends ValueClass<Invitation> {
     readonly senderReference: IdNameMap,
     readonly objReference: IdNameMap,
     readonly receiverReference: IdNameMap,
+    private readonly type: "group" | "service",
   ) {
     super();
     Object.freeze(this);
   }
 
   override toString() {
-    return `${this.senderName}:${this.objName}:${this.receiverName}`;
+    return `${this.senderName}:${this.objName}:${this.receiverName}:${
+      this.type[0]
+    }`;
   }
 }

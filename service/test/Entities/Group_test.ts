@@ -75,11 +75,12 @@ Deno.test("Group Class", async (t) => {
         testUserCredentials,
         "Don Receiver",
       );
-      const user = new User(testUserCredentials, "asd");
+      const user = User.createUser(testUserCredentials, "asd");
       const testInvitation: Invitation = new Invitation(
         user.convertToShort(),
         group.convertToShort(),
         testReceiver.convertToShort(),
+        "group",
       );
       group.listSentInvitation();
       group.sendInvitation(

@@ -134,6 +134,7 @@ export class Service extends Entity {
       sender.convertToShort(),
       this.convertToShort(),
       receiver.convertToShort(),
+      "service",
     );
     this._sentInvitations.push(invitation);
   }

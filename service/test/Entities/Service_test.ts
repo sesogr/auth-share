@@ -57,6 +57,7 @@ Deno.test("Service Class", async (t) => {
       user.convertToShort(),
       service.convertToShort(),
       user2.convertToShort(),
+      "service",
     );
     service.sendInvitation(user2 as unknown as Group, user);
     assertFalse(!service.sentInvitations.some((e) => e.equals(testInvite)));

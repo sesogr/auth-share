@@ -343,6 +343,7 @@ export class DbUserRepository extends DbRepository implements UserRepository {
         new IdNameMap(currData.senderRef.id, currData.senderRef.displayname),
         new IdNameMap(currData.objRef.id, currData.objRef.displayname),
         userRef,
+        "group",
       );
     });
     const joinedGroups: AllowedUserGroupMap[] = temp.groups.map((e) =>

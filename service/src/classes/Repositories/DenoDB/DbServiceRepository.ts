@@ -314,8 +314,8 @@ export class DbServiceRepository extends DbRepository
             "id": record.senderId?.toString()!,
           },
           "receiverRef": {
-            "displayname": record.senderName?.toString()!,
-            "id": record.senderId?.toString()!,
+            "displayname": record.receiverName?.toString()!,
+            "id": record.receiverId?.toString()!,
           },
         };
       }
@@ -342,6 +342,7 @@ export class DbServiceRepository extends DbRepository
           e.receiverRef.id,
           e.receiverRef.displayname,
         ),
+        "service",
       )
     );
     const authorizedUsers = temp.authorizedUsers.map((e) =>
