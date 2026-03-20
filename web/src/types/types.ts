@@ -8,9 +8,7 @@ type Flatten<T> = T extends { credentials?: Credentials }
   ? T & { [K in keyof Credentials]: Credentials[K] }
   : T;
 type AllRequired<T> = {
-  [P in keyof T]-?: T[P] extends object | undefined
-    ? AllRequired<Exclude<T[P], undefined>>
-    : Exclude<T[P], undefined>;
+  [P in keyof T]-?: Exclude<T[P], undefined>;
 };
 
 type ReceivingConvertedUser = AllRequired<ConvertedUser>;
@@ -28,6 +26,7 @@ export type {
   ConvertedGroup,
   ConvertedService,
   ConvertedUser,
+  Credentials,
   ReceivingConvertedGroup,
   ReceivingConvertedService,
   ReceivingConvertedUser,
