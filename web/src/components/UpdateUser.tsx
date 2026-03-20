@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Input } from "antd";
 import { useAuth } from "../Context/AuthContext.tsx";
 import type { ConvertedUser, StringKeys } from "../types/types.ts";
+import type { Credentials } from "../types/types.ts";
 
 const Change: React.FC<
   { toChange: keyof ConvertedUser; password?: boolean }
@@ -16,12 +17,15 @@ const Change: React.FC<
     setError(null);
     setAnswer(null);
     if (!user) return;
-    let newCred = newValue;
+    let newCred: string | Credentials = newValue;
     let toChangeKey: StringKeys<ConvertedUser> = toChange as StringKeys<
       ConvertedUser
     >;
     if (toChange === "credentials") {
-      newCred = user.credentials + ":" + newValue;
+      newCred = {
+        username: user.credentials.username,
+        password: newCred,
+      } as Credentials;
       toChangeKey = "password";
     }
     //@ts-ignore asdjk
@@ -39,11 +43,15 @@ const Change: React.FC<
         },
       );
       if (!res.ok) {
+        const response = await res.text();
         setError(
-          new Error(`Failed to update user: ${await res.text()}`),
+          new Error(`Failed to update user: ${response}`),
         );
-        console.error("Error updating user:" + await res.text());
+        console.error("Error updating user:" + response);
       } else {
+        if (toChangeKey === "password") {
+          user.credentials = { username: user.credentials.username };
+        }
         setUser(user);
         setAnswer("User updated successfully");
       }
