@@ -89,6 +89,9 @@ function ensureConvertedUserIntegrity(
   }
   if (Array.isArray(assertion)) {
     if (assertion.some((a) => a === "credentials")) {
+      if (obj["credentials"] === undefined) {
+        throw new MissingDataError("Missing property: credentials");
+      }
       assertIsCredentials(obj["credentials"]);
     }
   }
@@ -107,6 +110,9 @@ function ensureConvertedUserIntegrity(
     ];
     for (const prop of requiredProperties) {
       if (prop === "credentials") {
+        if (obj["credentials"] === undefined) {
+          throw new MissingDataError("Missing property: credentials");
+        }
         assertIsCredentials(obj["credentials"]);
         continue;
       }

@@ -6,6 +6,7 @@ import {
   indepthTypeCheck,
   typeCheck,
 } from "./types.ts";
+import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
 
 export type ConvertedService =
   & {
@@ -81,11 +82,17 @@ function ensureConvertedServiceIntegrity(
   }
   if (Array.isArray(assertion)) {
     if (assertion.some((a) => a === "credentials")) {
+      if (obj["credentials"] === undefined) {
+        throw new MissingDataError("Missing property: credentials");
+      }
       assertIsCredentials(obj["credentials"]);
     }
   }
   if (assertion) indepthTypeCheck(assertion, stringKeys, obj, stringArrayKeys);
   else {
+    if (obj["credentials"] === undefined) {
+      throw new MissingDataError("Missing property: credentials");
+    }
     assertIsCredentials(obj["credentials"]);
     for (const prop of stringKeys) {
       typeCheck(obj, prop);
