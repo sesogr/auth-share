@@ -16,15 +16,21 @@ const context = {
   },
   req: {
     json: () => {
-      return { credentials: "Hans Maiser:wh234he" } as unknown as Promise<
-        ConvertedUser
-      >;
+      return Promise.resolve({
+        displayname: "Hans Maiser",
+        credentials: {
+          username: "Hans Maiser",
+          password: "wh234he",
+        },
+      } as ConvertedUser);
     },
   },
   //@ts-ignore any parameter
   body: (a, b) => {
     return { body: a, status: b };
   },
+  //@ts-ignore any parameter
+  json: (a, b) => context.body(a, b),
 } as unknown as Context;
 
 Deno.test("UserController - Test", async (t) => {
@@ -50,15 +56,15 @@ Deno.test("UserController - Test", async (t) => {
         ...context,
         req: {
           json: () => {
-            return {} as unknown as Promise<ConvertedUser>;
+            return { "ha": "be" } as unknown as Promise<ConvertedUser>;
           },
         },
       } as unknown as Context;
 
       const returnbody = await controller.create(contextWithInvalidData);
-      assertEquals(returnbody!.status, 500);
-      //@ts-ignore body is not the same
-      assertEquals(returnbody.body, "Credentials are required");
+      assertEquals(returnbody.status, 400);
+      //@ts-ignore body is different
+      assertEquals(returnbody.body.message, "Wrong Keys Detected");
     });
   });
   await t.step("Change Password", async (st) => {
@@ -107,7 +113,7 @@ Deno.test("UserController - Test", async (t) => {
         //@ts-ignore override private method
         user.validateSession = () => user.validated = true;
         user.validateSession("");
-        return Promise.resolve(user);
+        return user;
       });
       //start der zu testenden Methode mit folgenden assertions
       const response = await controller.changePassword(context);
