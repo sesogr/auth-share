@@ -1,10 +1,15 @@
-# auth-share
+# Quickstart
+## Run dev build on Localhost
+1. run the docker-compose.yml via docker-compose / podman-compose
+2. open localhost:3000 in browser
 
-## after cloning run
+## Development
+1. ```deno run hooks:install```
+2. ```cd web```
+3. ```deno install``` (to install vite dependencies)
 
-deno task hooks:install
+# Known Issues
 
-## setting up dev environment
-
-docker-compose up\
-deno run databasetestsetup
+- column mismatches over versions aren't automatically resolved
+  - for test builds deleting the old database volume and restarting the containers resolves this
+- SELinux blocks podman-compose volume mapping
