@@ -9,8 +9,6 @@ import { Invitation } from "./Invitation.ts";
 import { User, ValidatedUser } from "./User.ts";
 import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 
-export type OwnedGroups = Group & { zzz: never };
-
 export class Group extends Entity {
   public get serviceList(): AllowedGroupServiceMap[] {
     return this._serviceList;
@@ -23,15 +21,14 @@ export class Group extends Entity {
   public get allowedUser(): AllowedUserGroupMap[] {
     return [...this._allowedUser];
   }
-
   public constructor(
-    private groupname: string,
-    private owner: IdNameMap,
+    protected groupname: string,
+    protected owner: IdNameMap,
     protected override readonly id: string = crypto.randomUUID(),
-    private _serviceList: AllowedGroupServiceMap[] = [],
-    private readonly _sentInvitations: Invitation[] = [],
-    private serviceInvitations: Invitation[] = [],
-    private readonly _allowedUser: AllowedUserGroupMap[] = [],
+    protected _serviceList: AllowedGroupServiceMap[] = [],
+    protected readonly _sentInvitations: Invitation[] = [],
+    protected serviceInvitations: Invitation[] = [],
+    protected readonly _allowedUser: AllowedUserGroupMap[] = [],
   ) {
     super(id, groupname, "group");
   }
@@ -40,10 +37,14 @@ export class Group extends Entity {
     return this.groupname;
   }
 
-  checkOwner(user: User): asserts this is OwnedGroups {
+  checkOwner(user: ValidatedUser): asserts this is OwnedGroup {
     if (!user.convertToShort().equals(this.owner)) {
       throw new AuthorizationError("You dont own this Group");
     }
+  }
+  allevateGroup(user: ValidatedUser) {
+    this.checkOwner(user);
+    return new OwnedGroup(this as unknown as OwnedGroup);
   }
 
   giveAuthorizationToUser(user: IdNameMap | User): void {
@@ -89,8 +90,8 @@ export class Group extends Entity {
     return [...this.sentInvitations];
   }
 
-  static createUserGroup(groupname: string, owner: User): Group {
-    const newGroup = new Group(groupname, owner.convertToShort());
+  static createUserGroup(groupname: string, owner: ValidatedUser): Group {
+    const newGroup: Group = new Group(groupname, owner.convertToShort());
     newGroup._allowedUser.push(
       new AllowedUserGroupMap(
         owner.convertToShort(),
@@ -98,6 +99,7 @@ export class Group extends Entity {
         true,
       ),
     );
+    newGroup.checkOwner(owner);
     return newGroup;
   }
   sendInvitation(
@@ -146,7 +148,34 @@ export class Group extends Entity {
     return JSON.stringify(this.showAll());
   }
 
-  private showAll(): ConvertedGroup {
+  protected showAll(): ConvertedGroup {
+    return {
+      id: this.getId(),
+      groupname: this.groupname,
+      owner: this.getOwner().displayname,
+      serviceList: this.serviceList.map((e) => e.getServicename),
+    };
+  }
+
+  toJson() {
+    return this.showAll();
+  }
+}
+
+export class OwnedGroup extends Group {
+  constructor(oldGroup: OwnedGroup) {
+    super(
+      oldGroup.groupname,
+      oldGroup.owner,
+      oldGroup.id,
+      oldGroup._serviceList,
+      oldGroup._sentInvitations,
+      oldGroup.serviceInvitations,
+      oldGroup._allowedUser,
+    );
+  }
+
+  override showAll() {
     return {
       id: this.getId(),
       groupname: this.groupname,
@@ -156,9 +185,5 @@ export class Group extends Entity {
       sentInvitations: this.sentInvitations.map((e) => e.toString()),
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
     };
-  }
-
-  toJson() {
-    return this.showAll();
   }
 }
