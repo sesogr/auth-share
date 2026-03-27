@@ -3,9 +3,9 @@ import { stub } from "@std/testing/mock";
 import { UserCredential } from "../../src/classes/UserCredential.ts";
 import { bcryptAdapter } from "../../src/deps/bcryptAdapter.ts";
 
-Deno.test("Usercredential", async (t) => {
+Deno.test("User Credential", async (t) => {
   const username = "asdkflj";
-  const plainpassword = "asdfjk";
+  const plainPassword = "asdfjk";
 
   const genSaltStub = stub(
     bcryptAdapter,
@@ -28,25 +28,24 @@ Deno.test("Usercredential", async (t) => {
     () => Promise.resolve(true),
   );
 
-  const usercred = await UserCredential.create(username, plainpassword);
+  const userCred = await UserCredential.create(username, plainPassword);
   try {
     await t.step("creation", () => {
-      assertEquals(usercred.username, username);
-      assertEquals(usercred.hash, "hash");
-      assertEquals(usercred.salt, "salt");
+      assertEquals(userCred.username, username);
+      assertEquals(userCred.hash, "hash");
+      assertEquals(userCred.salt, "salt");
     });
 
     await t.step("verifyPasswordHash", async () => {
-      const ok = await usercred.verifyPasswordHash("pw");
-      assertEquals(ok, true);
+      await userCred.verifyPasswordHash("pw");
     });
 
     await t.step("changePassword", async () => {
-      const newCred = await usercred.changePassword("123");
+      const newCred = await userCred.changePassword("123");
       assertEquals(newCred.hash, "hashb");
       const latestCall = hashStub.calls.length - 1;
       assertEquals(hashStub.calls[latestCall].args[0], "123");
-      assertEquals(hashStub.calls[latestCall].args[1], usercred.salt);
+      assertEquals(hashStub.calls[latestCall].args[1], userCred.salt);
     });
   } finally {
     genSaltStub.restore();

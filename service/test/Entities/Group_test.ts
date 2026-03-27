@@ -76,6 +76,8 @@ Deno.test("Group Class", async (t) => {
         "Don Receiver",
       );
       const user = User.createUser(testUserCredentials, "asd");
+      //@ts-ignore private property
+      group.owner = user.convertToShort();
       const testInvitation: Invitation = new Invitation(
         user.convertToShort(),
         group.convertToShort(),

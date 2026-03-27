@@ -6,8 +6,9 @@ import { stub } from "@std/testing/mock";
 import { User } from "../../src/classes/User.ts";
 import { Service } from "../../src/classes/Service.ts";
 import { GroupRepository } from "../../src/interfaceTypes/GroupRepository.ts";
+import { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 
-Deno.test("DbServiceController", async (t) => {
+Deno.test("ServiceController", async (t) => {
   const { serviceController, mockContext } = buildUp();
   await t.step("list my Service", async () => {
     const _serviceList =
@@ -35,15 +36,20 @@ Deno.test("DbServiceController", async (t) => {
       // @ts-ignore Protected
       "getMeFromContext",
       () => {
-        return Promise.resolve(user);
+        return user;
       },
     );
     const mockContext = {
       req: {},
       res: {},
-      json: (e: object) => e,
+      json: (e: object, statuscode: number) => {
+        return {
+          object: e,
+          status: statuscode,
+        };
+      },
+      body: (e: object, i: ContentfulStatusCode) => mockContext.json(e, i),
     } as unknown as Context;
-    console.log(_getMeFromContext);
     return { serviceController, mockContext };
   }
 });

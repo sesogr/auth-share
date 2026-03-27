@@ -27,6 +27,7 @@ export class Service extends Entity {
   public get credentials(): ServiceCredential {
     return this._credentials;
   }
+  private ownedService: boolean = false;
   constructor(
     private _credentials: ServiceCredential,
     private serviceName: string = "",
@@ -53,10 +54,15 @@ export class Service extends Entity {
     credentials: ServiceCredential,
     serviceName: string,
     serviceUrl: string,
-    owner: User,
+    owner: ValidatedUser,
     id: string = crypto.randomUUID(),
-  ) {
-    const service = new Service(credentials, serviceName, serviceUrl, id);
+  ): OwnedService {
+    const service: Service = new Service(
+      credentials,
+      serviceName,
+      serviceUrl,
+      id,
+    );
     service._allowedUsers.push(
       new AllowedUserServiceMap(
         owner.convertToShort(),
@@ -64,6 +70,7 @@ export class Service extends Entity {
         true,
       ),
     );
+    service.checkOwner(owner);
     return service;
   }
   override getDisplayName(): string {

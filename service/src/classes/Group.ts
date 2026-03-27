@@ -42,7 +42,9 @@ export class Group extends Entity {
 
   checkOwner(user: User): asserts this is OwnedGroups {
     if (!user.convertToShort().equals(this.owner)) {
-      throw new AuthorizationError("You dont own this Group");
+      throw new AuthorizationError(
+        `${user.getDisplayName()} doesn't own this Group`,
+      );
     }
   }
 
