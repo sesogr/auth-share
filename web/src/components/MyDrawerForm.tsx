@@ -12,6 +12,7 @@ type MyDrawerFormParams = {
   type: string;
   formItems: string[];
   openState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  error: string | null;
 };
 export const MyDrawerForm: React.FC<
   MyDrawerFormParams
@@ -78,6 +79,7 @@ export const MyDrawerForm: React.FC<
             })}
           </Row>
         </Form>
+        {props.error && <p style={{ color: "red" }}>{props.error}</p>}
       </Drawer>
     </>
   );

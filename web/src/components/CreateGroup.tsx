@@ -5,7 +5,7 @@ import { MyDrawerForm } from "./MyDrawerForm.tsx";
 
 const CreateGroup: React.FC = () => {
   const openState = useState(false);
-
+  const [error, setError] = useState<string | null>(null);
   const [form] = Form.useForm();
   const handleSubmit = (values: { name: string }) => {
     const displayname = values.name;
@@ -23,9 +23,12 @@ const CreateGroup: React.FC = () => {
       body: JSON.stringify(newGroupData),
     })
       .then((response) => {
-        form.resetFields();
-        return response.status;
-      });
+        if (response.status !== 204) {
+          return response.text();
+        } else {
+          form.resetFields();
+        }
+      }).then((e) => e ? setError(e) : null).catch((e) => setError(e));
   };
   return (
     <MyDrawerForm
@@ -35,6 +38,7 @@ const CreateGroup: React.FC = () => {
       title="Create a new Group"
       formItems={["Name"]}
       type="group"
+      error={error}
     />
   );
 };
