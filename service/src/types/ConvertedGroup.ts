@@ -28,6 +28,7 @@ export function ensureConvertedGroupIntegrity<
   : { [P in K]: Exclude<ConvertedGroup[P], undefined> } {
   assertIsStringRecord(obj);
   const stringKeys: FilterForValues<ConvertedGroup, string | undefined>[] = [
+    "id",
     "groupname",
     "owner",
   ];
