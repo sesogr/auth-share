@@ -17,9 +17,8 @@ const Home: React.FC = () => {
   const { serviceName } = useParams();
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  function fetchUserOwnedServices() {
     setLoading(true);
-
     fetch(import.meta.env.VITE_APIURL + "/user/owned", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -34,15 +33,15 @@ const Home: React.FC = () => {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    fetchUserOwnedServices();
   }, []);
 
   if (error) return <div>Error: {error}</div>;
   if (!loading && serviceList.length === 0) {
-    return (
-      <CreateService
-        serviceList={serviceList}
-      />
-    );
+    return <CreateService />;
   }
 
   const service = serviceName
@@ -57,10 +56,8 @@ const Home: React.FC = () => {
         </Col>
       </Row>
 
-      <CreateService
-        serviceList={serviceList}
-      />
-
+      <CreateService />
+      <Button onClick={() => fetchUserOwnedServices()} />
       <List
         bordered
         loading={loading}
@@ -92,7 +89,7 @@ const Home: React.FC = () => {
                     key="password"
                     type="default"
                     onClick={() =>
-                      navigator.clipboard.writeText(item.credentials.password)}
+                      navigator.clipboard.writeText(item.credentials.password!)}
                     aria-label={`Password for ${item.serviceName}`}
                   >
                     Password
@@ -101,7 +98,7 @@ const Home: React.FC = () => {
                     key="username"
                     type="default"
                     onClick={() =>
-                      navigator.clipboard.writeText(item.credentials.username)}
+                      navigator.clipboard.writeText(item.credentials.username!)}
                     aria-label={`Username for ${item.serviceName}`}
                   >
                     Username
