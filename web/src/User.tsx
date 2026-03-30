@@ -84,9 +84,8 @@ const User: React.FC = () => {
         <List.Item>
           <Button
             danger
-            onClick={async () => {
-              await deleteUser();
-              return <Navigate to="/login" replace />;
+            onClick={() => {
+              deleteUser().then(() => <Navigate to="/login" replace />);
             }}
           >
             Delete Account
