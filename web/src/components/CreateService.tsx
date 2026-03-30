@@ -3,7 +3,7 @@ import { Form } from "antd";
 import type { ConvertedService } from "../types/types.ts";
 import { MyDrawerForm } from "./MyDrawerForm.tsx";
 
-const CreateService: React.FC = () => {
+const CreateService: React.FC<{ addReload: () => void }> = ({ addReload }) => {
   const openState = useState(false);
   const [form] = Form.useForm();
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +42,10 @@ const CreateService: React.FC = () => {
 
   return (
     <MyDrawerForm
-      onFinish={(values) => handleSubmit(values)}
+      onFinish={(values) => {
+        handleSubmit(values);
+        addReload();
+      }}
       openState={openState}
       title="Create a new Service"
       form={form}

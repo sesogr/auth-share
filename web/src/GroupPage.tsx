@@ -15,7 +15,10 @@ const GroupPage: React.FC = () => {
   const navigate = useNavigate();
   const { groupname } = useParams();
   const [loading, setLoading] = useState(false);
-
+  const [reload, setReload] = useState(0);
+  const addReload = () => {
+    setReload(reload + 1);
+  };
   useEffect(() => {
     setLoading(true);
 
@@ -33,11 +36,11 @@ const GroupPage: React.FC = () => {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [reload]);
 
   if (error) return <div>Error: {error}</div>;
   if (!loading && groupList.length === 0) {
-    return <CreateGroup />;
+    return <CreateGroup addReload={addReload} />;
   }
 
   const group = groupname
@@ -51,7 +54,7 @@ const GroupPage: React.FC = () => {
           <Typography.Title level={2}>Group List</Typography.Title>
         </Col>
       </Row>
-      <CreateGroup />
+      <CreateGroup addReload={addReload} />
       <List
         bordered
         loading={loading}
@@ -105,14 +108,20 @@ const GroupPage: React.FC = () => {
                       type="default"
                       aria-label={`DELETE ${item.groupname}`}
                       onClick={() => {
+                        console.log(item);
                         fetch(import.meta.env.VITE_APIURL + "/group", {
                           method: "DELETE",
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
                           body: JSON.stringify(item),
                         }).then((res) => {
-                          console.log(res);
-                          console.log(item);
+                          if (res.ok) {
+                            addReload();
+                          } else {
+                            console.error(
+                              `Failed to delete group ${item.groupname}: ${res.status} ${res.statusText}`,
+                            );
+                          }
                         });
                       }}
                     >

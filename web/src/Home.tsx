@@ -16,6 +16,10 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const { serviceName } = useParams();
   const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(0);
+  const addReload = () => {
+    setReload(reload + 1);
+  };
 
   function fetchUserOwnedServices() {
     setLoading(true);
@@ -37,11 +41,11 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     fetchUserOwnedServices();
-  }, []);
+  }, [reload]);
 
   if (error) return <div>Error: {error}</div>;
   if (!loading && serviceList.length === 0) {
-    return <CreateService />;
+    return <CreateService addReload={addReload} />;
   }
 
   const service = serviceName
@@ -56,8 +60,12 @@ const Home: React.FC = () => {
         </Col>
       </Row>
 
-      <CreateService />
-      <Button onClick={() => fetchUserOwnedServices()} />
+      <CreateService addReload={addReload} />
+      <Button
+        onClick={() => {
+          addReload();
+        }}
+      />
       <List
         bordered
         loading={loading}
@@ -118,9 +126,8 @@ const Home: React.FC = () => {
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
                           body: JSON.stringify(item),
-                        }).then((res) => {
-                          console.log(res);
-                          console.log(item);
+                        }).then(async (res) => {
+                          res.ok ? addReload() : setError(await res.json());
                         });
                       }}
                     >
@@ -145,7 +152,7 @@ const Home: React.FC = () => {
         }}
       />
 
-      {service && <Service service={service} />}
+      {service && <Service addReload={addReload} service={service} />}
     </div>
   );
 };

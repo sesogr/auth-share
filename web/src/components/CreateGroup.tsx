@@ -3,7 +3,11 @@ import { Form } from "antd";
 import type { ConvertedGroup } from "../../../service/src/types/ConvertedGroup.ts";
 import { MyDrawerForm } from "./MyDrawerForm.tsx";
 
-const CreateGroup: React.FC = () => {
+const CreateGroup: React.FC<
+  { addReload: () => void }
+> = (
+  { addReload },
+) => {
   const openState = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form] = Form.useForm();
@@ -32,7 +36,10 @@ const CreateGroup: React.FC = () => {
   };
   return (
     <MyDrawerForm
-      onFinish={(values) => handleSubmit(values)}
+      onFinish={(values) => {
+        handleSubmit(values);
+        addReload();
+      }}
       openState={openState}
       form={form}
       title="Create a new Group"

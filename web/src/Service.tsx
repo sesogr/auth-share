@@ -6,8 +6,10 @@ import ServiceInvitation from "./components/ServiceInvitation.tsx";
 const { Panel } = Collapse;
 const { Title } = Typography;
 
-const Service: React.FC<{ service: ReceivingConvertedService }> = (
-  { service },
+const Service: React.FC<
+  { addReload: () => void; service: ReceivingConvertedService }
+> = (
+  { service, addReload },
 ) => {
   const [value, setValue] = useState<string>("");
   return (
@@ -63,6 +65,7 @@ const Service: React.FC<{ service: ReceivingConvertedService }> = (
               credentials: "include",
               body: JSON.stringify(service),
             }).then(async (e) => console.log(await e.json()));
+            addReload();
           }}
         >
           Confirm Changes
