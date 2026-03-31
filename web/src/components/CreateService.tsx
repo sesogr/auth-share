@@ -3,23 +3,19 @@ import { Form } from "antd";
 import type { ConvertedService } from "../types/types.ts";
 import { MyDrawerForm } from "./MyDrawerForm.tsx";
 
-const CreateService: React.FC<
-  {
-    serviceList: ConvertedService[];
-  }
-> = ({ serviceList }) => {
+const CreateService: React.FC<{ addReload: () => void }> = ({ addReload }) => {
   const openState = useState(false);
   const [form] = Form.useForm();
-
+  const [error, setError] = useState<string | null>(null);
   const handleSubmit = (values: FormValues) => {
     console.log(values);
-    const servicename = values.name;
+    const serviceName = values.name;
     const serviceUrl = values.url;
     const username = values.username;
     const password = values.password;
 
     const newServiceData: ConvertedService = {
-      "serviceName": servicename,
+      "serviceName": serviceName,
       "serviceUrl": serviceUrl,
       "credentials": {
         username: username,
@@ -35,34 +31,27 @@ const CreateService: React.FC<
       },
       body: JSON.stringify(newServiceData),
     })
-      .then((response) => response.status)
-      .then((data) => {
-        form.resetFields();
-        serviceList.push({
-          serviceName: servicename,
-          serviceUrl: serviceUrl,
-          credentials: {
-            username: username,
-            password: password,
-          },
-        });
-
-        return console.log(data);
-      })
-      .catch((error) => {
-        console.log(import.meta.env.VITE_APIURL);
-        return console.error(error);
-      });
+      .then((response) => {
+        if (response.status !== 204) {
+          return response.text();
+        } else {
+          form.resetFields();
+        }
+      }).catch((e) => setError(e));
   };
 
   return (
     <MyDrawerForm
-      onFinish={(values) => handleSubmit(values)}
+      onFinish={(values) => {
+        handleSubmit(values);
+        addReload();
+      }}
       openState={openState}
       title="Create a new Service"
       form={form}
       formItems={["Name", "Url", "Username", "Password"]}
       type="service"
+      error={error}
     />
   );
 };

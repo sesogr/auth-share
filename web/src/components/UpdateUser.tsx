@@ -9,7 +9,7 @@ const Change: React.FC<
 > = (
   { toChange, password },
 ) => {
-  const { user, setUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [newValue, setNewValue] = React.useState("");
   const [error, setError] = React.useState<Error | null>(null);
   const [answer, setAnswer] = React.useState<string | null>(null);
@@ -52,7 +52,7 @@ const Change: React.FC<
         if (toChangeKey === "password") {
           user.credentials = { username: user.credentials.username };
         }
-        setUser(user);
+        refreshUser();
         setAnswer("User updated successfully");
       }
     } catch (e) {

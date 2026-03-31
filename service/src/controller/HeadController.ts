@@ -17,7 +17,7 @@ export class HeadController {
       return c.json(error, error.errorCode);
     }
     if (error instanceof Error) {
-      console.error(error);
+      console.log(error);
       return c.body(null, 500);
     }
     console.log(error);

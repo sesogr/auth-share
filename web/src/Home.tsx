@@ -16,10 +16,13 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const { serviceName } = useParams();
   const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(0);
+  const addReload = () => {
+    setReload(reload + 1);
+  };
 
-  useEffect(() => {
+  function fetchUserOwnedServices() {
     setLoading(true);
-
     fetch(import.meta.env.VITE_APIURL + "/user/owned", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -34,15 +37,15 @@ const Home: React.FC = () => {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }
+
+  useEffect(() => {
+    fetchUserOwnedServices();
+  }, [reload]);
 
   if (error) return <div>Error: {error}</div>;
   if (!loading && serviceList.length === 0) {
-    return (
-      <CreateService
-        serviceList={serviceList}
-      />
-    );
+    return <CreateService addReload={addReload} />;
   }
 
   const service = serviceName
@@ -57,10 +60,12 @@ const Home: React.FC = () => {
         </Col>
       </Row>
 
-      <CreateService
-        serviceList={serviceList}
+      <CreateService addReload={addReload} />
+      <Button
+        onClick={() => {
+          addReload();
+        }}
       />
-
       <List
         bordered
         loading={loading}
@@ -92,7 +97,7 @@ const Home: React.FC = () => {
                     key="password"
                     type="default"
                     onClick={() =>
-                      navigator.clipboard.writeText(item.credentials.password)}
+                      navigator.clipboard.writeText(item.credentials.password!)}
                     aria-label={`Password for ${item.serviceName}`}
                   >
                     Password
@@ -101,7 +106,7 @@ const Home: React.FC = () => {
                     key="username"
                     type="default"
                     onClick={() =>
-                      navigator.clipboard.writeText(item.credentials.username)}
+                      navigator.clipboard.writeText(item.credentials.username!)}
                     aria-label={`Username for ${item.serviceName}`}
                   >
                     Username
@@ -121,9 +126,8 @@ const Home: React.FC = () => {
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
                           body: JSON.stringify(item),
-                        }).then((res) => {
-                          console.log(res);
-                          console.log(item);
+                        }).then(async (res) => {
+                          res.ok ? addReload() : setError(await res.json());
                         });
                       }}
                     >
@@ -148,7 +152,7 @@ const Home: React.FC = () => {
         }}
       />
 
-      {service && <Service service={service} />}
+      {service && <Service addReload={addReload} service={service} />}
     </div>
   );
 };

@@ -27,10 +27,14 @@ export class GroupController extends HeadController {
   }
   async delete(c: Context) {
     try {
-      await c.req.json();
-      return c.body("not implemented", 500);
+      const groupData: ConvertedGroup = await c.req.json();
+      ensureConvertedGroupIntegrity(groupData, ["id"]);
+      await this.groupRepository.delete(
+        await this.groupRepository.findById(groupData.id),
+      );
+      return c.body(null, 204);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
   async listMyGroups(c: Context) {

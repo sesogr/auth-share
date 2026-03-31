@@ -13,6 +13,7 @@ type AuthContextShape = {
   logout: () => void;
   isAuthenticated: boolean;
   setUser: React.Dispatch<React.SetStateAction<ReceivingConvertedUser | null>>;
+  refreshUser: () => void;
 };
 
 export const AuthContext = createContext<AuthContextShape | undefined>(
@@ -52,7 +53,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = (
   };
 
   const value = useMemo(
-    () => ({ user, login, logout, isAuthenticated: !!user, setUser }),
+    () => ({
+      user,
+      login,
+      logout,
+      isAuthenticated: !!user,
+      setUser,
+      refreshUser,
+    }),
     [user],
   );
 
