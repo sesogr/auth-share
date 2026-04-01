@@ -23,7 +23,7 @@ const CreateService: React.FC<{ addReload: () => void }> = ({ addReload }) => {
       },
     };
     console.log(newServiceData);
-    fetch(import.meta.env.VITE_APIURL + "/service/create", {
+    return fetch(import.meta.env.VITE_APIURL + "/service/create", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -43,8 +43,7 @@ const CreateService: React.FC<{ addReload: () => void }> = ({ addReload }) => {
   return (
     <MyDrawerForm
       onFinish={(values) => {
-        handleSubmit(values);
-        addReload();
+        handleSubmit(values).then(() => addReload());
       }}
       openState={openState}
       title="Create a new Service"

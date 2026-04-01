@@ -18,7 +18,7 @@ const CreateGroup: React.FC<
       groupname: displayname,
     };
     console.log(newGroupData);
-    fetch(import.meta.env.VITE_APIURL + "/group/create", {
+    return fetch(import.meta.env.VITE_APIURL + "/group/create", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -37,8 +37,7 @@ const CreateGroup: React.FC<
   return (
     <MyDrawerForm
       onFinish={(values) => {
-        handleSubmit(values);
-        addReload();
+        handleSubmit(values).then(() => addReload());
       }}
       openState={openState}
       form={form}
