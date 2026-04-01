@@ -8,7 +8,6 @@ import { DbUser } from "../../src/classes/Repositories/DenoDB/Models/DbUser.ts";
 import { DbUserCredential } from "../../src/classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
 import { DbUserGroup } from "../../src/classes/Repositories/DenoDB/Models/DbUserGroup.ts";
 import { DbUserService } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
-import { DbIdDisplayname } from "../../src/classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
 
 const connector = new MySQLConnector({
   database: Deno.env.get("DB_NAME")!,
@@ -30,7 +29,6 @@ db.link([
   DbUserGroup,
   DbGroupService,
   DbInvitation,
-  DbIdDisplayname,
 ]);
 
 await db.sync({ drop: true });

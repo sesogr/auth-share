@@ -5,7 +5,6 @@ import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbSer
 import { DbUserRepository } from "../../src/classes/Repositories/DenoDB/DbUserRepository.ts";
 import { DbGroup } from "../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
 import { DbGroupService } from "../../src/classes/Repositories/DenoDB/Models/DbGroupService.ts";
-import { DbIdDisplayname } from "../../src/classes/Repositories/DenoDB/Models/DbIdDisplayname.ts";
 import { DbInvitation } from "../../src/classes/Repositories/DenoDB/Models/DbInvitation.ts";
 import { DbService } from "../../src/classes/Repositories/DenoDB/Models/DbService.ts";
 import { DbServiceCredential } from "../../src/classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
@@ -40,7 +39,6 @@ db.link([
   DbUserGroup,
   DbGroupService,
   DbInvitation,
-  DbIdDisplayname,
   DbSessions,
 ]);
 
