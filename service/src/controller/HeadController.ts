@@ -2,8 +2,11 @@ import { User, ValidatedUser } from "../classes/User.ts";
 import { Context } from "@hono/hono";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ControllerError } from "../errors/controllerErrors/ControllerError.ts";
+import { Logger } from "../interfaceTypes/Logger.ts";
 
 export class HeadController {
+  constructor(readonly logging: Logger) {
+  }
   protected getMeFromContext(c: Context): ValidatedUser {
     const me: User = c.get("currentUser");
     if (!me) {
@@ -14,13 +17,14 @@ export class HeadController {
   }
   errorHandle(error: unknown, c: Context) {
     if (error instanceof ControllerError) {
+      this.logging.warn(error);
       return c.json(error, error.errorCode);
     }
     if (error instanceof Error) {
-      console.log(error);
+      this.logging.error(error);
       return c.body(null, 500);
     }
-    console.log(error);
+    this.logging.error(error);
     return c.body(null, 500);
   }
 }

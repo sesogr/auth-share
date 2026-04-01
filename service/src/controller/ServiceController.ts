@@ -15,14 +15,16 @@ import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/Alre
 import { ConvertedUser } from "../types/types.ts";
 import { GroupRepository } from "../interfaceTypes/GroupRepository.ts";
 import { Group } from "../classes/Group.ts";
+import { Logger } from "../interfaceTypes/Logger.ts";
 
 export class ServiceController extends HeadController {
   constructor(
     private readonly serviceRepository: ServiceRepository,
     private readonly userRepository: UserRepository,
     private readonly groupRepository: GroupRepository,
+    logging: Logger,
   ) {
-    super();
+    super(logging.instantiateWithOwnContext("ServiceController"));
   }
 
   async listMyServices(
@@ -61,7 +63,7 @@ export class ServiceController extends HeadController {
         ME,
       );
       await this.serviceRepository.save(service);
-      return c.body!(null, 201);
+      return c.body(null, 201);
     } catch (error) {
       return this.errorHandle(error, c);
     }
@@ -147,7 +149,7 @@ export class ServiceController extends HeadController {
   async acceptInvitation(c: Context) {
     try {
       await Promise.all([() => {
-        console.log("not implemented yet");
+        this.logging.error("not implemented yet");
         return Promise.resolve();
       }]);
       return c.body(null, 500);

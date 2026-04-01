@@ -23,6 +23,12 @@ import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupReposito
 import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
 import { Environment } from "./classes/Environment.ts";
 import { GroupController } from "./controller/GroupController.ts";
+import { Logger } from "./interfaceTypes/Logger.ts";
+import { ConsoleWrapper } from "./classes/Logging/ConsoleWrapper.ts";
+const logging: Logger = new ConsoleWrapper(
+  ["error", "info", "warn", "debug"],
+  "main",
+);
 Environment.load();
 const db = new Database(
   new MySQLConnector({
@@ -57,7 +63,7 @@ while (!connected) {
         error.message.includes("failed to lookup address information") ||
         error.message.includes("Connection refused")
       ) {
-        console.error(
+        logging.warn(
           "Connection to database failed. Retrying in 5 seconds...",
         );
       } else if (error.message === "Multiple primary key defined") {
@@ -76,16 +82,18 @@ while (!connected) {
 const serviceRepository: ServiceRepository = new DbServiceRepository();
 const groupRepository: GroupRepository = new DbGroupRepository();
 const userRepository: UserRepository = new DbUserRepository();
-const userController = new UserController(userRepository);
+const userController = new UserController(userRepository, logging);
 const serviceController = new ServiceController(
   serviceRepository,
   userRepository,
   groupRepository,
+  logging,
 );
 const groupController = new GroupController(
   groupRepository,
   userRepository,
   serviceRepository,
+  logging,
 );
 export const app = new Hono();
 app.use(
@@ -96,6 +104,10 @@ app.use(
     allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   }),
 );
+app.use("*", (c, next) => {
+  logging.log(c.req.method, c.req.url);
+  return next();
+});
 app.use(
   "*",
   except(

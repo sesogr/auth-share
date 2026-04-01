@@ -10,12 +10,14 @@ import { HeadController } from "./HeadController.ts";
 import { Environment } from "../classes/Environment.ts";
 import { ensureConvertedUserIntegrity } from "../types/ConvertedUser.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
+import { Logger } from "../interfaceTypes/Logger.ts";
 
 export class UserController extends HeadController {
   constructor(
     readonly userRepository: UserRepository,
+    logging: Logger,
   ) {
-    super();
+    super(logging.instantiateWithOwnContext("UserController"));
   }
 
   async authMiddleware(c: Context, next: () => Promise<void>) {
@@ -155,7 +157,6 @@ export class UserController extends HeadController {
         requestData.displayname,
       );
       await this.userRepository.save(newUser);
-      console.log("test");
       return c.body(null, 201);
     } catch (error) {
       return this.errorHandle(error, c);

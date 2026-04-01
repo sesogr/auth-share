@@ -16,14 +16,16 @@ import {
   ensureConvertedUserIntegrity,
 } from "../types/ConvertedUser.ts";
 import { Invitation } from "../classes/Invitation.ts";
+import { Logger } from "../interfaceTypes/Logger.ts";
 
 export class GroupController extends HeadController {
   constructor(
     private readonly groupRepository: GroupRepository,
     private readonly userRepository: UserRepository,
     private readonly serviceRepository: ServiceRepository,
+    logging: Logger,
   ) {
-    super();
+    super(logging.instantiateWithOwnContext("GroupController"));
   }
   async delete(c: Context) {
     try {
