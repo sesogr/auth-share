@@ -8,13 +8,15 @@ import { Invitation } from "../../Invitation.ts";
 import { Session } from "../../Session.ts";
 import { NotFoundError } from "../../../errors/NotFoundError.ts";
 import { AlreadyTakenError } from "../../../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export abstract class DbRepository {
   constructor(
     protected readonly model: typeof Model,
     protected readonly displayname: string,
     // "=" makes id optional
-    protected readonly id: string = "id",
+    protected readonly id: string,
+    protected readonly logging: Logger,
   ) {
   }
 

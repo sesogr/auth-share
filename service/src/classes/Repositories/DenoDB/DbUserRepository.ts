@@ -21,10 +21,16 @@ import { Session } from "../../Session.ts";
 import { DbRepository } from "./DbRepository.ts";
 import { Entity } from "../../Entity.ts";
 import { ConflictError } from "../../../errors/controllerErrors/ConflictError/ConflictError.ts";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export class DbUserRepository extends DbRepository implements UserRepository {
-  constructor() {
-    super(DbUser, "displayname");
+  constructor(logging: Logger) {
+    super(
+      DbUser,
+      "displayname",
+      "id",
+      logging.withOwnContext("DbUserRepository"),
+    );
   }
 
   override async delete(item: Entity): Promise<void> {

@@ -19,11 +19,17 @@ import { DbServiceCredential } from "./Models/DbServiceCredentials.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
 import { DbRepository } from "./DbRepository.ts";
 import { Values } from "@denodb/datatypes";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export class DbServiceRepository extends DbRepository
   implements ServiceRepository {
-  constructor() {
-    super(DbService, "servicename");
+  constructor(logging: Logger) {
+    super(
+      DbService,
+      "servicename",
+      "id",
+      logging.withOwnContext("DbServiceConstructor"),
+    );
   }
 
   async findOwnedByUserId(userId: string): Promise<Service[]> {

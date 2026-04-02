@@ -23,10 +23,16 @@ import {
   DbInvitationJoinOnReceived,
 } from "./Models/DbInvitation.ts";
 import { DbRepository } from "./DbRepository.ts";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export class DbGroupRepository extends DbRepository implements GroupRepository {
-  constructor() {
-    super(DbGroup, "groupname");
+  constructor(logging: Logger) {
+    super(
+      DbGroup,
+      "groupname",
+      "id",
+      logging.withOwnContext("DbGroupRepository"),
+    );
   }
 
   async update(item: Group): Promise<void> {
