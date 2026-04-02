@@ -24,10 +24,12 @@ import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
 import { Environment } from "./classes/Environment.ts";
 import { GroupController } from "./controller/GroupController.ts";
 import { Logger } from "./interfaceTypes/Logger.ts";
-import { ConsoleWrapper } from "./classes/Logging/ConsoleWrapper.ts";
-const logging: Logger = new ConsoleWrapper(
+import { LogWriter } from "./classes/Logging/LogWriter.ts";
+
+const logging: Logger = new LogWriter(
   ["error", "info", "warn", "debug"],
   "main",
+  "/.logs/info.log",
 );
 Environment.load();
 const db = new Database(
