@@ -25,7 +25,7 @@ export class GroupController extends HeadController {
     private readonly serviceRepository: ServiceRepository,
     logging: Logger,
   ) {
-    super(logging.instantiateWithOwnContext("GroupController"));
+    super(logging.withOwnContext("GroupController"));
   }
   async delete(c: Context) {
     try {

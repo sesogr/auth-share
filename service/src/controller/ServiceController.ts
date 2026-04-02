@@ -24,7 +24,7 @@ export class ServiceController extends HeadController {
     private readonly groupRepository: GroupRepository,
     logging: Logger,
   ) {
-    super(logging.instantiateWithOwnContext("ServiceController"));
+    super(logging.withOwnContext("ServiceController"));
   }
 
   async listMyServices(

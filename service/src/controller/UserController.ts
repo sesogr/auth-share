@@ -17,7 +17,7 @@ export class UserController extends HeadController {
     readonly userRepository: UserRepository,
     logging: Logger,
   ) {
-    super(logging.instantiateWithOwnContext("UserController"));
+    super(logging.withOwnContext("UserController"));
   }
 
   async authMiddleware(c: Context, next: () => Promise<void>) {

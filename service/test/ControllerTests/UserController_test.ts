@@ -7,6 +7,7 @@ import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
 import { UserCredential } from "../../src/classes/UserCredential.ts";
 import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
 import { User } from "../../src/classes/User.ts";
+import { Logger } from "../../src/interfaceTypes/Logger.ts";
 
 const context = {
   res: {
@@ -34,12 +35,13 @@ const context = {
 } as unknown as Context;
 
 Deno.test("UserController - Test", async (t) => {
+  const logger = {} as Logger;
   await t.step("Create", async (st) => {
     await st.step("user is saved", async () => {
       const repo = {
         save: () => Promise.resolve(),
       } as unknown as UserRepository;
-      const controller = new UserController(repo);
+      const controller = new UserController(repo, logger);
       const spySave = spy(repo, "save");
       const response = await controller.create(context);
       assertEquals(response?.body, null);
@@ -51,7 +53,10 @@ Deno.test("UserController - Test", async (t) => {
       );
     });
     await st.step("invalid request data", async () => {
-      const controller = new UserController({} as unknown as UserRepository);
+      const controller = new UserController(
+        {} as unknown as UserRepository,
+        {} as Logger,
+      );
       const contextWithInvalidData = {
         ...context,
         req: {
@@ -97,7 +102,7 @@ Deno.test("UserController - Test", async (t) => {
       } as unknown as UserRepository;
 
       //initieren des zu testenden Objects
-      const controller = new UserController(repo);
+      const controller = new UserController(repo, logger);
       const spySave = spy(repo, "save");
       const user: User = await FakeObjectGen.createFakeUser();
       const stubChangeUserCredentials = stub(
