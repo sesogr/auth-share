@@ -1,71 +1,73 @@
 import { EnvError } from "./errors/EnvError.ts";
+import { Logger } from "../../interfaceTypes/Logger.ts";
 
 export class Environment {
+  private static logger: Logger;
   private static _FRONT_END_URL: string;
   public static get FRONT_END_URL(): string {
     if (!this.checked) {
       this.check();
     }
-    return Environment._FRONT_END_URL;
+    return this._FRONT_END_URL;
   }
   public static set FRONT_END_URL(value: string) {
     this.checked = false;
-    Environment._FRONT_END_URL = value;
+    this._FRONT_END_URL = value;
   }
   private static _DB_NAME: string;
   public static get DB_NAME(): string {
     if (!this.checked) {
       this.check();
     }
-    return Environment._DB_NAME;
+    return this._DB_NAME;
   }
   public static set DB_NAME(value: string) {
     this.checked = false;
-    Environment._DB_NAME = value;
+    this._DB_NAME = value;
   }
   private static _DB_USER: string;
   public static get DB_USER(): string {
     if (!this.checked) {
       this.check();
     }
-    return Environment._DB_USER;
+    return this._DB_USER;
   }
   public static set DB_USER(value: string) {
     this.checked = false;
-    Environment._DB_USER = value;
+    this._DB_USER = value;
   }
   private static _DB_PASSWORD: string;
   public static get DB_PASSWORD(): string {
     if (!this.checked) {
       this.check();
     }
-    return Environment._DB_PASSWORD;
+    return this._DB_PASSWORD;
   }
   public static set DB_PASSWORD(value: string) {
     this.checked = false;
-    Environment._DB_PASSWORD = value;
+    this._DB_PASSWORD = value;
   }
   private static _DENO_ENV: string;
   public static get DENO_ENV(): string {
     if (!this.checked) {
       this.check();
     }
-    return Environment._DENO_ENV;
+    return this._DENO_ENV;
   }
   public static set DENO_ENV(value: string) {
     this.checked = false;
-    Environment._DENO_ENV = value;
+    this._DENO_ENV = value;
   }
   private static _DB_HOST: string;
   public static get DB_HOST(): string {
     if (!this.checked) {
       this.check();
     }
-    return Environment._DB_HOST;
+    return this._DB_HOST;
   }
   public static set DB_HOST(value: string) {
     this.checked = false;
-    Environment._DB_HOST = value;
+    this._DB_HOST = value;
   }
   private static checked: boolean = false;
 
@@ -87,13 +89,14 @@ export class Environment {
     this._DB_HOST = undefined as unknown as string;
     this.checked = false;
   }
-  public static load(): void {
-    Environment.FRONT_END_URL = Deno.env.get("FRONT_END_URL")!;
-    Environment.DB_NAME = Deno.env.get("DB_NAME")!;
-    Environment.DB_USER = Deno.env.get("DB_USER")!;
-    Environment.DB_PASSWORD = Deno.env.get("DB_PASSWORD")!;
-    Environment.DB_HOST = Deno.env.get("DB_HOST")!;
-    Environment.DENO_ENV = Deno.env.get("DENO_ENV")!;
-    Environment.check();
+  public static load(logger: Logger): void {
+    this.logger = logger.withOwnContext("this");
+    this.FRONT_END_URL = Deno.env.get("FRONT_END_URL")!;
+    this.DB_NAME = Deno.env.get("DB_NAME")!;
+    this.DB_USER = Deno.env.get("DB_USER")!;
+    this.DB_PASSWORD = Deno.env.get("DB_PASSWORD")!;
+    this.DB_HOST = Deno.env.get("DB_HOST")!;
+    this.DENO_ENV = Deno.env.get("DENO_ENV")!;
+    this.check();
   }
 }

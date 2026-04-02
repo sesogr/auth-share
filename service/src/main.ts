@@ -31,7 +31,7 @@ const logging: Logger = new LogWriter(
   "main",
   "/.logs/info.log",
 );
-Environment.load();
+Environment.load(logging);
 const db = new Database(
   new MySQLConnector({
     database: Environment.DB_NAME,
