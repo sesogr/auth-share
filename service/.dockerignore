@@ -1,0 +1,11 @@
+# Test files
+test/
+# Types
+interfaceTypes/
+# Documentation
+README.md
+
+# Docker files
+Dockerfile
+.dockerignore
+
