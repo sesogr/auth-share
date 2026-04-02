@@ -81,9 +81,9 @@ while (!connected) {
   }
 }
 
-const serviceRepository: ServiceRepository = new DbServiceRepository();
-const groupRepository: GroupRepository = new DbGroupRepository();
-const userRepository: UserRepository = new DbUserRepository();
+const serviceRepository: ServiceRepository = new DbServiceRepository(logging);
+const groupRepository: GroupRepository = new DbGroupRepository(logging);
+const userRepository: UserRepository = new DbUserRepository(logging);
 const userController = new UserController(userRepository, logging);
 const serviceController = new ServiceController(
   serviceRepository,
