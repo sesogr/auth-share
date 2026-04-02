@@ -1,6 +1,6 @@
-import { DisplayableEntity } from "../interfaceTypes/DisplayableEntity.ts";
-import { IdNameMap } from "./IdNameMap.ts";
-import { Invitation } from "./Invitation.ts";
+import { DisplayableEntity } from "../../interfaceTypes/DisplayableEntity.ts";
+import { IdNameMap } from "./Values/IdNameMap.ts";
+import { Invitation } from "./Values/Invitation.ts";
 
 export class Entity implements DisplayableEntity {
   public get sentInvitations(): Invitation[] {

@@ -1,13 +1,13 @@
 import { spy, stub } from "@std/testing/mock";
-import { UserController } from "../../src/controller/UserController.ts";
+import { UserController } from "../../src/classes/controller/UserController.ts";
 import { assertEquals } from "@std/assert";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
+import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { Context } from "@hono/hono";
-import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
-import { UserCredential } from "../../src/classes/UserCredential.ts";
-import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
-import { User } from "../../src/classes/User.ts";
-import { Logger } from "../../src/interfaceTypes/Logger.ts";
+import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
+import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
+import { ConvertedUser } from "../../types/ConvertedUser.ts";
+import { User } from "../../src/classes/Entities/User.ts";
+import { Logger } from "../../interfaceTypes/Logger.ts";
 
 const context = {
   res: {

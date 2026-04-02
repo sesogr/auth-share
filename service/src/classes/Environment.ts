@@ -1,4 +1,4 @@
-import { EnvError } from "../errors/EnvError.ts";
+import { EnvError } from "./errors/EnvError.ts";
 
 export class Environment {
   private static _FRONT_END_URL: string;

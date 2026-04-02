@@ -1,14 +1,14 @@
 import { Model } from "@denodb";
 import { Entity } from "../../Entity.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
-import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
-import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
-import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
-import { Invitation } from "../../Invitation.ts";
+import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "../../Values/AllowedUserGroupMap.ts";
+import { AllowedUserServiceMap } from "../../Values/AllowedUserServiceMap.ts";
+import { Invitation } from "../../Values/Invitation.ts";
 import { Session } from "../../Session.ts";
-import { NotFoundError } from "../../../errors/NotFoundError.ts";
-import { AlreadyTakenError } from "../../../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
-import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { NotFoundError } from "../../errors/NotFoundError.ts";
+import { AlreadyTakenError } from "../../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { Logger } from "../../../../interfaceTypes/Logger.ts";
 
 export abstract class DbRepository {
   constructor(

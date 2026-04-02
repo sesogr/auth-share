@@ -1,5 +1,5 @@
 import { IdNameMap } from "./IdNameMap.ts";
-import { ValueClass } from "./ValueClass.ts";
+import { ValueClass } from "../ValueClass.ts";
 
 export class AllowedUserGroupMap extends ValueClass<AllowedUserGroupMap> {
   public get getGroupId(): string {

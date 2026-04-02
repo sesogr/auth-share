@@ -1,21 +1,21 @@
 import {
   ConvertedService,
   ensureConvertedServiceIntegrity,
-} from "../types/ConvertedService.ts";
-import { ServiceRepository } from "../interfaceTypes/ServiceRepository.ts";
+} from "../../../types/ConvertedService.ts";
+import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
 import { Context } from "@hono/hono";
-import { Service } from "../classes/Service.ts";
-import { ServiceCredential } from "../classes/ServiceCredential.ts";
+import { Service } from "../Entities/Service.ts";
+import { ServiceCredential } from "../Values/ServiceCredential.ts";
 import { HeadController } from "./HeadController.ts";
-import { UserRepository } from "../interfaceTypes/UserRepository.ts";
-import { User } from "../classes/User.ts";
+import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
+import { User } from "../Entities/User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
-import { PromisesUtil } from "../services/PromissesUtil.ts";
+import { PromisesUtil } from "../PromissesUtil.ts";
 import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
-import { ConvertedUser } from "../types/types.ts";
-import { GroupRepository } from "../interfaceTypes/GroupRepository.ts";
-import { Group } from "../classes/Group.ts";
-import { Logger } from "../interfaceTypes/Logger.ts";
+import { ConvertedUser } from "../../../types/types.ts";
+import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
+import { Group } from "../Entities/Group.ts";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export class ServiceController extends HeadController {
   constructor(

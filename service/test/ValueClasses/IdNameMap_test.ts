@@ -1,5 +1,5 @@
 import { assertEquals, assertInstanceOf, assertThrows } from "@std/assert";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
+import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 
 Deno.test("IdNameMap", async (t) => {
   const [id, name] = ["123", "1234"];

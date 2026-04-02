@@ -1,5 +1,5 @@
-import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
-import { Group } from "../../Group.ts";
+import { GroupRepository } from "../../../../interfaceTypes/GroupRepository.ts";
+import { Group } from "../../Entities/Group.ts";
 import { DbGroup, DbGroupReceiverJoin } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
 
@@ -9,13 +9,13 @@ import {
   DbUserSenderJoin2,
 } from "./Models/DbUser.ts";
 import { DbServiceJoin, DbServiceObjJoin } from "./Models/DbService.ts";
-import { RuntimeError } from "../../../errors/RuntimeError.ts";
-import { IdNameMap } from "../../IdNameMap.ts";
-import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
-import { Invitation } from "../../Invitation.ts";
-import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
+import { RuntimeError } from "../../errors/RuntimeError.ts";
+import { IdNameMap } from "../../Values/IdNameMap.ts";
+import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
+import { Invitation } from "../../Values/Invitation.ts";
+import { AllowedUserGroupMap } from "../../Values/AllowedUserGroupMap.ts";
 import { Model } from "@denodb";
-import { NotFoundError } from "../../../errors/NotFoundError.ts";
+import { NotFoundError } from "../../errors/NotFoundError.ts";
 import { DbGroupService } from "./Models/DbGroupService.ts";
 import {
   DbInvitation,
@@ -23,7 +23,7 @@ import {
   DbInvitationJoinOnReceived,
 } from "./Models/DbInvitation.ts";
 import { DbRepository } from "./DbRepository.ts";
-import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { Logger } from "../../../../interfaceTypes/Logger.ts";
 
 export class DbGroupRepository extends DbRepository implements GroupRepository {
   constructor(logging: Logger) {

@@ -1,16 +1,16 @@
 import { Context } from "@hono/hono";
-import { UserRepository } from "../interfaceTypes/UserRepository.ts";
-import { User } from "../classes/User.ts";
-import { UserCredential } from "../classes/UserCredential.ts";
-import { ConvertedUser } from "../types/types.ts";
-import { HonoCookieAdapter } from "../deps/HonoCookieAdapter.ts";
+import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
+import { User } from "../Entities/User.ts";
+import { UserCredential } from "../Values/UserCredential.ts";
+import { ConvertedUser } from "../../../types/types.ts";
+import { HonoCookieAdapter } from "../../adapter/HonoCookieAdapter.ts";
 
 const { deleteCookie, saveGetCookie, setCookie } = HonoCookieAdapter;
 import { HeadController } from "./HeadController.ts";
-import { Environment } from "../classes/Environment.ts";
-import { ensureConvertedUserIntegrity } from "../types/ConvertedUser.ts";
+import { Environment } from "../Environment.ts";
+import { ensureConvertedUserIntegrity } from "../../../types/ConvertedUser.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
-import { Logger } from "../interfaceTypes/Logger.ts";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export class UserController extends HeadController {
   constructor(

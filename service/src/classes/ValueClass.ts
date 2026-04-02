@@ -1,4 +1,4 @@
-import { OnlyProperties } from "../types/OnlyProperties.ts";
+import { OnlyProperties } from "../../types/OnlyProperties.ts";
 
 export abstract class ValueClass<T extends ValueClass<T>> {
   //every key is a string --> that maps to a primitive type. RecursiveValueClass is ValueClass<RecursiveValueClass>

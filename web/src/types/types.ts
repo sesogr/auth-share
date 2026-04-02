@@ -3,7 +3,7 @@ import type {
   ConvertedService,
   ConvertedUser,
   Credentials,
-} from "../../../service/src/types/types.ts";
+} from "../../../service/types/types.ts";
 type Flatten<T> = T extends { credentials?: Credentials }
   ? T & { [K in keyof Credentials]: Credentials[K] }
   : T;

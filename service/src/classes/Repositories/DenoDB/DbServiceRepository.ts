@@ -1,25 +1,25 @@
-import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
-import { OwnedService, Service } from "../../Service.ts";
+import { ServiceRepository } from "../../../../interfaceTypes/ServiceRepository.ts";
+import { OwnedService, Service } from "../../Entities/Service.ts";
 import { DbService } from "./Models/DbService.ts";
-import { ServiceCredential } from "../../ServiceCredential.ts";
+import { ServiceCredential } from "../../Values/ServiceCredential.ts";
 import { Model } from "@denodb";
 import { DbUserService } from "./Models/DbUserService.ts";
 
 import { DbGroupJoin, DbGroupReceiverJoin } from "./Models/DbGroup.ts";
 import { DbUserJoin, DbUserSenderJoin } from "./Models/DbUser.ts";
 
-import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
-import { IdNameMap } from "../../IdNameMap.ts";
-import { NotFoundError } from "../../../errors/NotFoundError.ts";
+import { AllowedUserServiceMap } from "../../Values/AllowedUserServiceMap.ts";
+import { IdNameMap } from "../../Values/IdNameMap.ts";
+import { NotFoundError } from "../../errors/NotFoundError.ts";
 import { DbGroupService } from "./Models/DbGroupService.ts";
-import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
-import { RuntimeError } from "../../../errors/RuntimeError.ts";
-import { Invitation } from "../../Invitation.ts";
+import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
+import { RuntimeError } from "../../errors/RuntimeError.ts";
+import { Invitation } from "../../Values/Invitation.ts";
 import { DbServiceCredential } from "./Models/DbServiceCredentials.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
 import { DbRepository } from "./DbRepository.ts";
 import { Values } from "@denodb/datatypes";
-import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { Logger } from "../../../../interfaceTypes/Logger.ts";
 
 export class DbServiceRepository extends DbRepository
   implements ServiceRepository {

@@ -1,12 +1,12 @@
 import { assertArrayIncludes, assertEquals, assertFalse } from "@std/assert";
-import { Service } from "../../src/classes/Service.ts";
-import { ServiceCredential } from "../../src/classes/ServiceCredential.ts";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
-import { Invitation } from "../../src/classes/Invitation.ts";
-import { Group } from "../../src/classes/Group.ts";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
-import { AllowedGroupServiceMap } from "../../src/classes/AllowedGroupServiceMap.ts";
-import { AllowedUserServiceMap } from "../../src/classes/AllowedUserServiceMap.ts";
+import { Service } from "../../src/classes/Entities/Service.ts";
+import { ServiceCredential } from "../../src/classes/Values/ServiceCredential.ts";
+import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { Invitation } from "../../src/classes/Values/Invitation.ts";
+import { Group } from "../../src/classes/Entities/Group.ts";
+import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
+import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
+import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
 
 const serviceCredential = new ServiceCredential("", "");
 const userShort = await FakeObjectGen.createFakeUser(

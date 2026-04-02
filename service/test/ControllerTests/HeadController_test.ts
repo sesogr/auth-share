@@ -1,5 +1,5 @@
-import { HeadController } from "../../src/controller/HeadController.ts";
-import { User } from "../../src/classes/User.ts";
+import { HeadController } from "../../src/classes/controller/HeadController.ts";
+import { User } from "../../src/classes/Entities/User.ts";
 import { Context } from "@hono/hono";
 
 class _unprotectHeadController extends HeadController {

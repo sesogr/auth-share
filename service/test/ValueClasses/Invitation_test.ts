@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
-import { Invitation } from "../../src/classes/Invitation.ts";
+import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
+import { Invitation } from "../../src/classes/Values/Invitation.ts";
 
 Deno.test("Invitations", async (t) => {
   const inviter = new IdNameMap("id123", "123");

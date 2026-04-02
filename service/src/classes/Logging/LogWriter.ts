@@ -1,4 +1,4 @@
-import { Logger, LogLevel } from "../../interfaceTypes/Logger.ts";
+import { Logger, LogLevel } from "../../../interfaceTypes/Logger.ts";
 
 export class LogWriter implements Logger {
   initialized: boolean = false;

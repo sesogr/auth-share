@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { User } from "../../src/classes/User.ts";
-import { UserCredential } from "../../src/classes/UserCredential.ts";
+import { User } from "../../src/classes/Entities/User.ts";
+import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
 import { stub } from "@std/testing/mock";
 import { Session } from "../../src/classes/Session.ts";
 Deno.test("UserClass", async (t) => {

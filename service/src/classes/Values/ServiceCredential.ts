@@ -1,4 +1,4 @@
-import { ValueClass } from "./ValueClass.ts";
+import { ValueClass } from "../ValueClass.ts";
 
 export class ServiceCredential extends ValueClass<ServiceCredential> {
   constructor(

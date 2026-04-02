@@ -1,8 +1,8 @@
 import { assert, assertEquals, assertFalse } from "@std/assert";
-import { AllowedGroupServiceMap } from "../../src/classes/AllowedGroupServiceMap.ts";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
-import { AllowedUserGroupMap } from "../../src/classes/AllowedUserGroupMap.ts";
-import { AllowedUserServiceMap } from "../../src/classes/AllowedUserServiceMap.ts";
+import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
+import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
+import { AllowedUserGroupMap } from "../../src/classes/Values/AllowedUserGroupMap.ts";
+import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
 
 Deno.test("AllowedMaps", async (t) => {
   const leftSide = new IdNameMap(

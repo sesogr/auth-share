@@ -1,22 +1,22 @@
 import { Context } from "@hono/hono";
-import { GroupRepository } from "../interfaceTypes/GroupRepository.ts";
+import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
 import { HeadController } from "./HeadController.ts";
 import {
   ConvertedGroup,
   ensureConvertedGroupIntegrity,
-} from "../types/ConvertedGroup.ts";
-import { Group } from "../classes/Group.ts";
-import { UserRepository } from "../interfaceTypes/UserRepository.ts";
-import { ServiceRepository } from "../interfaceTypes/ServiceRepository.ts";
-import { PromisesUtil } from "../services/PromissesUtil.ts";
+} from "../../../types/ConvertedGroup.ts";
+import { Group } from "../Entities/Group.ts";
+import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
+import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
+import { PromisesUtil } from "../PromissesUtil.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
-import { User } from "../classes/User.ts";
+import { User } from "../Entities/User.ts";
 import {
   ConvertedUser,
   ensureConvertedUserIntegrity,
-} from "../types/ConvertedUser.ts";
-import { Invitation } from "../classes/Invitation.ts";
-import { Logger } from "../interfaceTypes/Logger.ts";
+} from "../../../types/ConvertedUser.ts";
+import { Invitation } from "../Values/Invitation.ts";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export class GroupController extends HeadController {
   constructor(

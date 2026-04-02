@@ -1,9 +1,9 @@
 import { faker } from "@jackfiszr/faker";
-import { User } from "./classes/User.ts";
-import { UserCredential } from "./classes/UserCredential.ts";
-import { Group } from "./classes/Group.ts";
-import { Service } from "./classes/Service.ts";
-import { ServiceCredential } from "./classes/ServiceCredential.ts";
+import { User } from "./Entities/User.ts";
+import { UserCredential } from "./Values/UserCredential.ts";
+import { Group } from "./Entities/Group.ts";
+import { Service } from "./Entities/Service.ts";
+import { ServiceCredential } from "./Values/ServiceCredential.ts";
 export class FakeObjectGen {
   static async createFakeUser(
     userName = faker.internet.userName(),

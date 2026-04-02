@@ -1,4 +1,4 @@
-import { Service } from "../classes/Service.ts";
+import { Service } from "../src/classes/Entities/Service.ts";
 import type { Repository } from "./Repository.ts";
 
 export type ServiceRepository =

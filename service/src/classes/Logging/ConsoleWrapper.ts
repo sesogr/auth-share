@@ -1,4 +1,4 @@
-import type { Logger, LogLevel } from "../../interfaceTypes/Logger.ts";
+import type { Logger, LogLevel } from "../../../interfaceTypes/Logger.ts";
 
 export class ConsoleWrapper implements Logger {
   constructor(

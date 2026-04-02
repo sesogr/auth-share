@@ -1,16 +1,16 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { InMemUserRepository } from "../../../src/classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
-import { UserRepository } from "../../../src/interfaceTypes/UserRepository.ts";
-import { User } from "../../../src/classes/User.ts";
-import { FakeObjectGen } from "../../../src/FakeObjectGen.ts";
-import { NotFoundError } from "../../../src/errors/NotFoundError.ts";
+import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
+import { User } from "../../../src/classes/Entities/User.ts";
+import { FakeObjectGen } from "../../../src/classes/FakeObjectGen.ts";
+import { NotFoundError } from "../../../src/classes/errors/NotFoundError.ts";
 import { spy } from "@std/testing/mock";
-import { AllowedUserGroupMap } from "../../../src/classes/AllowedUserGroupMap.ts";
-import { AllowedUserServiceMap } from "../../../src/classes/AllowedUserServiceMap.ts";
-import { ServiceAggregateView } from "../../../src/interfaceTypes/ServiceAggregateView.ts";
-import { GroupAggregateView } from "../../../src/interfaceTypes/GroupAggregateView.ts";
+import { AllowedUserGroupMap } from "../../../src/classes/Values/AllowedUserGroupMap.ts";
+import { AllowedUserServiceMap } from "../../../src/classes/Values/AllowedUserServiceMap.ts";
+import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
+import { GroupAggregateView } from "../../../interfaceTypes/GroupAggregateView.ts";
 import { SpyObject } from "../../HelperTypes.ts";
-import { IdNameMap } from "../../../src/classes/IdNameMap.ts";
+import { IdNameMap } from "../../../src/classes/Values/IdNameMap.ts";
 
 Deno.test("UserRepository", async (t) => {
   await t.step("Test for method findById()", async () => {

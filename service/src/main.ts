@@ -8,11 +8,11 @@ import { DbGroupService } from "./classes/Repositories/DenoDB/Models/DbGroupServ
 import { DbService } from "./classes/Repositories/DenoDB/Models/DbService.ts";
 import { DbUser } from "./classes/Repositories/DenoDB/Models/DbUser.ts";
 import { DbUserGroup } from "./classes/Repositories/DenoDB/Models/DbUserGroup.ts";
-import { UserController } from "./controller/UserController.ts";
-import { ServiceController } from "./controller/ServiceController.ts";
-import { GroupRepository } from "./interfaceTypes/GroupRepository.ts";
-import { ServiceRepository } from "./interfaceTypes/ServiceRepository.ts";
-import { UserRepository } from "./interfaceTypes/UserRepository.ts";
+import { UserController } from "./classes/controller/UserController.ts";
+import { ServiceController } from "./classes/controller/ServiceController.ts";
+import { GroupRepository } from "../interfaceTypes/GroupRepository.ts";
+import { ServiceRepository } from "../interfaceTypes/ServiceRepository.ts";
+import { UserRepository } from "../interfaceTypes/UserRepository.ts";
 import { DbInvitation } from "./classes/Repositories/DenoDB/Models/DbInvitation.ts";
 import { DbServiceCredential } from "./classes/Repositories/DenoDB/Models/DbServiceCredentials.ts";
 import { DbUserCredential } from "./classes/Repositories/DenoDB/Models/DbUserCredentials.ts";
@@ -22,8 +22,8 @@ import { DbServiceRepository } from "./classes/Repositories/DenoDB/DbServiceRepo
 import { DbGroupRepository } from "./classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbSessions } from "./classes/Repositories/DenoDB/Models/DbSessions.ts";
 import { Environment } from "./classes/Environment.ts";
-import { GroupController } from "./controller/GroupController.ts";
-import { Logger } from "./interfaceTypes/Logger.ts";
+import { GroupController } from "./classes/controller/GroupController.ts";
+import { Logger } from "../interfaceTypes/Logger.ts";
 import { LogWriter } from "./classes/Logging/LogWriter.ts";
 
 const logging: Logger = new LogWriter(

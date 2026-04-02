@@ -1,15 +1,15 @@
 import { Context } from "@hono/hono";
-import { ServiceController } from "../../src/controller/ServiceController.ts";
-import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts";
-import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
+import { ServiceController } from "../../src/classes/controller/ServiceController.ts";
+import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
+import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
 import { stub } from "@std/testing/mock";
-import { User } from "../../src/classes/User.ts";
-import { OwnedService, Service } from "../../src/classes/Service.ts";
-import { GroupRepository } from "../../src/interfaceTypes/GroupRepository.ts";
+import { User } from "../../src/classes/Entities/User.ts";
+import { OwnedService, Service } from "../../src/classes/Entities/Service.ts";
+import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
 import { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 import { assertEquals } from "@std/assert";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
-import { Logger } from "../../src/interfaceTypes/Logger.ts";
+import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { Logger } from "../../interfaceTypes/Logger.ts";
 
 Deno.test("ServiceController", async (t) => {
   const service: Service = await FakeObjectGen.createFakeService();

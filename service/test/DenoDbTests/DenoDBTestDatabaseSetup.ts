@@ -1,5 +1,5 @@
 import { Database, MySQLConnector } from "@denodb";
-import { Group } from "../../src/classes/Group.ts";
+import { Group } from "../../src/classes/Entities/Group.ts";
 import { DbGroupRepository } from "../../src/classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbServiceRepository } from "../../src/classes/Repositories/DenoDB/DbServiceRepository.ts";
 import { DbUserRepository } from "../../src/classes/Repositories/DenoDB/DbUserRepository.ts";
@@ -13,11 +13,11 @@ import { DbUserCredential } from "../../src/classes/Repositories/DenoDB/Models/D
 import { DbUserGroup } from "../../src/classes/Repositories/DenoDB/Models/DbUserGroup.ts";
 import { DbUserService } from "../../src/classes/Repositories/DenoDB/Models/DbUserService.ts";
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
-import { Service } from "../../src/classes/Service.ts";
-import { User } from "../../src/classes/User.ts";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
-import { ServiceRepository } from "../../src/interfaceTypes/ServiceRepository.ts";
-import { UserRepository } from "../../src/interfaceTypes/UserRepository.ts";
+import { Service } from "../../src/classes/Entities/Service.ts";
+import { User } from "../../src/classes/Entities/User.ts";
+import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
+import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
 import { DbSessions } from "../../src/classes/Repositories/DenoDB/Models/DbSessions.ts";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
 

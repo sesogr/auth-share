@@ -1,27 +1,27 @@
-import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
-import { AllowedUserServiceMap } from "../../AllowedUserServiceMap.ts";
-import { User } from "../../User.ts";
+import { UserRepository } from "../../../../interfaceTypes/UserRepository.ts";
+import { AllowedUserServiceMap } from "../../Values/AllowedUserServiceMap.ts";
+import { User } from "../../Entities/User.ts";
 
 import { DbGroup, DbGroupJoin, DbGroupObjJoin } from "./Models/DbGroup.ts";
 import { DbServiceJoin } from "./Models/DbService.ts";
 import { DbUser, DbUserSenderJoin } from "./Models/DbUser.ts";
 import { DbUserCredential } from "./Models/DbUserCredentials.ts";
-import { IdNameMap } from "../../IdNameMap.ts";
+import { IdNameMap } from "../../Values/IdNameMap.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
-import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
-import { NotFoundError } from "../../../errors/NotFoundError.ts";
+import { AllowedUserGroupMap } from "../../Values/AllowedUserGroupMap.ts";
+import { NotFoundError } from "../../errors/NotFoundError.ts";
 import { Model } from "@denodb";
 import { DbUserService, DbUserServiceTable } from "./Models/DbUserService.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
-import { UserCredential } from "../../UserCredential.ts";
-import { Invitation } from "../../Invitation.ts";
-import { RuntimeError } from "../../../errors/RuntimeError.ts";
+import { UserCredential } from "../../Values/UserCredential.ts";
+import { Invitation } from "../../Values/Invitation.ts";
+import { RuntimeError } from "../../errors/RuntimeError.ts";
 import { DbSessions } from "./Models/DbSessions.ts";
 import { Session } from "../../Session.ts";
 import { DbRepository } from "./DbRepository.ts";
 import { Entity } from "../../Entity.ts";
-import { ConflictError } from "../../../errors/controllerErrors/ConflictError/ConflictError.ts";
-import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { ConflictError } from "../../errors/controllerErrors/ConflictError/ConflictError.ts";
+import { Logger } from "../../../../interfaceTypes/Logger.ts";
 
 export class DbUserRepository extends DbRepository implements UserRepository {
   constructor(logging: Logger) {

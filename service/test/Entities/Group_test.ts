@@ -1,14 +1,14 @@
 import { assertArrayIncludes, assertEquals, assertThrows } from "@std/assert";
-import { Group } from "../../src/classes/Group.ts";
-import { User } from "../../src/classes/User.ts";
-import { UserCredential } from "../../src/classes/UserCredential.ts";
-import { Invitation } from "../../src/classes/Invitation.ts";
-import { FakeObjectGen } from "../../src/FakeObjectGen.ts";
-import { DuplicateError } from "../../src/errors/DuplicateError.ts";
-import { ConvertedGroup } from "../../src/types/types.ts";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
-import { AllowedGroupServiceMap } from "../../src/classes/AllowedGroupServiceMap.ts";
-import { AllowedUserGroupMap } from "../../src/classes/AllowedUserGroupMap.ts";
+import { Group } from "../../src/classes/Entities/Group.ts";
+import { User } from "../../src/classes/Entities/User.ts";
+import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
+import { Invitation } from "../../src/classes/Values/Invitation.ts";
+import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { DuplicateError } from "../../src/classes/errors/DuplicateError.ts";
+import { ConvertedGroup } from "../../types/types.ts";
+import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
+import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "../../src/classes/Values/AllowedUserGroupMap.ts";
 
 const userCredential = new UserCredential("Hans Meiser", "abcdef", "");
 

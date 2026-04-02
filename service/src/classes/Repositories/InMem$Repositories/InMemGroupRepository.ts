@@ -1,10 +1,10 @@
-import { GroupAggregateView } from "../../../interfaceTypes/GroupAggregateView.ts";
-import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
-import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
-import { AllowedGroupServiceMap } from "../../AllowedGroupServiceMap.ts";
-import { AllowedUserGroupMap } from "../../AllowedUserGroupMap.ts";
-import { Group } from "../../Group.ts";
-import { Invitation } from "../../Invitation.ts";
+import { GroupAggregateView } from "../../../../interfaceTypes/GroupAggregateView.ts";
+import { GroupRepository } from "../../../../interfaceTypes/GroupRepository.ts";
+import { ServiceAggregateView } from "../../../../interfaceTypes/ServiceAggregateView.ts";
+import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "../../Values/AllowedUserGroupMap.ts";
+import { Group } from "../../Entities/Group.ts";
+import { Invitation } from "../../Values/Invitation.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemGroupRepository extends InMemoryRepository<Group>

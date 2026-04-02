@@ -1,5 +1,5 @@
 import { IdNameMap } from "./IdNameMap.ts";
-import { ValueClass } from "./ValueClass.ts";
+import { ValueClass } from "../ValueClass.ts";
 
 export class Invitation extends ValueClass<Invitation> {
   public get receiverName(): string {

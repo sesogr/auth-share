@@ -1,8 +1,8 @@
-import { AlreadyTakenError } from "../../../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
-import { NotFoundError } from "../../../errors/NotFoundError.ts";
-import { Displayable } from "../../../interfaceTypes/Displayable.ts";
-import { Entity } from "../../../interfaceTypes/Entity.ts";
-import { Repository } from "../../../interfaceTypes/Repository.ts";
+import { AlreadyTakenError } from "../../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { NotFoundError } from "../../errors/NotFoundError.ts";
+import { Displayable } from "../../../../interfaceTypes/Displayable.ts";
+import { Entity } from "../../../../interfaceTypes/Entity.ts";
+import { Repository } from "../../../../interfaceTypes/Repository.ts";
 
 export abstract class InMemoryRepository<T extends Displayable & Entity>
   implements Repository<T> {

@@ -3,7 +3,7 @@ import { Entity } from "../../../src/classes/Entity.ts";
 import { DbRepository } from "../../../src/classes/Repositories/DenoDB/DbRepository.ts";
 import { spy, stub } from "@std/testing/mock";
 import { assert, assertFalse, assertGreater, assertRejects } from "@std/assert";
-import { DuplicateError } from "../../../src/errors/DuplicateError.ts";
+import { DuplicateError } from "../../../src/classes/errors/DuplicateError.ts";
 
 class TestDbRepository extends DbRepository {
   override update(_item: Entity): Promise<void> {

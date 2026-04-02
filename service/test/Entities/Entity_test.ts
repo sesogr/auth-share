@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { Entity } from "../../src/classes/Entity.ts";
-import { IdNameMap } from "../../src/classes/IdNameMap.ts";
+import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 
 Deno.test("Entity", async (t) => {
   await t.step("creation", () => {

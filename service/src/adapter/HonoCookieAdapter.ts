@@ -1,6 +1,6 @@
 import { deleteCookie, getCookie, setCookie } from "@hono/hono/cookie";
 import { Context } from "@hono/hono";
-import { MissingDataError } from "../errors/controllerErrors/MissingDataError.ts";
+import { MissingDataError } from "../classes/errors/controllerErrors/MissingDataError.ts";
 function assertCookie(obj: unknown, key: string): asserts obj is string {
   if (obj === undefined) {
     throw new MissingDataError(`${key} Cookie is undefined`);

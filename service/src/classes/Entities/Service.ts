@@ -1,11 +1,11 @@
 import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
-import { ConvertedService } from "../types/types.ts";
-import { AllowedGroupServiceMap } from "./AllowedGroupServiceMap.ts";
-import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
-import { Entity } from "./Entity.ts";
+import { ConvertedService } from "../../../types/types.ts";
+import { AllowedGroupServiceMap } from "../Values/AllowedGroupServiceMap.ts";
+import { AllowedUserServiceMap } from "../Values/AllowedUserServiceMap.ts";
+import { Entity } from "../Entity.ts";
 import { Group } from "./Group.ts";
-import { Invitation } from "./Invitation.ts";
-import { ServiceCredential } from "./ServiceCredential.ts";
+import { Invitation } from "../Values/Invitation.ts";
+import { ServiceCredential } from "../Values/ServiceCredential.ts";
 import { User, ValidatedUser } from "./User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { DuplicateError } from "../errors/DuplicateError.ts";

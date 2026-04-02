@@ -1,6 +1,6 @@
 import { Environment } from "../src/classes/Environment.ts";
 import { assertEquals, assertThrows } from "@std/assert";
-import { EnvError } from "../src/errors/EnvError.ts";
+import { EnvError } from "../src/classes/errors/EnvError.ts";
 
 Deno.test("Environment variables should be loaded correctly", (_t) => {
   const testcase = (caseName: string) => {

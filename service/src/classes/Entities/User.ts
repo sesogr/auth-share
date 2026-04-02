@@ -1,11 +1,11 @@
-import { Invitation } from "./Invitation.ts";
-import { UserCredential } from "./UserCredential.ts";
+import { Invitation } from "../Values/Invitation.ts";
+import { UserCredential } from "../Values/UserCredential.ts";
 import { NameTooLongError } from "../errors/NameTooLongError.ts";
-import { AllowedUserGroupMap } from "./AllowedUserGroupMap.ts";
-import { ConvertedUser } from "../types/ConvertedUser.ts";
-import { AllowedUserServiceMap } from "./AllowedUserServiceMap.ts";
-import { Entity } from "./Entity.ts";
-import { Session } from "./Session.ts";
+import { AllowedUserGroupMap } from "../Values/AllowedUserGroupMap.ts";
+import { ConvertedUser } from "../../../types/ConvertedUser.ts";
+import { AllowedUserServiceMap } from "../Values/AllowedUserServiceMap.ts";
+import { Entity } from "../Entity.ts";
+import { Session } from "../Session.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ValidationError } from "../errors/ValidationError.ts";
 export type ValidatedUser = User & { zzz: never };

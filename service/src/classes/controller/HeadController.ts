@@ -1,8 +1,8 @@
-import { User, ValidatedUser } from "../classes/User.ts";
+import { User, ValidatedUser } from "../Entities/User.ts";
 import { Context } from "@hono/hono";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ControllerError } from "../errors/controllerErrors/ControllerError.ts";
-import { Logger } from "../interfaceTypes/Logger.ts";
+import { Logger } from "../../../interfaceTypes/Logger.ts";
 
 export class HeadController {
   constructor(readonly logging: Logger) {

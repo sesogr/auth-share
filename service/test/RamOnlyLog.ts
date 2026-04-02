@@ -1,4 +1,4 @@
-import { Logger } from "../src/interfaceTypes/Logger.ts";
+import { Logger } from "../interfaceTypes/Logger.ts";
 
 export class RamOnlyLog implements Logger {
   constructor(readonly logLevel = [], readonly context = "") {

@@ -1,8 +1,8 @@
-import { GroupAggregateView } from "../../../interfaceTypes/GroupAggregateView.ts";
-import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
-import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
+import { GroupAggregateView } from "../../../../interfaceTypes/GroupAggregateView.ts";
+import { ServiceAggregateView } from "../../../../interfaceTypes/ServiceAggregateView.ts";
+import { UserRepository } from "../../../../interfaceTypes/UserRepository.ts";
 import { Session } from "../../Session.ts";
-import { User } from "../../User.ts";
+import { User } from "../../Entities/User.ts";
 import { InMemoryRepository } from "./InMemoryRepository.ts";
 
 export class InMemUserRepository extends InMemoryRepository<User>

@@ -1,21 +1,21 @@
 import { spy } from "@std/testing/mock";
-import { AllowedGroupServiceMap } from "../../../src/classes/AllowedGroupServiceMap.ts";
-import { Invitation } from "../../../src/classes/Invitation.ts";
+import { AllowedGroupServiceMap } from "../../../src/classes/Values/AllowedGroupServiceMap.ts";
+import { Invitation } from "../../../src/classes/Values/Invitation.ts";
 import { InMemGroupRepository } from "../../../src/classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
-import { FakeObjectGen } from "../../../src/FakeObjectGen.ts";
-import { ServiceAggregateView } from "../../../src/interfaceTypes/ServiceAggregateView.ts";
+import { FakeObjectGen } from "../../../src/classes/FakeObjectGen.ts";
+import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
 import { SpyObject } from "../../HelperTypes.ts";
-import { Group } from "../../../src/classes/Group.ts";
-import { GroupRepository } from "../../../src/interfaceTypes/GroupRepository.ts";
+import { Group } from "../../../src/classes/Entities/Group.ts";
+import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
 import { assertArrayIncludes, assertEquals, assertThrows } from "@std/assert";
-import { IdNameMap } from "../../../src/classes/IdNameMap.ts";
-import { NotFoundError } from "../../../src/errors/NotFoundError.ts";
-import { AlreadyTakenError } from "../../../src/errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
-import { AllowedUserGroupMap } from "../../../src/classes/AllowedUserGroupMap.ts";
-import { User } from "../../../src/classes/User.ts";
-import { UserCredential } from "../../../src/classes/UserCredential.ts";
-import { Service } from "../../../src/classes/Service.ts";
-import { ServiceCredential } from "../../../src/classes/ServiceCredential.ts";
+import { IdNameMap } from "../../../src/classes/Values/IdNameMap.ts";
+import { NotFoundError } from "../../../src/classes/errors/NotFoundError.ts";
+import { AlreadyTakenError } from "../../../src/classes/errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { AllowedUserGroupMap } from "../../../src/classes/Values/AllowedUserGroupMap.ts";
+import { User } from "../../../src/classes/Entities/User.ts";
+import { UserCredential } from "../../../src/classes/Values/UserCredential.ts";
+import { Service } from "../../../src/classes/Entities/Service.ts";
+import { ServiceCredential } from "../../../src/classes/Values/ServiceCredential.ts";
 
 Deno.test("Group Repository", async (t) => {
   await t.step("findbyid", async (st) => {
