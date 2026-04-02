@@ -5,7 +5,7 @@ import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { Context } from "@hono/hono";
 import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
 import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
-import { ConvertedUser } from "../../types/ConvertedUser.ts";
+import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
 import { User } from "../../src/classes/Entities/User.ts";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
 

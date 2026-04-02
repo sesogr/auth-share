@@ -1,5 +1,5 @@
 import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
-import { ConvertedService } from "../../../types/types.ts";
+import { ConvertedService } from "../../types/types.ts";
 import { AllowedGroupServiceMap } from "../Values/AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "../Values/AllowedUserServiceMap.ts";
 import { Entity } from "../Entity.ts";

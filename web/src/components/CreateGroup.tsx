@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form } from "antd";
-import type { ConvertedGroup } from "../../../service/types/ConvertedGroup.ts";
+import type { ConvertedGroup } from "../../../service/src/types/ConvertedGroup.ts";
 import { MyDrawerForm } from "./MyDrawerForm.tsx";
 
 const CreateGroup: React.FC<

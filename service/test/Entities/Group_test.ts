@@ -5,7 +5,7 @@ import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
 import { Invitation } from "../../src/classes/Values/Invitation.ts";
 import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { DuplicateError } from "../../src/classes/errors/DuplicateError.ts";
-import { ConvertedGroup } from "../../types/types.ts";
+import { ConvertedGroup } from "../../src/types/types.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "../../src/classes/Values/AllowedUserGroupMap.ts";

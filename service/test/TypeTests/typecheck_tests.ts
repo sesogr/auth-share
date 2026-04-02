@@ -1,5 +1,5 @@
 import { assertThrows } from "@std/assert";
-import { checkForAdditionalKeys } from "../../types/types.ts";
+import { checkForAdditionalKeys } from "../../src/types/types.ts";
 import { FormlessError } from "../../src/classes/errors/controllerErrors/FormlessError.ts";
 
 Deno.test("Typechecks", async (t) => {

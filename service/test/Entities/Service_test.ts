@@ -7,7 +7,7 @@ import { Group } from "../../src/classes/Entities/Group.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
-import { ConvertedService } from "../../types/ConvertedService.ts";
+import { ConvertedService } from "../../src/types/ConvertedService.ts";
 
 const serviceCredential = new ServiceCredential("", "");
 const userShort = await FakeObjectGen.createFakeUser(

@@ -4,7 +4,7 @@ import { HeadController } from "./HeadController.ts";
 import {
   ConvertedGroup,
   ensureConvertedGroupIntegrity,
-} from "../../../types/ConvertedGroup.ts";
+} from "../../types/ConvertedGroup.ts";
 import { Group } from "../Entities/Group.ts";
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
@@ -14,7 +14,7 @@ import { User } from "../Entities/User.ts";
 import {
   ConvertedUser,
   ensureConvertedUserIntegrity,
-} from "../../../types/ConvertedUser.ts";
+} from "../../types/ConvertedUser.ts";
 import { Invitation } from "../Values/Invitation.ts";
 import { Logger } from "../../../interfaceTypes/Logger.ts";
 

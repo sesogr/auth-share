@@ -2,7 +2,7 @@ import { Invitation } from "../Values/Invitation.ts";
 import { UserCredential } from "../Values/UserCredential.ts";
 import { NameTooLongError } from "../errors/NameTooLongError.ts";
 import { AllowedUserGroupMap } from "../Values/AllowedUserGroupMap.ts";
-import { ConvertedUser } from "../../../types/ConvertedUser.ts";
+import { ConvertedUser } from "../../types/ConvertedUser.ts";
 import { AllowedUserServiceMap } from "../Values/AllowedUserServiceMap.ts";
 import { Entity } from "../Entity.ts";
 import { Session } from "../Session.ts";

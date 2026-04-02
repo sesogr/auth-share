@@ -6,7 +6,7 @@ import {
   indepthTypeCheck,
   typeCheck,
 } from "./types.ts";
-import { MissingDataError } from "../src/classes/errors/controllerErrors/MissingDataError.ts";
+import { MissingDataError } from "../classes/errors/controllerErrors/MissingDataError.ts";
 
 export type ConvertedService =
   & {

@@ -2,13 +2,13 @@ import { Context } from "@hono/hono";
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { User } from "../Entities/User.ts";
 import { UserCredential } from "../Values/UserCredential.ts";
-import { ConvertedUser } from "../../../types/types.ts";
+import { ConvertedUser } from "../../types/types.ts";
 import { HonoCookieAdapter } from "../../adapter/HonoCookieAdapter.ts";
 
 const { deleteCookie, saveGetCookie, setCookie } = HonoCookieAdapter;
 import { HeadController } from "./HeadController.ts";
 import { Environment } from "../Environment.ts";
-import { ensureConvertedUserIntegrity } from "../../../types/ConvertedUser.ts";
+import { ensureConvertedUserIntegrity } from "../../types/ConvertedUser.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { Logger } from "../../../interfaceTypes/Logger.ts";
 

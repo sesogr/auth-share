@@ -1,4 +1,4 @@
-import { MissingDataError } from "../src/classes/errors/controllerErrors/MissingDataError.ts";
+import { MissingDataError } from "../classes/errors/controllerErrors/MissingDataError.ts";
 import { assertIsCredentials, Credentials } from "./Credentials.ts";
 import {
   assertIsStringRecord,

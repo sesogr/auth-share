@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Input } from "antd";
-import type { ConvertedService } from "../../../service/types/ConvertedService.ts";
+import type { ConvertedService } from "../../../service/src/types/ConvertedService.ts";
 
 const ServiceInvitation: React.FC<{ service: ConvertedService }> = (
   { service },

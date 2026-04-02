@@ -1,5 +1,5 @@
-import { FormlessError } from "../src/classes/errors/controllerErrors/FormlessError.ts";
-import { MissingDataError } from "../src/classes/errors/controllerErrors/MissingDataError.ts";
+import { FormlessError } from "../classes/errors/controllerErrors/FormlessError.ts";
+import { MissingDataError } from "../classes/errors/controllerErrors/MissingDataError.ts";
 import { ConvertedGroup } from "./ConvertedGroup.ts";
 import { ConvertedService } from "./ConvertedService.ts";
 import { ConvertedUser } from "./ConvertedUser.ts";
