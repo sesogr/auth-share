@@ -5,7 +5,7 @@ export class ConsoleWrapper implements Logger {
     readonly logLevel: LogLevel[],
     private readonly context: string = "",
   ) {}
-  instantiateWithOwnContext(context: string): Logger {
+  withOwnContext(context: string): Logger {
     return new ConsoleWrapper(this.logLevel, context);
   }
   log(...message: unknown[]) {
@@ -15,7 +15,7 @@ export class ConsoleWrapper implements Logger {
 
   private getNow() {
     const date = new Date();
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    return `${date.toISOString()}`;
   }
 
   warn(...message: unknown[]) {
