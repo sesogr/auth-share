@@ -9,20 +9,24 @@ import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
 import { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 import { assertEquals } from "@std/assert";
 import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
-import { Logger } from "../../interfaceTypes/Logger.ts";
+import { RamOnlyLog } from "../RamOnlyLog.ts";
 
 Deno.test("ServiceController", async (t) => {
   const service: Service = await FakeObjectGen.createFakeService();
 
   const serviceRepo = {
-    findOwnedByUserId(_a) {
+    data: [],
+    findOwnedByUserId(_a: string) {
       return Promise.resolve([] as unknown as Service[]);
     },
     findById(_id: string): Promise<Service> {
       return Promise.resolve(service);
     },
-  } as ServiceRepository;
-
+    save(...data: unknown[]) {
+      serviceRepo.data.push(...data);
+    },
+  } as unknown as ServiceRepository & { data: unknown[] };
+  const ramLogger = new RamOnlyLog();
   const userRepo = {} as UserRepository;
   const user = { getId: () => "123" } as User;
   const groupRepo = {} as GroupRepository;
@@ -30,7 +34,7 @@ Deno.test("ServiceController", async (t) => {
     serviceRepo,
     userRepo,
     groupRepo,
-    {} as Logger,
+    ramLogger,
   );
   const _getMeFromContext = stub(
     serviceController,
@@ -41,7 +45,7 @@ Deno.test("ServiceController", async (t) => {
     },
   );
   const mockContext = {
-    req: {},
+    req: { json: () => service.toJson() },
     res: {},
     json: (e: object, statuscode: number) => {
       return {

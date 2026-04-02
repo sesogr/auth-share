@@ -93,7 +93,7 @@ Deno.test("Group Class", async (t) => {
       assertEquals([testInvitation], listSentInvitation);
     },
   );
-  await t.step("Showall", () => {
+  await t.step("Show All", () => {
     const group = new Group(
       "abc",
       { displayname: "abc" } as IdNameMap,
@@ -103,7 +103,8 @@ Deno.test("Group Class", async (t) => {
       [{ toString: () => "abc" }] as Invitation[],
       [{ getUsername: "abc" }] as AllowedUserGroupMap[],
     );
-    const convgroup: ConvertedGroup = {
+    const convGroup: ConvertedGroup = {
+      id: group.getId(),
       groupname: group.getDisplayName(),
       owner: group.getOwner().displayname,
       users: group.allowedUser.map((e) => e.getUsername),
@@ -113,7 +114,7 @@ Deno.test("Group Class", async (t) => {
         e.toString()
       ),
     };
-    assertEquals(group.toJson(), convgroup);
-    assertEquals(group.toJsonString(), JSON.stringify(convgroup));
+    assertEquals(group.toJson(), convGroup);
+    assertEquals(group.toJsonString(), JSON.stringify(convGroup));
   });
 });

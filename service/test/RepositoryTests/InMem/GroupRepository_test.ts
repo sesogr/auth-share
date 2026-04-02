@@ -18,7 +18,7 @@ import { Service } from "../../../src/classes/Entities/Service.ts";
 import { ServiceCredential } from "../../../src/classes/Values/ServiceCredential.ts";
 
 Deno.test("Group Repository", async (t) => {
-  await t.step("findbyid", async (st) => {
+  await t.step("find by id", async (st) => {
     const { groupList, groupRepository, serviceRepository }: GroupRepoTestsuit =
       await buildUp();
     await st.step("correct find", async () => {

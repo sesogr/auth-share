@@ -7,6 +7,7 @@ import { Group } from "../../src/classes/Entities/Group.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
+import { ConvertedService } from "../../types/ConvertedService.ts";
 
 const serviceCredential = new ServiceCredential("", "");
 const userShort = await FakeObjectGen.createFakeUser(
@@ -94,7 +95,7 @@ Deno.test("Service Class", async (t) => {
         getGroupname: "asd",
       }] as AllowedGroupServiceMap[],
     );
-    const data = {
+    const data: ConvertedService = {
       credentials: {
         username: service.credentials.username!,
         password: service.credentials.password!,
@@ -105,6 +106,7 @@ Deno.test("Service Class", async (t) => {
       users: service.listAllowedUsers(),
       owners: service.listAllowedUsers(true),
       sentInvitations: service.sentInvitations.map((e) => e.toString()),
+      id: service.getId(),
     };
     assertEquals(service.toJson(), data);
     assertEquals(service.toJsonString(), JSON.stringify(data));

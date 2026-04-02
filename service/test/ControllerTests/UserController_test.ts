@@ -7,7 +7,7 @@ import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
 import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
 import { ConvertedUser } from "../../types/ConvertedUser.ts";
 import { User } from "../../src/classes/Entities/User.ts";
-import { Logger } from "../../interfaceTypes/Logger.ts";
+import { RamOnlyLog } from "../RamOnlyLog.ts";
 
 const context = {
   res: {
@@ -35,7 +35,8 @@ const context = {
 } as unknown as Context;
 
 Deno.test("UserController - Test", async (t) => {
-  const logger = {} as Logger;
+  const ramLogger = new RamOnlyLog();
+  const logger = ramLogger;
   await t.step("Create", async (st) => {
     await st.step("user is saved", async () => {
       const repo = {
@@ -55,7 +56,7 @@ Deno.test("UserController - Test", async (t) => {
     await st.step("invalid request data", async () => {
       const controller = new UserController(
         {} as unknown as UserRepository,
-        {} as Logger,
+        ramLogger,
       );
       const contextWithInvalidData = {
         ...context,
@@ -66,10 +67,10 @@ Deno.test("UserController - Test", async (t) => {
         },
       } as unknown as Context;
 
-      const returnbody = await controller.create(contextWithInvalidData);
-      assertEquals(returnbody.status, 400);
+      const returnBody = await controller.create(contextWithInvalidData);
+      assertEquals(returnBody.status, 400);
       //@ts-ignore body is different
-      assertEquals(returnbody.body.message, "Wrong Keys Detected");
+      assertEquals(returnBody.body.message, "Wrong Keys Detected");
     });
   });
   await t.step("Change Password", async (st) => {

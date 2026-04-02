@@ -2,10 +2,12 @@ import { stub } from "@std/testing/mock";
 import { DbGroupRepository } from "../../../src/classes/Repositories/DenoDB/DbGroupRepository.ts";
 import { DbGroup } from "../../../src/classes/Repositories/DenoDB/Models/DbGroup.ts";
 import { assertEquals } from "@std/assert";
+import { RamOnlyLog } from "../../RamOnlyLog.ts";
 
 Deno.test("DbGroupRepository - Save()", async (t) => {
+  const ramOnlyLog = new RamOnlyLog();
   await t.step("ExistId", async () => {
-    const repo = new DbGroupRepository();
+    const repo = new DbGroupRepository(ramOnlyLog);
     const testGroupId = "62787485749";
     const stub2 = stub(
       DbGroup,

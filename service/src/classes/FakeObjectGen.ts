@@ -1,5 +1,5 @@
 import { faker } from "@jackfiszr/faker";
-import { User } from "./Entities/User.ts";
+import { User, ValidatedUser } from "./Entities/User.ts";
 import { UserCredential } from "./Values/UserCredential.ts";
 import { Group } from "./Entities/Group.ts";
 import { Service } from "./Entities/Service.ts";
@@ -25,7 +25,7 @@ export class FakeObjectGen {
     );
   }
   static async createFakeService(
-    futureOwner?: User,
+    futureOwner?: ValidatedUser,
   ) {
     return Service.createService(
       new ServiceCredential(
@@ -65,7 +65,7 @@ export class FakeObjectGen {
     return fakeGroupList;
   }
   static async generateFakeServices(
-    userList: User[] = [],
+    userList: ValidatedUser[] = [],
     count: number = 10,
   ): Promise<Service[]> {
     const fakeServiceList: Service[] = [];

@@ -3,7 +3,8 @@ import { Entity } from "../../../src/classes/Entity.ts";
 import { DbRepository } from "../../../src/classes/Repositories/DenoDB/DbRepository.ts";
 import { spy, stub } from "@std/testing/mock";
 import { assert, assertFalse, assertGreater, assertRejects } from "@std/assert";
-import { DuplicateError } from "../../../src/classes/errors/DuplicateError.ts";
+import { RamOnlyLog } from "../../RamOnlyLog.ts";
+import { AlreadyTakenError } from "../../../src/classes/errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 
 class TestDbRepository extends DbRepository {
   override update(_item: Entity): Promise<void> {
@@ -19,6 +20,7 @@ class TModel extends Model {
 }
 
 Deno.test("DbRepository", async (t) => {
+  const ramOnlyLog = new RamOnlyLog();
   let modelResponse: boolean[] | undefined[];
   let modelResponseNumber: number = 0;
   stub(TModel, "where", () => TModel);
@@ -42,6 +44,7 @@ Deno.test("DbRepository", async (t) => {
     TModel,
     "displayname",
     "id",
+    ramOnlyLog,
   );
   let mockData: { id?: string; displayname?: string } = {
     id: undefined,
@@ -113,7 +116,7 @@ Deno.test("DbRepository", async (t) => {
       modelResponse = [true, true];
       await assertRejects(async () => {
         await dbRepository.save(item);
-      }, DuplicateError);
+      }, AlreadyTakenError);
     },
   );
   await t.step(
