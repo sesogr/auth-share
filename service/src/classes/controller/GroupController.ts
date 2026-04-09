@@ -31,8 +31,10 @@ export class GroupController extends HeadController {
     try {
       const groupData: ConvertedGroup = await c.req.json();
       ensureConvertedGroupIntegrity(groupData, ["id"]);
+      const group: Group = await this.groupRepository.findById(groupData.id);
+      group.checkOwner(this.getMeFromContext(c));
       await this.groupRepository.delete(
-        await this.groupRepository.findById(groupData.id),
+        group,
       );
       return c.body(null, 204);
     } catch (error) {
@@ -43,7 +45,10 @@ export class GroupController extends HeadController {
     try {
       const ME = this.getMeFromContext(c);
       const groups = (await this.groupRepository.findOwnedByUserId(ME.getId()))
-        .map((e) => e.toJson());
+        .map((e: Group) => {
+          e.checkOwner(ME);
+          return e.toJson();
+        });
       return c.json(groups);
     } catch (error) {
       return this.errorHandle(error, c);

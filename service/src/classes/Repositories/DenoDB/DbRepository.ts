@@ -11,8 +11,10 @@ import { AlreadyTakenError } from "../../errors/controllerErrors/ConflictError/A
 import { Logger } from "../../../../interfaceTypes/Logger.ts";
 import { DisplayableEntity } from "../../../../interfaceTypes/DisplayableEntity.ts";
 import { HasInvitations } from "../../../../interfaceTypes/HasInvitations.ts";
+import { Repository } from "../../../../interfaceTypes/Repository.ts";
 
-export abstract class DbRepository {
+export abstract class DbRepository<T extends DisplayableEntity>
+  implements Repository<T> {
   constructor(
     protected readonly model: typeof Model,
     protected readonly displayname: string,
@@ -20,6 +22,27 @@ export abstract class DbRepository {
     protected readonly id: string,
     protected readonly logging: Logger,
   ) {
+  }
+  async findByDisplayName(name: string): Promise<T> {
+    const aItem =
+      (await this.model.where(this.displayname, name).first()) as unknown as {
+        [k in string]: string;
+      };
+    if (!aItem || !aItem[this.displayname]) {
+      throw new NotFoundError(this.model.name, this.displayname, name);
+    }
+    return this.hydrate(aItem.id);
+  }
+  async findAll(): Promise<T[]> {
+    const models = await this.model.all() as unknown as {
+      id: string;
+    }[];
+    return Promise.all(
+      models.map((e) => this.hydrate(e.id)),
+    );
+  }
+  async removeById(id: string): Promise<void> {
+    await this.model.where(this.id, id).delete();
   }
 
   protected nTomFilter(
@@ -89,7 +112,7 @@ export abstract class DbRepository {
     return data && data[this.displayname] == item.getDisplayName();
   }
 
-  async save(item: DisplayableEntity) {
+  async save(item: T) {
     const idExists = await this.existId(item.getId());
     if (!idExists) {
       if (await this.existDisplayname(item.getDisplayName())) {
@@ -113,7 +136,7 @@ export abstract class DbRepository {
   }
 
   abstract update(item: Entity): Promise<void>;
-
+  abstract hydrate(searchedId: string): Promise<T>;
   abstract add(item: Entity): Promise<void>;
 
   async delete(item: Entity) {
@@ -127,7 +150,12 @@ export abstract class DbRepository {
     }
     await this.model.where(this.id, item.getId()).delete();
   }
-
+  async findById(id: string): Promise<T> {
+    if (!(await this.existId(id))) {
+      throw new NotFoundError(this.model.name, "id", id);
+    }
+    return this.hydrate(id);
+  }
   protected async updateInvitation(item: Entity & HasInvitations) {
     const _invitationsModel = await DbInvitation.where(
       "obj_reference",

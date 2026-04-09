@@ -5,8 +5,12 @@ import { spy, stub } from "@std/testing/mock";
 import { assert, assertFalse, assertGreater, assertRejects } from "@std/assert";
 import { RamOnlyLog } from "../../RamOnlyLog.ts";
 import { AlreadyTakenError } from "../../../src/classes/errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { DisplayableEntity } from "../../../interfaceTypes/DisplayableEntity.ts";
 
-class TestDbRepository extends DbRepository {
+class TestDbRepository extends DbRepository<DisplayableEntity> {
+  override hydrate(_searchedId: string): Promise<DisplayableEntity> {
+    throw new Error("Method not implemented.");
+  }
   override update(_item: Entity): Promise<void> {
     return Promise.resolve();
   }

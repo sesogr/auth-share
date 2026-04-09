@@ -1,31 +1,30 @@
 import { GroupRepository } from "../../../../interfaceTypes/GroupRepository.ts";
-import { Group } from "../../Entities/Group.ts";
+import { Group, OwnedGroups } from "../../Entities/Group.ts";
 import { DbGroup, DbGroupReceiverJoin } from "./Models/DbGroup.ts";
 import { DbUserGroup } from "./Models/DbUserGroup.ts";
-
-import {
-  DbUserJoin,
-  DbUserSenderJoin,
-  DbUserSenderJoin2,
-} from "./Models/DbUser.ts";
-import { DbServiceJoin, DbServiceObjJoin } from "./Models/DbService.ts";
-import { RuntimeError } from "../../errors/RuntimeError.ts";
-import { IdNameMap } from "../../Values/IdNameMap.ts";
-import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
-import { Invitation } from "../../Values/Invitation.ts";
-import { AllowedUserGroupMap } from "../../Values/AllowedUserGroupMap.ts";
 import { Model } from "@denodb";
-import { NotFoundError } from "../../errors/NotFoundError.ts";
+import { Logger } from "../../../../interfaceTypes/Logger.ts";
+import { RuntimeError } from "../../errors/RuntimeError.ts";
+import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
+import { AllowedUserGroupMap } from "../../Values/AllowedUserGroupMap.ts";
+import { IdNameMap } from "../../Values/IdNameMap.ts";
+import { Invitation } from "../../Values/Invitation.ts";
+import { DbRepository } from "./DbRepository.ts";
 import { DbGroupService } from "./Models/DbGroupService.ts";
 import {
   DbInvitation,
   DbInvitationJoinOnObject,
   DbInvitationJoinOnReceived,
 } from "./Models/DbInvitation.ts";
-import { DbRepository } from "./DbRepository.ts";
-import { Logger } from "../../../../interfaceTypes/Logger.ts";
+import { DbServiceJoin, DbServiceObjJoin } from "./Models/DbService.ts";
+import {
+  DbUserJoin,
+  DbUserSenderJoin,
+  DbUserSenderJoin2,
+} from "./Models/DbUser.ts";
 
-export class DbGroupRepository extends DbRepository implements GroupRepository {
+export class DbGroupRepository extends DbRepository<Group>
+  implements GroupRepository {
   constructor(logging: Logger) {
     super(
       DbGroup,
@@ -33,6 +32,9 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
       "id",
       logging.withOwnContext("DbGroupRepository"),
     );
+  }
+  remove(group: OwnedGroups): Promise<void> {
+    return this.removeById(group.getId());
   }
 
   async update(item: Group): Promise<void> {
@@ -66,12 +68,7 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
     await this.updateInvitation(item);
   }
 
-  async findByDisplayName(name: string): Promise<Group> {
-    const searchedName = await DbGroup.where("groupname", name).first();
-    return this.hydrate(searchedName.id?.toString() ?? "");
-  }
-
-  async hydrate(searchedId: string): Promise<Group> {
+  override async hydrate(searchedId: string): Promise<Group> {
     const queryData = await DbGroup
       .select(
         DbGroup.field("groupname"),
@@ -324,25 +321,8 @@ export class DbGroupRepository extends DbRepository implements GroupRepository {
     await Promise.all(item.map(async (e) => await this.save(e)));
   }
 
-  async removeById(id: string): Promise<void> {
+  override async removeById(id: string): Promise<void> {
     await DbGroup.where("id", id).delete();
-  }
-
-  async findById(id: string): Promise<Group> {
-    if (!(await this.existId(id))) {
-      throw new NotFoundError("group", "id", id);
-    }
-    return this.hydrate(id);
-  }
-
-  async findAll(): Promise<Group[]> {
-    const all = DbGroup;
-    const groups = await all.all();
-    return Promise.all(
-      groups.map((group) => {
-        return this.hydrate(group.id?.toString() ?? "");
-      }),
-    );
   }
 
   async add(item: Group): Promise<void> {

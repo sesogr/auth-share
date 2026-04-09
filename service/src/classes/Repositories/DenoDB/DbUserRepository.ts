@@ -23,7 +23,8 @@ import { Entity } from "../../Entity.ts";
 import { ConflictError } from "../../errors/controllerErrors/ConflictError/ConflictError.ts";
 import { Logger } from "../../../../interfaceTypes/Logger.ts";
 
-export class DbUserRepository extends DbRepository implements UserRepository {
+export class DbUserRepository extends DbRepository<User>
+  implements UserRepository {
   constructor(logging: Logger) {
     super(
       DbUser,
@@ -106,41 +107,10 @@ export class DbUserRepository extends DbRepository implements UserRepository {
     return this.hydrate(aUser.dbuserId);
   }
 
-  async findByDisplayName(name: string): Promise<User> {
-    const aUser = await DbUser.where("displayname", name).first();
-    if (!aUser || !aUser.displayname) {
-      throw new NotFoundError("user", "displayname", name);
-    }
-    return this.hydrate(aUser.id);
-  }
-
-  async removeById(id: string): Promise<void> {
-    await DbUser.where("id", id).delete();
-  }
-
   async findBySessionToken(token: string): Promise<User> {
     const sessionId = Session.fromSessionTokenToSessionId(token);
     const sessionData = await DbSessions.where("id", sessionId).first();
     return this.hydrate(sessionData.dbuserId);
-  }
-
-  async findById(id: string): Promise<User> {
-    if (!(await this.existId(id))) {
-      throw new NotFoundError("user", "id", id);
-    }
-    return this.hydrate(id);
-  }
-
-  override async existId(id: string): Promise<boolean> {
-    return !!(await DbUser.where("id", id).first());
-  }
-
-  async findAll() {
-    const all = DbUser;
-    const allUserIDs = await all.all();
-    return Promise.all(allUserIDs.map((user) => {
-      return this.hydrate(user.id?.toString() ?? "");
-    }));
   }
 
   async add(item: User): Promise<void> {

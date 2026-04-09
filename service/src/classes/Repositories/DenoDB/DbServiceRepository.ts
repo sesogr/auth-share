@@ -10,7 +10,6 @@ import { DbUserJoin, DbUserSenderJoin } from "./Models/DbUser.ts";
 
 import { AllowedUserServiceMap } from "../../Values/AllowedUserServiceMap.ts";
 import { IdNameMap } from "../../Values/IdNameMap.ts";
-import { NotFoundError } from "../../errors/NotFoundError.ts";
 import { DbGroupService } from "./Models/DbGroupService.ts";
 import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
 import { RuntimeError } from "../../errors/RuntimeError.ts";
@@ -21,7 +20,7 @@ import { DbRepository } from "./DbRepository.ts";
 import { Values } from "@denodb/datatypes";
 import { Logger } from "../../../../interfaceTypes/Logger.ts";
 
-export class DbServiceRepository extends DbRepository
+export class DbServiceRepository extends DbRepository<Service>
   implements ServiceRepository {
   constructor(logging: Logger) {
     super(
@@ -36,8 +35,7 @@ export class DbServiceRepository extends DbRepository
     const userServiceData: Model[] = await DbUserService.where(
       "dbuser_id",
       userId,
-    )
-      .get() as Model[];
+    ).get() as Model[];
 
     return Promise.all(
       userServiceData.map((e: Model) => {
@@ -49,22 +47,10 @@ export class DbServiceRepository extends DbRepository
     );
   }
 
+  remove(service: OwnedService): Promise<void> {
+    return this.removeById(service.getId());
+  }
   findAuthorizedForId(_Id: string): Promise<Service[]> {
-    throw new Error("Method not implemented.");
-  }
-
-  async findById(id: string): Promise<Service> {
-    if ((await DbService.where("id", id).first()) === undefined) {
-      throw new NotFoundError("service", "id", id);
-    }
-    return this.hydrate(id);
-  }
-
-  findByDisplayName(_name: string): Promise<Service> {
-    throw new Error("Method not implemented.");
-  }
-
-  findAll(): Promise<Service[]> {
     throw new Error("Method not implemented.");
   }
 
@@ -180,11 +166,7 @@ export class DbServiceRepository extends DbRepository
     }
   }
 
-  removeById(_id: string): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
-  async hydrate(searchedId: string): Promise<Service> {
+  override async hydrate(searchedId: string): Promise<Service> {
     const queryData = await DbService
       .select(
         DbUserJoin.field("displayname", "allowedUserName"),
