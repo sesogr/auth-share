@@ -9,9 +9,10 @@ import { ServiceCredential } from "../Values/ServiceCredential.ts";
 import { User, ValidatedUser } from "./User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { DuplicateError } from "../errors/DuplicateError.ts";
+import { HasInvitations } from "../../../interfaceTypes/HasInvitations.ts";
 
 export type OwnedService = { zzz: never } & Service;
-export class Service extends Entity {
+export class Service extends Entity implements HasInvitations {
   public get serviceUrl(): string {
     return this._serviceUrl;
   }
@@ -21,7 +22,7 @@ export class Service extends Entity {
   public get allowedUsers(): AllowedUserServiceMap[] {
     return [...this._allowedUsers];
   }
-  public override get sentInvitations(): Invitation[] {
+  public get sentInvitations(): Invitation[] {
     return [...this._sentInvitations];
   }
   public get credentials(): ServiceCredential {
@@ -49,6 +50,7 @@ export class Service extends Entity {
     if (!this.allowedUsers.find((e) => e.getUserId == user.getId())) {
       throw new AuthorizationError(`You are not an Owner`);
     }
+    this.ownedService = true;
   }
   static createService(
     credentials: ServiceCredential,
@@ -118,6 +120,17 @@ export class Service extends Entity {
     return JSON.stringify(this.convertToSerializableObj());
   }
   private convertToSerializableObj(): ConvertedService {
+    if (!this.ownedService) {
+      return {
+        credentials: {
+          username: this._credentials.username!,
+          password: this._credentials.password!,
+        },
+        serviceName: this.getDisplayName(),
+        serviceUrl: this.serviceUrl,
+        id: this.id,
+      };
+    }
     return {
       credentials: {
         username: this._credentials.username!,

@@ -1,5 +1,5 @@
 import { Model } from "@denodb";
-import { Entity } from "../../Entity.ts";
+import type { Entity } from "../../../../interfaceTypes/Entity.ts";
 import { DbInvitation } from "./Models/DbInvitation.ts";
 import { AllowedGroupServiceMap } from "../../Values/AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "../../Values/AllowedUserGroupMap.ts";
@@ -9,6 +9,8 @@ import { Session } from "../../Session.ts";
 import { NotFoundError } from "../../errors/NotFoundError.ts";
 import { AlreadyTakenError } from "../../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 import { Logger } from "../../../../interfaceTypes/Logger.ts";
+import { DisplayableEntity } from "../../../../interfaceTypes/DisplayableEntity.ts";
+import { HasInvitations } from "../../../../interfaceTypes/HasInvitations.ts";
 
 export abstract class DbRepository {
   constructor(
@@ -81,13 +83,13 @@ export abstract class DbRepository {
     return !!(await this.model.where(this.displayname, displayname).first());
   }
 
-  async checkIdName(item: Entity): Promise<boolean> {
+  async checkIdName(item: DisplayableEntity): Promise<boolean> {
     const data = await this.model.where("id", item.getId()).first();
 
     return data && data[this.displayname] == item.getDisplayName();
   }
 
-  async save(item: Entity) {
+  async save(item: DisplayableEntity) {
     const idExists = await this.existId(item.getId());
     if (!idExists) {
       if (await this.existDisplayname(item.getDisplayName())) {
@@ -126,7 +128,7 @@ export abstract class DbRepository {
     await this.model.where(this.id, item.getId()).delete();
   }
 
-  protected async updateInvitation(item: Entity) {
+  protected async updateInvitation(item: Entity & HasInvitations) {
     const _invitationsModel = await DbInvitation.where(
       "obj_reference",
       item.getId(),

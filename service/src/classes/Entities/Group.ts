@@ -8,22 +8,23 @@ import { IdNameMap } from "../Values/IdNameMap.ts";
 import { Invitation } from "../Values/Invitation.ts";
 import { User, ValidatedUser } from "./User.ts";
 import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { HasInvitations } from "../../../interfaceTypes/HasInvitations.ts";
 
 export type OwnedGroups = Group & { zzz: never };
 
-export class Group extends Entity {
+export class Group extends Entity implements HasInvitations {
   public get serviceList(): AllowedGroupServiceMap[] {
     return this._serviceList;
   }
 
-  public override get sentInvitations(): Invitation[] {
+  public get sentInvitations(): Invitation[] {
     return [...this._sentInvitations];
   }
 
   public get allowedUser(): AllowedUserGroupMap[] {
     return [...this._allowedUser];
   }
-
+  private owned: boolean = false;
   public constructor(
     private groupname: string,
     private owner: IdNameMap,
@@ -46,6 +47,7 @@ export class Group extends Entity {
         `${user.getDisplayName()} doesn't own this Group`,
       );
     }
+    this.owned = true;
   }
 
   giveAuthorizationToUser(user: IdNameMap | User): void {
@@ -100,6 +102,7 @@ export class Group extends Entity {
         true,
       ),
     );
+    newGroup.owned = true;
     return newGroup;
   }
   sendInvitation(
@@ -149,6 +152,15 @@ export class Group extends Entity {
   }
 
   private showAll(): ConvertedGroup {
+    if (!this.owned) {
+      return {
+        id: this.getId(),
+        groupname: this.groupname,
+        owner: this.getOwner().displayname,
+        users: this.allowedUser.map((e) => e.getUsername),
+        serviceList: this.serviceList.map((e) => e.getServicename),
+      };
+    }
     return {
       id: this.getId(),
       groupname: this.groupname,
