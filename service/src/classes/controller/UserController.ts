@@ -135,7 +135,7 @@ export class UserController extends HeadController {
 
   async delete(c: Context) {
     try {
-      const me: User = this.getMeFromContext(c);
+      const me = this.getMeFromContext(c);
       await this.userRepository.delete(me);
       deleteCookie(c, "session");
       return c.body(null, 204);

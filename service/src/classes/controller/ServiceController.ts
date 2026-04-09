@@ -35,8 +35,11 @@ export class ServiceController extends HeadController {
       const serviceList = await this.serviceRepository.findOwnedByUserId(
         ME.getId(),
       );
-      const convertedList: ConvertedService[] = serviceList.map((e) =>
-        e.toJson()
+      const convertedList: ConvertedService[] = serviceList.map(
+        (e: Service) => {
+          e.checkOwner(ME);
+          return e.toJson();
+        },
       );
       return c.json(convertedList);
     } catch (error) {
