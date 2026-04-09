@@ -93,8 +93,37 @@ Deno.test("Group Class", async (t) => {
       assertEquals([testInvitation], listSentInvitation);
     },
   );
-  await t.step("Show All", () => {
-    const group = new Group(
+  await t.step("Show All as Owner", () => {
+    const group: Group = new Group(
+      "abc",
+      { displayname: "abc" } as IdNameMap,
+      "1ab",
+      [{ getServicename: "abc" }] as AllowedGroupServiceMap[],
+      [{ toString: () => "abc" }] as Invitation[],
+      [{ toString: () => "abc" }] as Invitation[],
+      [{ getUsername: "abc" }] as AllowedUserGroupMap[],
+    );
+    group.checkOwner({
+      convertToShort: () => {
+        return { equals: () => true };
+      },
+    } as unknown as User);
+    const convGroup: ConvertedGroup = {
+      id: group.getId(),
+      groupname: group.getDisplayName(),
+      owner: group.getOwner().displayname,
+      users: group.allowedUser.map((e) => e.getUsername),
+      serviceList: group.serviceList.map((e) => e.getServicename),
+      sentInvitations: group.sentInvitations.map((e) => e.toString()),
+      serviceInvitations: group.listServiceInvitation().map((e) =>
+        e.toString()
+      ),
+    };
+    assertEquals(group.toJson(), convGroup);
+    assertEquals(group.toJsonString(), JSON.stringify(convGroup));
+  });
+  await t.step("Show All not Owner", () => {
+    const group: Group = new Group(
       "abc",
       { displayname: "abc" } as IdNameMap,
       "1ab",
@@ -109,10 +138,6 @@ Deno.test("Group Class", async (t) => {
       owner: group.getOwner().displayname,
       users: group.allowedUser.map((e) => e.getUsername),
       serviceList: group.serviceList.map((e) => e.getServicename),
-      sentInvitations: group.sentInvitations.map((e) => e.toString()),
-      serviceInvitations: group.listServiceInvitation().map((e) =>
-        e.toString()
-      ),
     };
     assertEquals(group.toJson(), convGroup);
     assertEquals(group.toJsonString(), JSON.stringify(convGroup));

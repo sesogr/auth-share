@@ -8,6 +8,7 @@ import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
 import { ConvertedService } from "../../src/types/ConvertedService.ts";
+import { ValidatedUser } from "../../src/classes/Entities/User.ts";
 
 const serviceCredential = new ServiceCredential("", "");
 const userShort = await FakeObjectGen.createFakeUser(
@@ -78,13 +79,50 @@ Deno.test("Service Class", async (t) => {
   });
 
   await t.step("show all", () => {
-    const service = new Service(
+    const service: Service = new Service(
       { username: "ha", password: "ha" } as ServiceCredential,
       "abc",
       "asd",
       "adc",
       [{ toString: () => "adjf" }] as Invitation[],
       [{
+        getUserId: "bcd",
+        getUsername: "asd",
+        isOwner: true,
+      }, {
+        getUsername: "asdc",
+        isOwner: false,
+      }] as AllowedUserServiceMap[],
+      [{
+        getGroupname: "asd",
+      }] as AllowedGroupServiceMap[],
+    );
+    service.checkOwner({ getId: () => "bcd" } as ValidatedUser);
+    const data: ConvertedService = {
+      credentials: {
+        username: service.credentials.username!,
+        password: service.credentials.password!,
+      },
+      serviceName: service.getDisplayName(),
+      serviceUrl: service.serviceUrl,
+      groups: service.listAllowedGroups(),
+      users: service.listAllowedUsers(),
+      owners: service.listAllowedUsers(true),
+      sentInvitations: service.sentInvitations.map((e) => e.toString()),
+      id: service.getId(),
+    };
+    assertEquals(service.toJson(), data);
+    assertEquals(service.toJsonString(), JSON.stringify(data));
+  });
+  await t.step("show all restricted", () => {
+    const service: Service = new Service(
+      { username: "ha", password: "ha" } as ServiceCredential,
+      "abc",
+      "asd",
+      "adc",
+      [{ toString: () => "adjf" }] as Invitation[],
+      [{
+        getUserId: "bcd",
         getUsername: "asd",
         isOwner: true,
       }, {
@@ -102,9 +140,6 @@ Deno.test("Service Class", async (t) => {
       },
       serviceName: service.getDisplayName(),
       serviceUrl: service.serviceUrl,
-      groups: service.listAllowedGroups(),
-      users: service.listAllowedUsers(),
-      owners: service.listAllowedUsers(true),
       sentInvitations: service.sentInvitations.map((e) => e.toString()),
       id: service.getId(),
     };
