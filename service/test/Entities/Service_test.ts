@@ -140,7 +140,6 @@ Deno.test("Service Class", async (t) => {
       },
       serviceName: service.getDisplayName(),
       serviceUrl: service.serviceUrl,
-      sentInvitations: service.sentInvitations.map((e) => e.toString()),
       id: service.getId(),
     };
     assertEquals(service.toJson(), data);
