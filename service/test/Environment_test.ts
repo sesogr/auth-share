@@ -1,13 +1,16 @@
 import { Environment } from "../src/classes/Environment.ts";
 import { assertEquals, assertThrows } from "@std/assert";
 import { EnvError } from "../src/classes/errors/EnvError.ts";
+import { Logger } from "../interfaceTypes/Logger.ts";
+import { RamOnlyLog } from "./RamOnlyLog.ts";
 
 Deno.test("Environment variables should be loaded correctly", (_t) => {
+  const ramOnlyLogger: Logger = new RamOnlyLog();
   const testcase = (caseName: string) => {
     Deno.env.delete(caseName);
     assertThrows(
       () => {
-        Environment.load();
+        Environment.load(ramOnlyLogger);
       },
       EnvError,
       caseName,
@@ -23,7 +26,7 @@ Deno.test("Environment variables should be loaded correctly", (_t) => {
     Deno.env.set(variable, `test_${variable.toLowerCase()}`);
   });
   // Load environment variables
-  Environment.load();
+  Environment.load(ramOnlyLogger);
 
   // Assert that the environment variables are loaded correctly
   environmental.forEach((variable) => {
