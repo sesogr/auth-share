@@ -29,13 +29,17 @@ export class User extends Entity {
     super(id, username, "user");
   }
   // exception! Unique Username(rules like length, what kind of special characters, ..)
-  static createUser(credentials: UserCredential, displayName: string) {
+  static createUser(
+    credentials: UserCredential,
+    displayName: string,
+    id?: string,
+  ) {
     if (User.stringToLong(displayName)) {
       throw new NameTooLongError(
         "Your Username is too long, please use a Name with max 40 characters.",
       );
     }
-    const user: User = new User(credentials, displayName);
+    const user: User = new User(credentials, displayName, id);
     user.validated = true;
     user.checkValidation();
     return user;

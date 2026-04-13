@@ -93,8 +93,12 @@ export class Group extends Entity implements HasInvitations {
     return [...this.sentInvitations];
   }
 
-  static createUserGroup(groupname: string, owner: User): Group {
-    const newGroup = new Group(groupname, owner.convertToShort());
+  static createUserGroup(
+    groupname: string,
+    owner: ValidatedUser,
+    id?: string,
+  ): OwnedGroups {
+    const newGroup: Group = new Group(groupname, owner.convertToShort(), id);
     newGroup._allowedUser.push(
       new AllowedUserGroupMap(
         owner.convertToShort(),
@@ -103,6 +107,7 @@ export class Group extends Entity implements HasInvitations {
       ),
     );
     newGroup.owned = true;
+    newGroup.checkOwner(owner);
     return newGroup;
   }
   sendInvitation(

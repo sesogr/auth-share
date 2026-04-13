@@ -4,24 +4,29 @@ import { UserCredential } from "./Values/UserCredential.ts";
 import { Group } from "./Entities/Group.ts";
 import { Service } from "./Entities/Service.ts";
 import { ServiceCredential } from "./Values/ServiceCredential.ts";
+
 export class FakeObjectGen {
   static async createFakeUser(
     userName = faker.internet.userName(),
     password = faker.internet.password(7, true, /.* /, ""),
     displayname = faker.name.findName(),
-  ) {
+    id?: string,
+  ): Promise<ValidatedUser> {
     return User.createUser(
       await UserCredential.create(userName, password),
       displayname,
+      id,
     );
   }
   static async createFakeGroup(
     groupDisplayName = faker.internet.domainName(),
-    user?: User,
+    user?: ValidatedUser,
+    id?: string,
   ) {
     return Group.createUserGroup(
       groupDisplayName,
       user ?? await FakeObjectGen.createFakeUser(),
+      id,
     );
   }
   static async createFakeService(
@@ -49,7 +54,7 @@ export class FakeObjectGen {
   }
 
   static async generateFakeGroups(
-    userList: User[] = [],
+    userList: ValidatedUser[] = [],
     count: number = 10,
   ): Promise<Group[]> {
     const fakeGroupList: Group[] = [];

@@ -82,7 +82,7 @@ export class Service extends Entity implements HasInvitations {
     serviceName: string,
     serviceUrl: string,
     owner: ValidatedUser,
-    id: string = crypto.randomUUID(),
+    id?: string,
   ): OwnedService {
     const service: Service = new Service(
       credentials,
