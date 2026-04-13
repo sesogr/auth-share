@@ -7,21 +7,23 @@ import { Context } from "@hono/hono";
 import { Service } from "../Entities/Service.ts";
 import { ServiceCredential } from "../Values/ServiceCredential.ts";
 import { HeadController } from "./HeadController.ts";
-import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
 import { User } from "../Entities/User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { PromisesUtil } from "../PromissesUtil.ts";
 import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 import { ConvertedUser } from "../../types/types.ts";
-import { GroupRepository } from "../../../interfaceTypes/GroupRepository.ts";
 import { Group } from "../Entities/Group.ts";
 import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { RepositoryView } from "../../../interfaceTypes/RepositoryView.ts";
+import { ensureConvertedGroupIntegrity } from "../../types/ConvertedGroup.ts";
+import { WrongInvitationTypeError } from "../errors/controllerErrors/ConflictError/WrongInvitationTypeError.ts";
+import { Invitation } from "../Values/Invitation.ts";
 
 export class ServiceController extends HeadController {
   constructor(
     private readonly serviceRepository: ServiceRepository,
-    private readonly userRepository: UserRepository,
-    private readonly groupRepository: GroupRepository,
+    private readonly userRepository: RepositoryView<User>,
+    private readonly groupRepository: RepositoryView<Group>,
     logging: Logger,
   ) {
     super(logging.withOwnContext("ServiceController"));
@@ -151,11 +153,55 @@ export class ServiceController extends HeadController {
   }
   async acceptInvitation(c: Context) {
     try {
-      await Promise.all([() => {
-        this.logging.error("not implemented yet");
-        return Promise.resolve();
-      }]);
-      return c.body(null, 500);
+      const ME = this.getMeFromContext(c);
+      const data = await c.req.json();
+      ensureConvertedGroupIntegrity(data, ["id", "serviceInvitations"]);
+      const settled = await Promise.allSettled(
+        data.serviceInvitations.map(async (invitation) => {
+          const [sendername, objname, receivername, type] = invitation.split(
+            ":",
+          );
+          if (type !== "service") {
+            return Promise.reject(
+              new WrongInvitationTypeError(
+                invitation + " is not a service invitation",
+              ),
+            );
+          }
+          const group: Group = await this.groupRepository.findByDisplayName(
+            receivername,
+          );
+          group.checkOwner(ME);
+          const service: Service = await this.serviceRepository
+            .findByDisplayName(
+              objname,
+            );
+          const sender: User = await this.userRepository
+            .findByDisplayName(
+              sendername,
+            );
+          service.checkOwner(sender);
+          const acceptableInvite = new Invitation(
+            sender.convertToShort(),
+            service.convertToShort(),
+            group.convertToShort(),
+            "service",
+          );
+          service.acceptInvitation(acceptableInvite);
+          return Promise.resolve(acceptableInvite);
+        }),
+      );
+      const { fulfilled, rejected } = PromisesUtil.splitSettled<
+        Invitation,
+        Error
+      >(
+        settled,
+      );
+
+      return c.json({
+        fulfilled: fulfilled.map((e) => e.toString()),
+        rejected: rejected.map((e) => e.message),
+      });
     } catch (error) {
       return this.errorHandle(error, c);
     }
