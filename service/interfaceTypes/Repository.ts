@@ -1,7 +1,6 @@
-export type Repository<T> = {
-  findById(_id: string): Promise<T>;
-  findByDisplayName(_name: string): Promise<T>;
-  findAll(): Promise<T[]>;
+import { RepositoryView } from "./RepositoryView.ts";
+
+export type Repository<T> = RepositoryView<T> & {
   add(_item: T): Promise<void>;
   removeById(_id: string): Promise<void>;
   save(_item: T): Promise<void>;
