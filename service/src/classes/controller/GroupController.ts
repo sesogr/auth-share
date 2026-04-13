@@ -6,8 +6,6 @@ import {
   ensureConvertedGroupIntegrity,
 } from "../../types/ConvertedGroup.ts";
 import { Group } from "../Entities/Group.ts";
-import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
-import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
 import { PromisesUtil } from "../PromissesUtil.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { User } from "../Entities/User.ts";
@@ -17,12 +15,15 @@ import {
 } from "../../types/ConvertedUser.ts";
 import { Invitation } from "../Values/Invitation.ts";
 import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { RepositoryView } from "../../../interfaceTypes/RepositoryView.ts";
+import { Service } from "../Entities/Service.ts";
+import { WrongInvitationTypeError } from "../errors/controllerErrors/ConflictError/WrongInvitationTypeError.ts";
 
 export class GroupController extends HeadController {
   constructor(
     private readonly groupRepository: GroupRepository,
-    private readonly userRepository: UserRepository,
-    private readonly serviceRepository: ServiceRepository,
+    private readonly userRepository: RepositoryView<User>,
+    private readonly serviceRepository: RepositoryView<Service>,
     logging: Logger,
   ) {
     super(logging.withOwnContext("GroupController"));
@@ -75,9 +76,14 @@ export class GroupController extends HeadController {
       ensureConvertedUserIntegrity(userData, ["userGroupInvitations"]);
       const settledResults = await Promise.allSettled(
         userData.userGroupInvitations.map(async (invitationStr) => {
-          const [sender, obj, receiver] = invitationStr.split(":");
+          const [sender, obj, receiver, type] = invitationStr.split(":");
           if (receiver !== ME.getDisplayName()) {
             throw new Error();
+          }
+          if (type !== "group") {
+            throw new WrongInvitationTypeError(
+              invitationStr + " is not a group invitation",
+            );
           }
           const object: Group = await this.groupRepository.findByDisplayName(
             obj,

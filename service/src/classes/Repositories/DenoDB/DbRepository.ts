@@ -12,9 +12,10 @@ import { Logger } from "../../../../interfaceTypes/Logger.ts";
 import { DisplayableEntity } from "../../../../interfaceTypes/DisplayableEntity.ts";
 import { HasInvitations } from "../../../../interfaceTypes/HasInvitations.ts";
 import { Repository } from "../../../../interfaceTypes/Repository.ts";
+import { RepositoryView } from "../../../../interfaceTypes/RepositoryView.ts";
 
 export abstract class DbRepository<T extends DisplayableEntity>
-  implements Repository<T> {
+  implements Repository<T>, RepositoryView<T> {
   constructor(
     protected readonly model: typeof Model,
     protected readonly displayname: string,
