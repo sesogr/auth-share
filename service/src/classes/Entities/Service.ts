@@ -10,6 +10,7 @@ import { User, ValidatedUser } from "./User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { DuplicateError } from "../errors/DuplicateError.ts";
 import { HasInvitations } from "../../../interfaceTypes/HasInvitations.ts";
+import { IdNameMap } from "../Values/IdNameMap.ts";
 
 export type OwnedService = { zzz: never } & Service;
 export class Service extends Entity implements HasInvitations {
@@ -41,12 +42,36 @@ export class Service extends Entity implements HasInvitations {
   ) {
     super(id, serviceName, "service");
   }
-  giveAuthorizationToGroup(group: Group): void {
+  acceptInvitation(invitation: Invitation): void {
+    const realInviteIndex = this._sentInvitations.findIndex((e) =>
+      e.equals(invitation)
+    );
+    if (realInviteIndex === -1) {
+      throw new NotFoundError(
+        "Invitation",
+        "Invitation in Service",
+        invitation.toString(),
+      );
+    }
+    this._sentInvitations.splice(realInviteIndex, 1);
     this._allowedGroups.push(
-      new AllowedGroupServiceMap(group.convertToShort(), this.convertToShort()),
+      this.createAllowedGroupServiceMap(invitation.receiverReference),
     );
   }
-  checkOwner(user: ValidatedUser): asserts this is OwnedService {
+  giveAuthorizationToGroup(group: Group): void {
+    this._allowedGroups.push(
+      this.createAllowedGroupServiceMap(group.convertToShort()),
+    );
+  }
+
+  private createAllowedGroupServiceMap(group: IdNameMap) {
+    return new AllowedGroupServiceMap(
+      group,
+      this.convertToShort(),
+    );
+  }
+
+  checkOwner(user: User): asserts this is OwnedService {
     if (!this.allowedUsers.find((e) => e.getUserId == user.getId())) {
       throw new AuthorizationError(`You are not an Owner`);
     }
