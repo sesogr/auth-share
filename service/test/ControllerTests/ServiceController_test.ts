@@ -1,71 +1,115 @@
-import { Context } from "@hono/hono";
 import { ServiceController } from "../../src/classes/controller/ServiceController.ts";
-import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
-import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
-import { stub } from "@std/testing/mock";
 import { User } from "../../src/classes/Entities/User.ts";
-import { OwnedService, Service } from "../../src/classes/Entities/Service.ts";
-import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
-import { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 import { assertEquals } from "@std/assert";
 import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
+import { RepositoryView } from "../../interfaceTypes/RepositoryView.ts";
+import { Group } from "../../src/classes/Entities/Group.ts";
+import { TestContext } from "./TestContext.ts";
+import { TestServiceRepo } from "./TestServiceRepo.ts";
+import { TestUserRepo } from "./TestUserRepo.ts";
+import { TestGroupRepo } from "./TestGroupRepo.ts";
+import { NotFoundError } from "../../src/classes/errors/NotFoundError.ts";
+import { AlreadyTakenError } from "../../src/classes/errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
+import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
 
 Deno.test("ServiceController", async (t) => {
-  const service: Service = await FakeObjectGen.createFakeService();
-
-  const serviceRepo = {
-    data: [],
-    findOwnedByUserId(_a: string) {
-      return Promise.resolve([] as unknown as Service[]);
-    },
-    findById(_id: string): Promise<Service> {
-      return Promise.resolve(service);
-    },
-    save(...data: unknown[]) {
-      serviceRepo.data.push(...data);
-    },
-  } as unknown as ServiceRepository & { data: unknown[] };
+  const serviceRepo = TestServiceRepo.create();
   const ramLogger = new RamOnlyLog();
-  const userRepo = {} as UserRepository;
-  const user = { getId: () => "123" } as User;
-  const groupRepo = {} as GroupRepository;
+  const userRepo = TestUserRepo.create<RepositoryView<User>>();
+  const groupRepo = TestGroupRepo.create<RepositoryView<Group>>();
   const serviceController = new ServiceController(
     serviceRepo,
     userRepo,
     groupRepo,
     ramLogger,
   );
-  const _getMeFromContext = stub(
-    serviceController,
-    // @ts-ignore Protected
-    "getMeFromContext",
-    () => {
-      return user;
-    },
-  );
-  const mockContext = {
-    req: { json: () => service.toJson() },
-    res: {},
-    json: (e: object, statuscode: number) => {
-      return {
-        object: e,
-        status: statuscode,
-      };
-    },
-    body: (e: object, i: ContentfulStatusCode) => mockContext.json(e, i),
-  } as unknown as Context;
+  const fakeMe = await FakeObjectGen.createFakeUser();
+  const serviceList = await Promise.all([
+    1,
+    2,
+    3,
+    4,
+  ].map(() => FakeObjectGen.createFakeService(fakeMe)));
+  const userList: User[] = await Promise.all([
+    1,
+    2,
+    3,
+    4,
+  ].map(() => FakeObjectGen.createUnvalidatedUser()));
+  const convertedServiceList = serviceList.map((service) => service.toJson());
+  const mockContext = TestContext.create();
+  mockContext.registerOutput("get", fakeMe, true);
 
-  await t.step("list my Service", async () => {
-    const _serviceList =
-      (await serviceController.listMyServices(mockContext)) as unknown as [];
+  await t.step("list my Service", async (st) => {
+    await st.step("all good", async () => {
+      mockContext.reset();
+      serviceRepo.reset();
+      serviceRepo.registerOutput(
+        "findOwnedByUserId",
+        Promise.resolve(serviceList),
+      );
+      await serviceController.listMyServices(mockContext);
+      assertEquals(
+        mockContext.lastArgs("json")[0],
+        convertedServiceList,
+      );
+    });
   });
 
-  await t.step("add", async () => {
-    stub(Service, "createService", (a, b, c, d) => {
-      return [a, b, c, d] as unknown as OwnedService;
+  await t.step("add", async (st) => {
+    await st.step("all good", async () => {
+      mockContext.reset();
+      serviceRepo.reset();
+      mockContext.req.registerOutput("json", convertedServiceList[0]);
+      await serviceController.add(mockContext);
+      const savedService = serviceRepo.stub["save"].args[0][0];
+      assertEquals(savedService.credentials, serviceList[0].credentials);
+      assertEquals(
+        savedService.getDisplayName(),
+        serviceList[0].getDisplayName(),
+      );
+      assertEquals(savedService.serviceUrl, serviceList[0].serviceUrl);
+      assertEquals(mockContext.lastArgs("body"), [null, 201]);
     });
-    const response = await serviceController.add(mockContext);
-    assertEquals(response.status, 201);
+  });
+  await t.step("addUsersToService", async (st) => {
+    await st.step("all good", async () => {
+      mockContext.reset();
+      serviceRepo.reset();
+      userRepo.reset();
+      const serviceData = { ...convertedServiceList[0] };
+      serviceData.users = [
+        ...serviceData.users!,
+        userList[0].getDisplayName(),
+        userList[1].getDisplayName(),
+      ];
+      mockContext.req.registerOutput("json", serviceData);
+      serviceRepo.registerOutput("findById", Promise.resolve(serviceList[0]));
+      userRepo.registerOutput(
+        "findByDisplayName",
+        Promise.resolve(userList[0]),
+      );
+      userRepo.registerOutput(
+        "findByDisplayName",
+        Promise.resolve(userList[1]),
+      );
+      await serviceController.addUsersToService(mockContext);
+      const savedService = serviceRepo.stub["save"].args[0][0];
+      const response = mockContext.lastArgs("json") as [{
+        resolved: ConvertedUser[];
+        rejected: NotFoundError[];
+        alreadyIn: AlreadyTakenError[];
+      }, number];
+
+      assertEquals(savedService.toJson(), serviceData);
+      assertEquals(
+        response[0].resolved,
+        [userList[0], userList[1]].map((e) => e.toJson()),
+      );
+      assertEquals(response[0].rejected, []);
+      assertEquals(response[0].alreadyIn, []);
+      assertEquals(response[1], 200);
+    });
   });
 });
