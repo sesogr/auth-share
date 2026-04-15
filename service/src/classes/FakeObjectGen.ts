@@ -18,6 +18,22 @@ export class FakeObjectGen {
       id,
     );
   }
+  static async createUnvalidatedUser(
+    userName = faker.internet.userName(),
+    password = faker.internet.password(7, true, /.* /, ""),
+    displayname = faker.name.findName(),
+    id?: string,
+  ): Promise<User> {
+    const user = User.createUser(
+      await UserCredential.create(userName, password),
+      displayname,
+      id,
+    );
+    //@ts-ignore validated
+    user.validated = false;
+    return user;
+  }
+
   static async createFakeGroup(
     groupDisplayName = faker.internet.domainName(),
     user?: ValidatedUser,
