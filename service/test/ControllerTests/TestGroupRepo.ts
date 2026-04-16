@@ -1,11 +1,11 @@
 import { CustomTestStub } from "../CustomTestStub.ts";
-import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
+import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
 
-export class TestGroupRepo extends CustomTestStub<ServiceRepository> {
+export class TestGroupRepo extends CustomTestStub<GroupRepository> {
   private constructor() {
     super();
   }
-  static override create<T = ServiceRepository>(): T & TestGroupRepo {
+  static override create<T = GroupRepository>(): T & TestGroupRepo {
     return new TestGroupRepo() as T & TestGroupRepo;
   }
 }
