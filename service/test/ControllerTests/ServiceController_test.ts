@@ -5,19 +5,21 @@ import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
 import { RepositoryView } from "../../interfaceTypes/RepositoryView.ts";
 import { Group } from "../../src/classes/Entities/Group.ts";
-import { TestContext } from "./TestContext.ts";
-import { TestServiceRepo } from "./TestServiceRepo.ts";
-import { TestUserRepo } from "./TestUserRepo.ts";
-import { TestGroupRepo } from "./TestGroupRepo.ts";
+import { TestContext } from "../StubbedClasses/TestContext.ts";
+import { TestServiceRepo } from "../StubbedClasses/TestServiceRepo.ts";
+import { TestUserRepo } from "../StubbedClasses/TestUserRepo.ts";
+import { TestGroupRepo } from "../StubbedClasses/TestGroupRepo.ts";
 import { NotFoundError } from "../../src/classes/errors/NotFoundError.ts";
 import { AlreadyTakenError } from "../../src/classes/errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
+import { TestService } from "../StubbedClasses/TestService.ts";
 
 Deno.test("ServiceController", async (t) => {
   const serviceRepo = TestServiceRepo.create();
   const ramLogger = new RamOnlyLog();
   const userRepo = TestUserRepo.create<RepositoryView<User>>();
   const groupRepo = TestGroupRepo.create<RepositoryView<Group>>();
+  const mockedService = TestService.create();
   const serviceController = new ServiceController(
     serviceRepo,
     userRepo,
@@ -110,6 +112,36 @@ Deno.test("ServiceController", async (t) => {
       assertEquals(response[0].rejected, []);
       assertEquals(response[0].alreadyIn, []);
       assertEquals(response[1], 200);
+    });
+  });
+
+  await t.step("promoteUsersOfService", async (st) => {
+    await st.step("all good", async () => {
+      mockContext.reset();
+      serviceRepo.reset();
+      userRepo.reset();
+      mockedService.reset();
+      const serviceData = { ...convertedServiceList[0] };
+      serviceData["owners"] = ["1", "2", "3"];
+      mockContext.req.registerOutput("json", Promise.resolve(serviceData));
+      serviceRepo.registerOutput("findById", Promise.resolve(mockedService));
+      mockedService.registerOutput(
+        "promoteUser",
+        new AlreadyTakenError("", ""),
+      );
+      mockedService.registerOutput(
+        "promoteUser",
+        new NotFoundError("", "", ""),
+      );
+      await serviceController.promoteUsersOfService(mockContext);
+      assertEquals(serviceRepo.lastArgs("findById"), [serviceData.id]);
+      assertEquals(mockedService.stub["checkOwner"].args[0], [fakeMe]);
+      assertEquals(serviceRepo.lastArgs("save"), [mockedService]);
+      assertEquals(mockContext.lastArgs("json"), [{
+        promoted: ["3"],
+        alreadyIn: ["1"],
+        rejected: ["2"],
+      }]);
     });
   });
 });
