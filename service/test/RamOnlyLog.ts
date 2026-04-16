@@ -19,4 +19,7 @@ export class RamOnlyLog implements Logger {
   debug(...message: unknown[]): void {
     this.logList.push(["debug", message, this.context]);
   }
+  reset() {
+    this.logList = [];
+  }
 }
