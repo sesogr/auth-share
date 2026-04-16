@@ -16,34 +16,34 @@ export class TestUserRepo extends CustomTestStub<UserRepository>
     this.initializeStub("findBySessionToken");
     this.initializeStub("delete");
   }
+  findById(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  findByDisplayName(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  findAll(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  add(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  removeById(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  save(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  findByUserName(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  findBySessionToken(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  delete(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
   static override create<StaticT = UserRepository>(): StaticT & TestUserRepo {
     return new TestUserRepo() as StaticT & TestUserRepo;
-  }
-  findById(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findById");
-  }
-  findAll(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findAll");
-  }
-  add(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "add");
-  }
-  removeById(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "removeById");
-  }
-  save(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "save");
-  }
-  findByUserName(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findByUserName");
-  }
-  findBySessionToken(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findBySessionToken");
-  }
-  delete(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "delete");
-  }
-  findByDisplayName(...args: unknown[]) {
-    return this.fakeProcess(args, "findByDisplayName");
   }
 }

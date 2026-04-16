@@ -17,46 +17,46 @@ export class TestService extends CustomTestStub<Service>
     this.initializeStub("listAllowedGroups");
     this.initializeStub("toJsonString");
   }
+  acceptInvitation(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  giveAuthorizationToGroup(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  checkOwner(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  getDisplayName(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  promoteUser(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  listAllowedUsers(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  listAllowedGroups(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  giveAuthorizationToUser(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  toJsonString(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  toJson(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  sendInvitation(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  getId(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  convertToShort(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
   static override create<T = Service>(): T & TestService {
     return new TestService() as T & TestService;
-  }
-  acceptInvitation(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "acceptInvitation");
-  }
-  giveAuthorizationToGroup(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "giveAuthorizationToGroup");
-  }
-  checkOwner(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "checkOwner");
-  }
-  promoteUser(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "promoteUser");
-  }
-  listAllowedUsers(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "listAllowedUsers");
-  }
-  giveAuthorizationToUser(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "giveAuthorizationToUser");
-  }
-  sendInvitation(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "sendInvitation");
-  }
-  getDisplayName(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "getDisplayName");
-  }
-  listAllowedGroups(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "listAllowedGroups");
-  }
-  toJsonString(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "toJsonString");
-  }
-  toJson(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "toJson");
-  }
-  getId(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "getId");
-  }
-  convertToShort(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "convertToShort");
   }
 }

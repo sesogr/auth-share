@@ -3,8 +3,7 @@ import { CustomTestStub } from "../CustomTestStub.ts";
 import { HonoRequest } from "@hono/hono/request";
 import { ClassMethodsOnlyShape } from "../ClassMethodsOnlyShape.ts";
 
-export class TestContext extends CustomTestStub<Context>
-  implements ClassMethodsOnlyShape<Context> {
+export class TestContext extends CustomTestStub<Context> {
   req: TestRequest;
   res: TestResponse;
   private constructor() {
@@ -37,54 +36,6 @@ export class TestContext extends CustomTestStub<Context>
     this.res.reset(trueReset);
     super.reset(trueReset);
   }
-  render(...args: unknown[]) {
-    return this.fakeProcess(args, "render");
-  }
-  setLayout(...args: unknown[]) {
-    return this.fakeProcess(args, "setLayout");
-  }
-  setRenderer(...args: unknown[]) {
-    return this.fakeProcess(args, "setRenderer");
-  }
-  header(...args: unknown[]) {
-    return this.fakeProcess(args, "header");
-  }
-  status(...args: unknown[]) {
-    return this.fakeProcess(args, "status");
-  }
-  newResponse(...args: unknown[]) {
-    return this.fakeProcess(args, "newResponse");
-  }
-  text(...args: unknown[]) {
-    return this.fakeProcess(args, "text");
-  }
-  html(...args: unknown[]) {
-    return this.fakeProcess(args, "html");
-  }
-  redirect(...args: unknown[]) {
-    return this.fakeProcess(args, "redirect");
-  }
-  json(...args: unknown[]) {
-    return this.fakeProcess(args, "json");
-  }
-  body(...args: unknown[]) {
-    return this.fakeProcess(args, "body");
-  }
-  get(...args: unknown[]) {
-    return this.fakeProcess(args, "get");
-  }
-  env(...args: unknown[]) {
-    return this.fakeProcess(args, "env");
-  }
-  getLayout(...args: unknown[]) {
-    return this.fakeProcess(args, "getLayout");
-  }
-  set(...args: unknown[]) {
-    return this.fakeProcess(args, "set");
-  }
-  notFound(...args: unknown[]) {
-    return this.fakeProcess(args, "notFound");
-  }
 }
 
 class TestRequest extends CustomTestStub<HonoRequest>
@@ -105,45 +56,45 @@ class TestRequest extends CustomTestStub<HonoRequest>
     this.initializeStub("blob");
     this.initializeStub("formData");
   }
+  param(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  query(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  queries(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  header(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  parseBody(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  json(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  text(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  arrayBuffer(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  blob(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  formData(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  addValidatedData(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  valid(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
 
   static override create<T = HonoRequest>(): T & TestRequest {
     return new TestRequest() as T & TestRequest;
-  }
-  param(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "param");
-  }
-  query(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "query");
-  }
-  queries(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "queries");
-  }
-  header(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "header");
-  }
-  parseBody(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "parseBody");
-  }
-  text(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "text");
-  }
-  arrayBuffer(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "arrayBuffer");
-  }
-  blob(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "blob");
-  }
-  formData(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "formData");
-  }
-  addValidatedData(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "addValidatedData");
-  }
-  valid(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "valid");
-  }
-  json(...args: unknown[]) {
-    return this.fakeProcess(args, "json");
   }
 }
 
@@ -159,29 +110,29 @@ class TestResponse extends CustomTestStub<Context["res"]>
     this.initializeStub("bytes");
     this.initializeStub("clone");
   }
+  clone(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  arrayBuffer(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  blob(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  bytes(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  formData(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  json(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  text(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
   static override create<T = Context["res"]>() {
     return new TestResponse() as T & TestResponse;
-  }
-  clone(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "clone");
-  }
-  arrayBuffer(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "arrayBuffer");
-  }
-  blob(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "blob");
-  }
-  bytes(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "bytes");
-  }
-  formData(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "formData");
-  }
-  text(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "text");
-  }
-  json(...args: unknown[]) {
-    return this.fakeProcess(args, "json");
   }
 }
 

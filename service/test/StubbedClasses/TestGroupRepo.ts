@@ -15,36 +15,31 @@ export class TestGroupRepo extends CustomTestStub<GroupRepository>
     this.initializeStub("findOwnedByUserId");
     this.initializeStub("delete");
   }
-  findById(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findById");
+  findById(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
   }
-  findByDisplayName(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findByDisplayName");
+  findByDisplayName(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
   }
-
-  findAll(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findAll");
+  findAll(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
   }
-
-  add(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "add");
+  add(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
   }
-
-  removeById(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "removeById");
+  removeById(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
   }
-
-  save(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "save");
+  save(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
   }
-
-  findOwnedByUserId(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "findOwnedByUserId");
+  findOwnedByUserId(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
+  }
+  delete(..._args: unknown[]): unknown {
+    throw new Error("Method not implemented.");
   }
 
-  delete(...args: unknown[]): unknown {
-    return this.fakeProcess(args, "delete");
-  }
   static override create<T = GroupRepository>(): T & TestGroupRepo {
     return new TestGroupRepo() as T & TestGroupRepo;
   }

@@ -1,4 +1,5 @@
 import { CustomStubType } from "./CustomStubType.ts";
+import { ClassMethodsOnlyShape } from "./ClassMethodsOnlyShape.ts";
 
 export class CustomTestStub<T> {
   public get stub(): CustomStubType<T> {
@@ -8,8 +9,14 @@ export class CustomTestStub<T> {
     private readonly _stub: CustomStubType<T> = {} as CustomStubType<T>,
   ) {}
 
-  protected initializeStub<K extends keyof T>(key: K) {
+  protected initializeStub<K extends keyof ClassMethodsOnlyShape<T>>(
+    key: K,
+    fn?: (...args: unknown[]) => unknown,
+  ) {
     this._stub[key] = this.createInitialState<K>();
+    this[key] = fn as this[K] ?? ((...args: unknown[]) => {
+      return this.fakeProcess(args, key);
+    }) as this[K];
   }
 
   static create<StaticT>(): StaticT & CustomTestStub<never> {
