@@ -2,7 +2,7 @@ import { HeadController } from "../../src/classes/controller/HeadController.ts";
 import { ValidatedUser } from "../../src/classes/Entities/User.ts";
 import { Context } from "@hono/hono";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
-import { TestContext } from "./TestContext.ts";
+import { TestContext } from "../StubbedClasses/TestContext.ts";
 import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { assertEquals, assertThrows } from "@std/assert";
 import { SessionError } from "../../src/classes/errors/controllerErrors/SessionError.ts";
