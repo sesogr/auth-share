@@ -13,6 +13,7 @@ export class TestService extends CustomTestStub<Service>
     this.initializeStub("listAllowedUsers");
     this.initializeStub("giveAuthorizationToUser");
     this.initializeStub("sendInvitation");
+    this.initializeStub("convertToShort");
     this.initializeStub("getDisplayName");
     this.initializeStub("listAllowedGroups");
     this.initializeStub("toJsonString");
