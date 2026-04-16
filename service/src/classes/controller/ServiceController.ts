@@ -137,7 +137,7 @@ export class ServiceController extends HeadController {
             alreadyIn.push(toPromote);
           }
           if (error instanceof NotFoundError) {
-            alreadyIn.push(toPromote);
+            rejectedUsers.push(toPromote);
           }
         }
       });
