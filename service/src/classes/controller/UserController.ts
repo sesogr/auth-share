@@ -5,7 +5,6 @@ import { UserCredential } from "../Values/UserCredential.ts";
 import { ConvertedUser } from "../../types/types.ts";
 import { HonoCookieAdapter } from "../../adapter/HonoCookieAdapter.ts";
 
-const { deleteCookie, saveGetCookie, setCookie } = HonoCookieAdapter;
 import { HeadController } from "./HeadController.ts";
 import { Environment } from "../Environment.ts";
 import { ensureConvertedUserIntegrity } from "../../types/ConvertedUser.ts";
@@ -22,7 +21,7 @@ export class UserController extends HeadController {
 
   async authMiddleware(c: Context, next: () => Promise<void>) {
     try {
-      const sessionToken = saveGetCookie(c, "session");
+      const sessionToken = HonoCookieAdapter.saveGetCookie(c, "session");
       if (!sessionToken) {
         return this.errorHandle(new SessionError("No session token"), c);
       }
@@ -77,11 +76,11 @@ export class UserController extends HeadController {
 
   async logOut(c: Context) {
     try {
-      const sessionToken = saveGetCookie(c, "session");
+      const sessionToken = HonoCookieAdapter.saveGetCookie(c, "session");
       const user = await this.userRepository.findBySessionToken(sessionToken);
       user.deleteSessionByToken(sessionToken);
       await this.userRepository.save(user);
-      deleteCookie(c, "session");
+      HonoCookieAdapter.deleteCookie(c, "session");
       return c.body(null, 200);
     } catch (error) {
       return this.errorHandle(error, c);
@@ -102,7 +101,7 @@ export class UserController extends HeadController {
           "",
         );
       await this.userRepository.save(userToCheck);
-      setCookie(c, "session", token, {
+      HonoCookieAdapter.setCookie(c, "session", token, {
         domain: URL,
         path: "/",
         secure: true,
@@ -137,7 +136,7 @@ export class UserController extends HeadController {
     try {
       const me = this.getMeFromContext(c);
       await this.userRepository.delete(me);
-      deleteCookie(c, "session");
+      HonoCookieAdapter.deleteCookie(c, "session");
       return c.body(null, 204);
     } catch (error) {
       return this.errorHandle(error, c);
