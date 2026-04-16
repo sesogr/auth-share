@@ -4,8 +4,8 @@ import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ControllerError } from "../errors/controllerErrors/ControllerError.ts";
 import { Logger } from "../../../interfaceTypes/Logger.ts";
 
-export class HeadController {
-  constructor(readonly logging: Logger) {
+export abstract class HeadController {
+  protected constructor(readonly logging: Logger) {
   }
   protected getMeFromContext(c: Context): ValidatedUser {
     const me: User = c.get("currentUser");
@@ -15,7 +15,7 @@ export class HeadController {
     me.checkValidation();
     return me;
   }
-  errorHandle(error: unknown, c: Context) {
+  protected errorHandle(error: unknown, c: Context) {
     if (error instanceof ControllerError) {
       this.logging.warn(error);
       return c.json(error, error.errorCode);
