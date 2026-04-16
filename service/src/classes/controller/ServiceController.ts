@@ -45,7 +45,7 @@ export class ServiceController extends HeadController {
       );
       return c.json(convertedList);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
 
@@ -156,6 +156,10 @@ export class ServiceController extends HeadController {
       const ME = this.getMeFromContext(c);
       const data = await c.req.json();
       ensureConvertedGroupIntegrity(data, ["id", "serviceInvitations"]);
+      const group: Group = await this.groupRepository.findById(
+        data.id,
+      );
+      group.checkOwner(ME);
       const settled = await Promise.allSettled(
         data.serviceInvitations.map(async (invitation) => {
           const [sendername, objname, receivername, type] = invitation.split(
@@ -168,10 +172,11 @@ export class ServiceController extends HeadController {
               ),
             );
           }
-          const group: Group = await this.groupRepository.findByDisplayName(
-            receivername,
-          );
-          group.checkOwner(ME);
+          if (receivername != group.getDisplayName()) {
+            throw new WrongInvitationTypeError(
+              invitation + " is not for this Group",
+            );
+          }
           const service: Service = await this.serviceRepository
             .findByDisplayName(
               objname,
@@ -188,6 +193,7 @@ export class ServiceController extends HeadController {
             "service",
           );
           service.acceptInvitation(acceptableInvite);
+          await this.serviceRepository.save(service);
           return Promise.resolve(acceptableInvite);
         }),
       );
@@ -254,7 +260,7 @@ export class ServiceController extends HeadController {
       await this.serviceRepository.delete(service);
       return c.body(null, 204);
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
 }
