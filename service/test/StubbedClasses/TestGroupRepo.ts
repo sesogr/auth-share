@@ -1,9 +1,8 @@
-import { CustomTestStub } from "../CustomTestStub.ts";
+import { FilterAndMapMethodsToUnknown, StubFullType } from "@stubClass";
 import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
-import { ClassMethodsOnlyShape } from "../ClassMethodsOnlyShape.ts";
 
-export class TestGroupRepo extends CustomTestStub<GroupRepository>
-  implements ClassMethodsOnlyShape<GroupRepository> {
+export class TestGroupRepo extends StubFullType<GroupRepository>
+  implements FilterAndMapMethodsToUnknown<GroupRepository> {
   private constructor() {
     super();
     this.initializeStub("findById");

@@ -1,7 +1,7 @@
-import { CustomTestStub } from "../CustomTestStub.ts";
+import { StubFullType } from "@stubClass";
 import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
 
-export class TestServiceRepo extends CustomTestStub<ServiceRepository> {
+export class TestServiceRepo extends StubFullType<ServiceRepository> {
   private constructor() {
     super();
     this.initializeStub("findOwnedByUserId");

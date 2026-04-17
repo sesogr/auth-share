@@ -1,7 +1,7 @@
-import { CustomTestStub } from "../CustomTestStub.ts";
+import { StubFullType } from "@stubClass";
 import type { User } from "../../src/classes/Entities/User.ts";
 
-export class TestUser extends CustomTestStub<User> {
+export class TestUser extends StubFullType<User> {
   static override create<T = User>(): T & TestUser {
     return new TestUser() as T & TestUser;
   }
@@ -33,7 +33,7 @@ export class TestUser extends CustomTestStub<User> {
   }
 }
 
-class TestCredentials extends CustomTestStub<User["credentials"]> {
+class TestCredentials extends StubFullType<User["credentials"]> {
   private constructor() {
     super();
     this.initializeStub("copy");

@@ -1,9 +1,8 @@
 import { Context } from "@hono/hono";
-import { CustomTestStub } from "../CustomTestStub.ts";
+import { FilterAndMapMethodsToUnknown, StubFullType } from "@stubClass";
 import { HonoRequest } from "@hono/hono/request";
-import { ClassMethodsOnlyShape } from "../ClassMethodsOnlyShape.ts";
 
-export class TestContext extends CustomTestStub<Context> {
+export class TestContext extends StubFullType<Context> {
   req: TestRequest;
   res: TestResponse;
   private constructor() {
@@ -38,8 +37,8 @@ export class TestContext extends CustomTestStub<Context> {
   }
 }
 
-class TestRequest extends CustomTestStub<HonoRequest>
-  implements ClassMethodsOnlyShape<HonoRequest> {
+class TestRequest extends StubFullType<HonoRequest>
+  implements FilterAndMapMethodsToUnknown<HonoRequest> {
   private constructor() {
     super();
     this.initializeStub("json");
@@ -98,8 +97,8 @@ class TestRequest extends CustomTestStub<HonoRequest>
   }
 }
 
-class TestResponse extends CustomTestStub<Context["res"]>
-  implements ClassMethodsOnlyShape<Context["res"]> {
+class TestResponse extends StubFullType<Context["res"]>
+  implements FilterAndMapMethodsToUnknown<Context["res"]> {
   private constructor() {
     super();
     this.initializeStub("json");

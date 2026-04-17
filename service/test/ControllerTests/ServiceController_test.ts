@@ -75,7 +75,7 @@ Deno.test("ServiceController", async (t) => {
       mockContext.reset();
       serviceRepo.reset();
       mockContext.req.registerOutput("json", convertedServiceList[0]);
-      await serviceController.add(mockContext);
+      await serviceController.add(mockContext); //todo add return
       const savedService = serviceRepo.stub["save"].args[0][0];
       assertEquals(savedService.credentials, serviceList[0].credentials);
       assertEquals(
@@ -245,26 +245,16 @@ Deno.test("ServiceController", async (t) => {
         await serviceController.listMyServices(
           mockContext,
         ) as unknown as string,
-      );
-      returned.push(
         await serviceController.add(mockContext) as unknown as string,
-      );
-      returned.push(
         await serviceController.addUsersToService(
           mockContext,
         ) as unknown as string,
-      );
-      returned.push(
         await serviceController.promoteUsersOfService(
           mockContext,
         ) as unknown as string,
-      );
-      returned.push(
         await serviceController.acceptInvitation(
           mockContext,
         ) as unknown as string,
-      );
-      returned.push(
         await serviceController.delete(mockContext) as unknown as string,
       );
 

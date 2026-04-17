@@ -1,9 +1,8 @@
-import { CustomTestStub } from "../CustomTestStub.ts";
+import { type FilterAndMapMethodsToUnknown, StubFullType } from "@stubClass";
 import { Service } from "../../src/classes/Entities/Service.ts";
-import { ClassMethodsOnlyShape } from "../ClassMethodsOnlyShape.ts";
 
-export class TestService extends CustomTestStub<Service>
-  implements ClassMethodsOnlyShape<Service> {
+export class TestService extends StubFullType<Service>
+  implements FilterAndMapMethodsToUnknown<Service> {
   private constructor() {
     super();
     this.initializeStub("acceptInvitation");
@@ -17,6 +16,8 @@ export class TestService extends CustomTestStub<Service>
     this.initializeStub("getDisplayName");
     this.initializeStub("listAllowedGroups");
     this.initializeStub("toJsonString");
+    this.initializeStub("toJson");
+    this.initializeStub("getId");
   }
   acceptInvitation(..._args: unknown[]): unknown {
     throw new Error("Method not implemented.");

@@ -564,7 +564,11 @@
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/util/save-async-stack.js": "07e4c038f79ac78209ef8584c8bfdee99572a80e024075cf89940af42f482360",
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/util/template.js": "be90a9fbc75793a69d6560875da64100796750efb9becaca7dcbf6ae334f1af2",
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/util/timeout.js": "2aeebed1e5c8dacf20e78044d5cae0c350538ba4e1f331e7f67dad997cd22262",
-    "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/mod-dyn.ts": "29ff4dc44941b869973832e11d06822efabbf865059910a39ab5136c832e0d4a"
+    "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/mod-dyn.ts": "29ff4dc44941b869973832e11d06822efabbf865059910a39ab5136c832e0d4a",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/heads/master/lib/StubFullType.ts": "e6af68c3bbec762390c53b07e9436cd19e31d5ff2e4f505e1597ac990c0a8e05",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/heads/master/lib/types/FilterAndMapMethodsToUnknown.ts": "c4076520d9113d484a58c49cb7d0b1c9e467b8f64236feed98574d93261ca159",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/heads/master/lib/types/Stub.ts": "cfae09f508d8446621700fcb66a8b1d61ed73c029b81cc947b8cdbd68ef6849f",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/heads/master/mod.ts": "f1d73548388e3cac0d55cd2daba7dabb4e5dc012d2c615afdb909929f764f728"
   },
   "workspace": {
     "dependencies": [

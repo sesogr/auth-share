@@ -1,7 +1,7 @@
-import { CustomTestStub } from "../CustomTestStub.ts";
+import { StubFullType } from "@stubClass";
 import { Group } from "../../src/classes/Entities/Group.ts";
 
-export class TestGroup extends CustomTestStub<Group> {
+export class TestGroup extends StubFullType<Group> {
   private constructor() {
     super();
     this.initializeStub("getId");

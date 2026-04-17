@@ -1,9 +1,8 @@
-import { CustomTestStub } from "../CustomTestStub.ts";
+import { FilterAndMapMethodsToUnknown, StubFullType } from "@stubClass";
 import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
-import { ClassMethodsOnlyShape } from "../ClassMethodsOnlyShape.ts";
 
-export class TestUserRepo extends CustomTestStub<UserRepository>
-  implements ClassMethodsOnlyShape<UserRepository> {
+export class TestUserRepo extends StubFullType<UserRepository>
+  implements FilterAndMapMethodsToUnknown<UserRepository> {
   private constructor() {
     super();
     this.initializeStub("findByDisplayName");
