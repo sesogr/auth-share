@@ -18,19 +18,22 @@ import { TestUser } from "../StubbedClasses/TestUser.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { Invitation } from "../../src/classes/Values/Invitation.ts";
 import { stub } from "@std/testing/mock";
+import { StubFullType } from "@stubClass";
 
 Deno.test("ServiceController", async (t) => {
   const serviceRepo = TestServiceRepo.create();
   const ramLogger = new RamOnlyLog();
-  const userRepo = TestUserRepo.create<RepositoryView<User>>();
-  const groupRepo = TestGroupRepo.create<RepositoryView<Group>>();
+  const userRepo = TestUserRepo.create() as StubFullType<RepositoryView<User>>;
+  const groupRepo = TestGroupRepo.create() as StubFullType<
+    RepositoryView<Group>
+  >;
   const mockedService = TestService.create();
   const mockedUser = TestUser.create();
   const mockedGroup = TestGroup.create();
   const serviceController = new ServiceController(
-    serviceRepo,
-    userRepo,
-    groupRepo,
+    serviceRepo.this,
+    userRepo.this,
+    groupRepo.this,
     ramLogger,
   );
   const fakeMe = await FakeObjectGen.createFakeUser();
@@ -62,7 +65,7 @@ Deno.test("ServiceController", async (t) => {
         "findOwnedByUserId",
         Promise.resolve(serviceList),
       );
-      await serviceController.listMyServices(mockContext);
+      await serviceController.listMyServices(mockContext.this);
       assertEquals(
         mockContext.lastArgs("json")[0],
         convertedServiceList,
@@ -75,7 +78,7 @@ Deno.test("ServiceController", async (t) => {
       mockContext.reset();
       serviceRepo.reset();
       mockContext.req.registerOutput("json", convertedServiceList[0]);
-      await serviceController.add(mockContext); //todo add return
+      await serviceController.add(mockContext.this); //todo add return
       const savedService = serviceRepo.stub["save"].args[0][0];
       assertEquals(savedService.credentials, serviceList[0].credentials);
       assertEquals(
@@ -107,7 +110,7 @@ Deno.test("ServiceController", async (t) => {
         "findByDisplayName",
         Promise.resolve(userList[1]),
       );
-      await serviceController.addUsersToService(mockContext);
+      await serviceController.addUsersToService(mockContext.this);
       const savedService = serviceRepo.stub["save"].args[0][0];
       const response = mockContext.lastArgs("json") as [{
         resolved: ConvertedUser[];
@@ -146,7 +149,7 @@ Deno.test("ServiceController", async (t) => {
       );
       mockContext.registerOutput("json", Promise.resolve("returned"));
       const returned = (await serviceController.promoteUsersOfService(
-        mockContext,
+        mockContext.this,
       )) as unknown as string;
       assertEquals(returned, "returned");
       assertEquals(serviceRepo.lastArgs("findById"), [serviceData.id]);
@@ -186,7 +189,7 @@ Deno.test("ServiceController", async (t) => {
       mockedGroup.registerOutput("convertToShort", idNameMap, true);
       mockContext.registerOutput("json", Promise.resolve("returned"));
       const returned = await serviceController.acceptInvitation(
-        mockContext,
+        mockContext.this,
       ) as unknown as string;
       assertEquals(returned, "returned");
       assertEquals(mockContext.lastArgs("json"), [{
@@ -194,9 +197,9 @@ Deno.test("ServiceController", async (t) => {
         rejected: ["generic"],
       }]);
       assertEquals(mockedGroup.stub["checkOwner"].args[0], [fakeMe]);
-      assertEquals(mockedService.stub["checkOwner"].args[0], [mockedUser]);
+      assertEquals(mockedService.stub["checkOwner"].args[0], [mockedUser.this]);
       assertEquals(mockedService.stub["acceptInvitation"].args[0], [invite]);
-      assertEquals(serviceRepo.stub["save"].args[0], [mockedService]);
+      assertEquals(serviceRepo.stub["save"].args[0], [mockedService.this]);
       serviceRepo.reset(true);
       userRepo.reset(true);
       mockedService.reset(true);
@@ -216,7 +219,7 @@ Deno.test("ServiceController", async (t) => {
       );
       mockContext.registerOutput("body", "returned");
       const returned =
-        (await serviceController.delete(mockContext)) as unknown as string;
+        (await serviceController.delete(mockContext.this)) as unknown as string;
       assertEquals(returned, "returned");
       assertEquals(mockContext.lastArgs("body"), [null, 204]);
       assertEquals(serviceRepo.lastArgs("findById"), [
@@ -243,19 +246,19 @@ Deno.test("ServiceController", async (t) => {
       const returned: string[] = [];
       returned.push(
         await serviceController.listMyServices(
-          mockContext,
+          mockContext.this,
         ) as unknown as string,
-        await serviceController.add(mockContext) as unknown as string,
+        await serviceController.add(mockContext.this) as unknown as string,
         await serviceController.addUsersToService(
-          mockContext,
+          mockContext.this,
         ) as unknown as string,
         await serviceController.promoteUsersOfService(
-          mockContext,
+          mockContext.this,
         ) as unknown as string,
         await serviceController.acceptInvitation(
-          mockContext,
+          mockContext.this,
         ) as unknown as string,
-        await serviceController.delete(mockContext) as unknown as string,
+        await serviceController.delete(mockContext.this) as unknown as string,
       );
 
       function createListWithCountOfMethodCalls<K>(returned1: K): K[] {

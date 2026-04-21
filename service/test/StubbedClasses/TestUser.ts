@@ -2,30 +2,31 @@ import { StubFullType } from "@stubClass";
 import type { User } from "../../src/classes/Entities/User.ts";
 
 export class TestUser extends StubFullType<User> {
-  static override create<T = User>(): T & TestUser {
-    return new TestUser() as T & TestUser;
+  static create() {
+    return new TestUser();
   }
   readonly _credentials: TestCredentials;
   private constructor() {
-    super();
+    super([
+      "listJoinedGroups",
+      "getId",
+      "getDisplayName",
+      "deleteSessionByToken",
+      "deleteSession",
+      "createSession",
+      "convertToShort",
+      "checkValidation",
+      "changeUserCredentials",
+      "getCredentials",
+      "validateSession",
+      "toJsonString",
+      "setDisplayName",
+      "toJson",
+      "listUserGroupInvitation",
+      "removeInvitation",
+      "listServices",
+    ]);
     this._credentials = TestCredentials.create();
-    this.initializeStub("getId");
-    this.initializeStub("getDisplayName");
-    this.initializeStub("toJsonString");
-    this.initializeStub("toJson");
-    this.initializeStub("convertToShort");
-    this.initializeStub("validateSession");
-    this.initializeStub("getCredentials", () => this._credentials);
-    this.initializeStub("changeUserCredentials");
-    this.initializeStub("deleteSession");
-    this.initializeStub("deleteSessionByToken");
-    this.initializeStub("listServices");
-    this.initializeStub("listJoinedGroups");
-    this.initializeStub("createSession");
-    this.initializeStub("removeInvitation");
-    this.initializeStub("listUserGroupInvitation");
-    this.initializeStub("setDisplayName");
-    this.initializeStub("checkValidation");
   }
   override reset(trueReset: boolean = false) {
     this._credentials.reset(trueReset);
@@ -35,16 +36,17 @@ export class TestUser extends StubFullType<User> {
 
 class TestCredentials extends StubFullType<User["credentials"]> {
   private constructor() {
-    super();
-    this.initializeStub("copy");
-    this.initializeStub("equals");
-    this.initializeStub("toString");
-    this.initializeStub("with");
-    this.initializeStub("verifyPasswordHash");
-    this.initializeStub("changePassword");
-    this.initializeStub("assertsVerification");
+    super([
+      "changePassword",
+      "verifyPasswordHash",
+      "copy",
+      "equals",
+      "with",
+      "assertsVerification",
+      "toString",
+    ]);
   }
-  static override create<T = User["credentials"]>(): T & TestCredentials {
-    return new TestCredentials() as T & TestCredentials;
+  static create() {
+    return new TestCredentials();
   }
 }

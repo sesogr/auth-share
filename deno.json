@@ -11,6 +11,7 @@
     "cover": "deno coverage --lcov > coverage/lcov.info"
   },
   "imports": {
+    "@stubClass": "https://raw.githubusercontent.com/vhusername123/StubClass/master/mod.ts",
     "@bcrypt": "https://deno.land/x/bcrypt/mod.ts",
     "@std/encoding": "jsr:@std/encoding",
     "@ant-design/icons": "npm:@ant-design/icons@^6.1.0",

@@ -1,34 +1,35 @@
 import { Context } from "@hono/hono";
-import { FilterAndMapMethodsToUnknown, StubFullType } from "@stubClass";
+import { StubFullType } from "@stubClass";
 import { HonoRequest } from "@hono/hono/request";
 
 export class TestContext extends StubFullType<Context> {
   req: TestRequest;
   res: TestResponse;
   private constructor() {
-    super();
-    this.initializeStub("json");
-    this.initializeStub("body");
-    this.initializeStub("get");
-    this.initializeStub("set");
-    this.initializeStub("notFound");
-    this.initializeStub("getLayout");
-    this.initializeStub("env");
-    this.initializeStub("render");
-    this.initializeStub("setLayout");
-    this.initializeStub("setRenderer");
-    this.initializeStub("header");
-    this.initializeStub("status");
-    this.initializeStub("newResponse");
-    this.initializeStub("text");
-    this.initializeStub("html");
-    this.initializeStub("redirect");
+    super([
+      "body",
+      "status",
+      "setRenderer",
+      "setLayout",
+      "text",
+      "set",
+      "render",
+      "redirect",
+      "notFound",
+      "newResponse",
+      "json",
+      "html",
+      "header",
+      "getLayout",
+      "get",
+      "env",
+    ]);
     this.req = TestRequest.create();
     this.res = TestResponse.create();
   }
 
-  static override create<T = Context>(): T & TestContext {
-    return new TestContext() as T & TestContext;
+  static create() {
+    return new TestContext();
   }
   override reset(trueReset: boolean = false) {
     this.req.reset(trueReset);
@@ -37,101 +38,42 @@ export class TestContext extends StubFullType<Context> {
   }
 }
 
-class TestRequest extends StubFullType<HonoRequest>
-  implements FilterAndMapMethodsToUnknown<HonoRequest> {
+class TestRequest extends StubFullType<HonoRequest> {
   private constructor() {
-    super();
-    this.initializeStub("json");
-    this.initializeStub("text");
-    this.initializeStub("param");
-    this.initializeStub("query");
-    this.initializeStub("queries");
-    this.initializeStub("header");
-    this.initializeStub("parseBody");
-    this.initializeStub("text");
-    this.initializeStub("arrayBuffer");
-    this.initializeStub("valid");
-    this.initializeStub("addValidatedData");
-    this.initializeStub("blob");
-    this.initializeStub("formData");
+    super([
+      "header",
+      "valid",
+      "query",
+      "queries",
+      "parseBody",
+      "param",
+      "formData",
+      "blob",
+      "arrayBuffer",
+      "addValidatedData",
+      "text",
+      "json",
+    ]);
   }
-  param(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  query(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  queries(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  header(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  parseBody(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  json(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  text(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  arrayBuffer(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  blob(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  formData(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  addValidatedData(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  valid(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-
-  static override create<T = HonoRequest>(): T & TestRequest {
-    return new TestRequest() as T & TestRequest;
+  static create() {
+    return new TestRequest();
   }
 }
 
-class TestResponse extends StubFullType<Context["res"]>
-  implements FilterAndMapMethodsToUnknown<Context["res"]> {
+class TestResponse extends StubFullType<Context["res"]> {
   private constructor() {
-    super();
-    this.initializeStub("json");
-    this.initializeStub("text");
-    this.initializeStub("arrayBuffer");
-    this.initializeStub("blob");
-    this.initializeStub("formData");
-    this.initializeStub("bytes");
-    this.initializeStub("clone");
+    super([
+      "text",
+      "clone",
+      "bytes",
+      "json",
+      "formData",
+      "blob",
+      "arrayBuffer",
+    ]);
   }
-  clone(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  arrayBuffer(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  blob(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  bytes(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  formData(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  json(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  text(..._args: unknown[]): unknown {
-    throw new Error("Method not implemented.");
-  }
-  static override create<T = Context["res"]>() {
-    return new TestResponse() as T & TestResponse;
+  static create() {
+    return new TestResponse();
   }
 }
 

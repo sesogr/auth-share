@@ -3,22 +3,24 @@ import { Group } from "../../src/classes/Entities/Group.ts";
 
 export class TestGroup extends StubFullType<Group> {
   private constructor() {
-    super();
-    this.initializeStub("getId");
-    this.initializeStub("getDisplayName");
-    this.initializeStub("toJsonString");
-    this.initializeStub("toJson");
-    this.initializeStub("convertToShort");
-    this.initializeStub("giveAuthorizationToUser");
-    this.initializeStub("listAllowedUsers");
-    this.initializeStub("sendInvitation");
-    this.initializeStub("acceptInvitation");
-    this.initializeStub("listSentInvitation");
-    this.initializeStub("listServiceInvitation");
-    this.initializeStub("sendMultipleInvitations");
-    this.initializeStub("checkOwner");
+    super([
+      "getId",
+      "sendMultipleInvitations",
+      "listServiceInvitation",
+      "listSentInvitation",
+      "getOwner",
+      "convertToShort",
+      "sendInvitation",
+      "listAllowedUsers",
+      "giveAuthorizationToUser",
+      "checkOwner",
+      "acceptInvitation",
+      "toJsonString",
+      "toJson",
+      "getDisplayName",
+    ]);
   }
-  static override create<T = Group>(): T & TestGroup {
-    return new TestGroup() as T & TestGroup;
+  static create() {
+    return new TestGroup();
   }
 }

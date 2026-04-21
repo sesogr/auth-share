@@ -37,7 +37,7 @@ Deno.test("HeadController", async (t) => {
       context.reset();
       context.registerOutput("get", user);
       const me: ValidatedUser = headController.unprotectGetMeFromContext(
-        context,
+        context.this,
       );
       assertEquals(me, user);
       assertEquals(context.stub["get"]["args"][0][0], "currentUser");
@@ -46,7 +46,7 @@ Deno.test("HeadController", async (t) => {
       context.reset();
       assertThrows(
         () => {
-          headController.unprotectGetMeFromContext(context);
+          headController.unprotectGetMeFromContext(context.this);
         },
         SessionError,
         "No user in context",
@@ -61,7 +61,7 @@ Deno.test("HeadController", async (t) => {
         "test Message",
         statusCode,
       );
-      headController.unProtectedErrorHandle(error, context);
+      headController.unProtectedErrorHandle(error, context.this);
       assertEquals(context.lastArgs("json"), [error, statusCode]);
       assertEquals(headController.getLog().logList[0], [
         "warn",
@@ -73,7 +73,7 @@ Deno.test("HeadController", async (t) => {
       context.reset();
       ramLogger.reset();
       const error = new Error("testMessage");
-      headController.unProtectedErrorHandle(error, context);
+      headController.unProtectedErrorHandle(error, context.this);
       assertEquals(context.lastArgs("body"), [null, 500]);
       assertEquals(headController.getLog().logList[0], [
         "error",
@@ -89,7 +89,7 @@ Deno.test("HeadController", async (t) => {
         test2: () => "test2",
         toString: () => "stringMethod",
       };
-      headController.unProtectedErrorHandle(someObject, context);
+      headController.unProtectedErrorHandle(someObject, context.this);
       assertEquals(context.lastArgs("body"), [null, 500]);
       assertEquals(ramLogger.logList[0], [
         "error",

@@ -11,7 +11,7 @@ import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
 Deno.test("UserController - Test", async (t) => {
   const goodReturn = "returned";
   const userRepo = TestUserRepo.create();
-  const userController = new UserController(userRepo, new RamOnlyLog());
+  const userController = new UserController(userRepo.this, new RamOnlyLog());
   const errorReturned = "errorReturned";
   //@ts-ignore protected member
   const errorHandleStub = stub(userController, "errorHandle", () => {
@@ -34,12 +34,12 @@ Deno.test("UserController - Test", async (t) => {
       sessionToken = "123";
       userRepo.registerOutput("findBySessionToken", mockedUser);
       let nextTriggered = false;
-      await userController.authMiddleware(mockContext, () => {
+      await userController.authMiddleware(mockContext.this, () => {
         nextTriggered = true;
         return Promise.resolve();
       });
       assertEquals(nextTriggered, true);
-      assertEquals(cookieStub.calls[0].args, [mockContext, "session"]);
+      assertEquals(cookieStub.calls[0].args, [mockContext.this, "session"]);
       assertEquals(mockedUser.stub["validateSession"].args[0], [sessionToken]);
       assertEquals(userRepo.stub["findBySessionToken"].args[0], [sessionToken]);
     });
@@ -50,13 +50,16 @@ Deno.test("UserController - Test", async (t) => {
       sessionToken = "";
       userRepo.registerOutput("findBySessionToken", mockedUser);
       let nextTriggered = false;
-      const returned = await userController.authMiddleware(mockContext, () => {
-        nextTriggered = true;
-        return Promise.resolve();
-      }) as unknown as string;
+      const returned = await userController.authMiddleware(
+        mockContext.this,
+        () => {
+          nextTriggered = true;
+          return Promise.resolve();
+        },
+      ) as unknown as string;
       assertEquals(returned, errorReturned);
       assertEquals(nextTriggered, false);
-      assertEquals(cookieStub.calls[0].args, [mockContext, "session"]);
+      assertEquals(cookieStub.calls[0].args, [mockContext.this, "session"]);
       assertEquals(errorHandleStub.calls[0].args[1], mockContext);
       assertEquals(userRepo.counter("findBySessionToken"), 0);
     });
@@ -68,7 +71,7 @@ Deno.test("UserController - Test", async (t) => {
     mockedUser.registerOutput("listServices", listServiceReturn);
     mockContext.registerOutput("json", goodReturn);
     const returned = userController.listMyServices(
-      mockContext,
+      mockContext.this,
     ) as unknown as string;
     assertEquals(returned, goodReturn);
     assertEquals(mockedUser.stub["listServices"].args[0], []);
@@ -79,7 +82,7 @@ Deno.test("UserController - Test", async (t) => {
     mockContext.reset();
     mockContext.registerOutput("json", goodReturn);
     mockedUser.registerOutput("toJson", { asd: "asd" });
-    const returned = userController.read(mockContext) as unknown as string;
+    const returned = userController.read(mockContext.this) as unknown as string;
     assertEquals(returned, goodReturn);
     assertEquals(mockedUser.stub["toJson"].args[0], []);
     assertEquals(mockContext.lastArgs("json"), [{ asd: "asd" }]);
@@ -100,7 +103,7 @@ Deno.test("UserController - Test", async (t) => {
       mockedUser._credentials.registerOutput("changePassword", changedPassword);
       mockContext.registerOutput("body", goodReturn);
       const returned = await userController.changePassword(
-        mockContext,
+        mockContext.this,
       ) as unknown as string;
       assertEquals(returned, goodReturn);
       assertEquals(mockedUser._credentials.stub["changePassword"].args[0], [
@@ -119,15 +122,15 @@ Deno.test("UserController - Test", async (t) => {
     userRepo.registerOutput("findBySessionToken", mockedUser);
     mockContext.registerOutput("body", goodReturn);
     const returned = await userController.logOut(
-      mockContext,
+      mockContext.this,
     ) as unknown as string;
     assertEquals(returned, goodReturn);
     assertEquals(userRepo.lastArgs("findBySessionToken"), [sessionToken]);
     assertEquals(mockedUser.stub["deleteSessionByToken"].args[0], [
       sessionToken,
     ]);
-    assertEquals(cookieStub.calls[2].args, [mockContext, "session"]);
-    assertEquals(deleteCookieStub.calls[0].args, [mockContext, "session"]);
+    assertEquals(cookieStub.calls[2].args, [mockContext.this, "session"]);
+    assertEquals(deleteCookieStub.calls[0].args, [mockContext.this, "session"]);
     assertEquals(mockContext.lastArgs("body"), [null, 200]);
     assertEquals(userRepo.lastArgs("save"), [mockedUser]);
   });
