@@ -1,10 +1,11 @@
 import { Context } from "@hono/hono";
 import { StubFullType } from "@stubClass";
 import { HonoRequest } from "@hono/hono/request";
+import { Stubbed } from "@stubClass";
 
 export class TestContext extends StubFullType<Context> {
-  req: TestRequest;
-  res: TestResponse;
+  req: Stubbed<HonoRequest>;
+  res: Stubbed<Context["res"]>;
   private constructor() {
     super([
       "body",
@@ -29,9 +30,12 @@ export class TestContext extends StubFullType<Context> {
   }
 
   static create() {
-    return new TestContext();
+    return new TestContext() as Stubbed<Context> & {
+      req: Stubbed<HonoRequest>;
+      res: Stubbed<Context["res"]>;
+    };
   }
-  override reset(trueReset: boolean = false) {
+  override reset(trueReset?: true) {
     this.req.reset(trueReset);
     this.res.reset(trueReset);
     super.reset(trueReset);
@@ -55,7 +59,7 @@ class TestRequest extends StubFullType<HonoRequest> {
       "json",
     ]);
   }
-  static create() {
+  static create(): Stubbed<HonoRequest> {
     return new TestRequest();
   }
 }
@@ -72,7 +76,7 @@ class TestResponse extends StubFullType<Context["res"]> {
       "arrayBuffer",
     ]);
   }
-  static create() {
+  static create(): Stubbed<Context["res"]> {
     return new TestResponse();
   }
 }

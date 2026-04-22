@@ -1,4 +1,4 @@
-import { StubFullType } from "@stubClass";
+import { Stubbed, StubFullType } from "@stubClass";
 import { GroupRepository } from "../../interfaceTypes/GroupRepository.ts";
 
 export class TestGroupRepo extends StubFullType<GroupRepository> {
@@ -14,7 +14,7 @@ export class TestGroupRepo extends StubFullType<GroupRepository> {
       "findByDisplayName",
     ]);
   }
-  static create() {
+  static create(): Stubbed<GroupRepository> {
     return new TestGroupRepo();
   }
 }

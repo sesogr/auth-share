@@ -3,8 +3,6 @@ import { User } from "../../src/classes/Entities/User.ts";
 import { assertEquals } from "@std/assert";
 import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
-import { RepositoryView } from "../../interfaceTypes/RepositoryView.ts";
-import { Group } from "../../src/classes/Entities/Group.ts";
 import { TestContext } from "../StubbedClasses/TestContext.ts";
 import { TestServiceRepo } from "../StubbedClasses/TestServiceRepo.ts";
 import { TestUserRepo } from "../StubbedClasses/TestUserRepo.ts";
@@ -18,15 +16,15 @@ import { TestUser } from "../StubbedClasses/TestUser.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { Invitation } from "../../src/classes/Values/Invitation.ts";
 import { stub } from "@std/testing/mock";
-import { StubFullType } from "@stubClass";
+import { RepositoryView } from "../../interfaceTypes/RepositoryView.ts";
+import { Stubbed } from "@stubClass";
+import { Group } from "../../src/classes/Entities/Group.ts";
 
 Deno.test("ServiceController", async (t) => {
   const serviceRepo = TestServiceRepo.create();
   const ramLogger = new RamOnlyLog();
-  const userRepo = TestUserRepo.create() as StubFullType<RepositoryView<User>>;
-  const groupRepo = TestGroupRepo.create() as StubFullType<
-    RepositoryView<Group>
-  >;
+  const userRepo = TestUserRepo.create() as Stubbed<RepositoryView<User>>;
+  const groupRepo = TestGroupRepo.create() as Stubbed<RepositoryView<Group>>;
   const mockedService = TestService.create();
   const mockedUser = TestUser.create();
   const mockedGroup = TestGroup.create();

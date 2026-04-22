@@ -1,8 +1,8 @@
-import { StubFullType } from "@stubClass";
-import type { User } from "../../src/classes/Entities/User.ts";
+import { Stubbed, StubFullType } from "@stubClass";
+import { User } from "../../src/classes/Entities/User.ts";
 
 export class TestUser extends StubFullType<User> {
-  static create() {
+  static create(): Stubbed<User> & { _credentials: TestCredentials } {
     return new TestUser();
   }
   readonly _credentials: TestCredentials;
@@ -17,7 +17,6 @@ export class TestUser extends StubFullType<User> {
       "convertToShort",
       "checkValidation",
       "changeUserCredentials",
-      "getCredentials",
       "validateSession",
       "toJsonString",
       "setDisplayName",
@@ -25,7 +24,9 @@ export class TestUser extends StubFullType<User> {
       "listUserGroupInvitation",
       "removeInvitation",
       "listServices",
+      "getCredentials",
     ]);
+    this.overwriteMethod("getCredentials", () => this._credentials);
     this._credentials = TestCredentials.create();
   }
   override reset(trueReset: boolean = false) {
@@ -46,6 +47,7 @@ class TestCredentials extends StubFullType<User["credentials"]> {
       "toString",
     ]);
   }
+
   static create() {
     return new TestCredentials();
   }

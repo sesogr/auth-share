@@ -1,4 +1,4 @@
-import { StubFullType } from "@stubClass";
+import { Stubbed, StubFullType } from "@stubClass";
 import { Group } from "../../src/classes/Entities/Group.ts";
 
 export class TestGroup extends StubFullType<Group> {
@@ -20,7 +20,7 @@ export class TestGroup extends StubFullType<Group> {
       "getDisplayName",
     ]);
   }
-  static create() {
+  static create(): Stubbed<Group> {
     return new TestGroup();
   }
 }

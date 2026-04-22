@@ -1,6 +1,5 @@
-import { StubFullType } from "@stubClass";
+import { Stubbed, StubFullType } from "@stubClass";
 import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
-
 export class TestUserRepo extends StubFullType<UserRepository> {
   private constructor() {
     super([
@@ -16,6 +15,6 @@ export class TestUserRepo extends StubFullType<UserRepository> {
     ]);
   }
   static create() {
-    return new TestUserRepo();
+    return new TestUserRepo() as Stubbed<UserRepository>;
   }
 }

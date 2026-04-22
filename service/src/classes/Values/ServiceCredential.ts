@@ -8,12 +8,11 @@ export class ServiceCredential extends ValueClass<ServiceCredential> {
     super();
     Object.freeze(this);
   }
-  static fromString(string: string) {
+  static fromString(string: `${string}:${string}`) {
     const [username, password] = string.split(":");
     return new ServiceCredential(username, password);
   }
+  override toString() {
+    return super.toString() as `${string}:${string}`;
+  }
 }
-
-//Deno.test("With from valueClass", () => {
-//  console.log(new ServiceCredential("d", "e").with({ "username": "u" }));
-//});

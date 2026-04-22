@@ -1,4 +1,4 @@
-import { StubFullType } from "@stubClass";
+import { Stubbed, StubFullType } from "@stubClass";
 import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
 
 export class TestServiceRepo extends StubFullType<ServiceRepository> {
@@ -16,6 +16,6 @@ export class TestServiceRepo extends StubFullType<ServiceRepository> {
     ]);
   }
   static create() {
-    return new TestServiceRepo();
+    return new TestServiceRepo() as Stubbed<ServiceRepository>;
   }
 }
