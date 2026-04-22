@@ -1,7 +1,7 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@hono/hono@^4.9.10": "4.11.1",
+    "jsr:@hono/hono@^4.9.10": "4.12.3",
     "jsr:@jackfiszr/faker@1.1.6": "1.1.6",
     "jsr:@std/assert@1.0.15": "1.0.15",
     "jsr:@std/assert@^1.0.15": "1.0.15",
@@ -10,8 +10,8 @@
     "jsr:@std/testing@1.0.16": "1.0.16"
   },
   "jsr": {
-    "@hono/hono@4.11.1": {
-      "integrity": "28bb28c7322a1379e7132af05ef76aef09f86bb8cdd7077c67e004dea288ac0d"
+    "@hono/hono@4.12.3": {
+      "integrity": "53c2d99912626a8bc293d6f69649af8148961b05d44485f2c0ed3053657d324c"
     },
     "@jackfiszr/faker@1.1.6": {
       "integrity": "0d04ca2a13889243670c17ef30d318208c918a7c6a5afbdb6e0958d4cd71e98b"
@@ -485,13 +485,13 @@
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/util/template.js": "be90a9fbc75793a69d6560875da64100796750efb9becaca7dcbf6ae334f1af2",
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/util/timeout.js": "2aeebed1e5c8dacf20e78044d5cae0c350538ba4e1f331e7f67dad997cd22262",
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/mod-dyn.ts": "29ff4dc44941b869973832e11d06822efabbf865059910a39ab5136c832e0d4a",
-    "https://raw.githubusercontent.com/vhusername123/StubClass/master/lib/StubFullType.ts": "4fd00601b776084d1afa477da1447251bba64da76331789248af8fd141beb37d",
-    "https://raw.githubusercontent.com/vhusername123/StubClass/master/lib/types/AnyFunctions.ts": "776018235d4a926fd8859d650149fb6f28450da7e5ab31f021987a52ed013406",
-    "https://raw.githubusercontent.com/vhusername123/StubClass/master/lib/types/FilterAndMapMethodsToUnknown.ts": "fc1a4c11fd5e981b00aa1864b23b8e2c0e6f52be4860288715a3af63d5384028",
-    "https://raw.githubusercontent.com/vhusername123/StubClass/master/lib/types/MethodKeys.ts": "08cdd223b188360d631f54f82dedc9e9f75dcfa8c20a2a3f1fa088e2974e70a3",
-    "https://raw.githubusercontent.com/vhusername123/StubClass/master/lib/types/Stub.ts": "cfae09f508d8446621700fcb66a8b1d61ed73c029b81cc947b8cdbd68ef6849f",
-    "https://raw.githubusercontent.com/vhusername123/StubClass/master/lib/types/Stubbed.ts": "4e53bc2fae562a18ef81eae2300956bd979ed0bb6c3ebf261a3818b8fd397d4e",
-    "https://raw.githubusercontent.com/vhusername123/StubClass/master/mod.ts": "2433e5cbaa6ac6f59faedbfd69c008574cf47c1f097f32175dd93d786303022e"
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/lib/StubFullType.ts": "d82f49d7413a399546b3a7c995a3cf11c3d965be1c1df1ba07a0b10cfd72194b",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/lib/types/AnyFunctions.ts": "776018235d4a926fd8859d650149fb6f28450da7e5ab31f021987a52ed013406",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/lib/types/FilterAndMapMethodsToUnknown.ts": "fc1a4c11fd5e981b00aa1864b23b8e2c0e6f52be4860288715a3af63d5384028",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/lib/types/MethodKeys.ts": "08cdd223b188360d631f54f82dedc9e9f75dcfa8c20a2a3f1fa088e2974e70a3",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/lib/types/Stub.ts": "cfae09f508d8446621700fcb66a8b1d61ed73c029b81cc947b8cdbd68ef6849f",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/lib/types/Stubbed.ts": "4e53bc2fae562a18ef81eae2300956bd979ed0bb6c3ebf261a3818b8fd397d4e",
+    "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/mod.ts": "2433e5cbaa6ac6f59faedbfd69c008574cf47c1f097f32175dd93d786303022e"
   },
   "workspace": {
     "dependencies": [

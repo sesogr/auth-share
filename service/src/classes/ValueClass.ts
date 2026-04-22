@@ -16,7 +16,7 @@ export abstract class ValueClass<T extends ValueClass<T>> {
     return this.toString() === that.toString() &&
       this.constructor === that.constructor;
   }
-  toString(): string {
+  toString() {
     return Object.values(this).join(":");
   }
   copy(): T {

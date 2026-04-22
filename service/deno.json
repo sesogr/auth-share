@@ -15,7 +15,7 @@
     "@denodb/datatypes": "https://deno.land/x/denodb@v1.4.0/lib/data-types.ts",
     "https://deno.land/std@0.224.0/crypto/_wasm/lib/deno_std_wasm_crypto.generated.d.mts": "data:text/typescript,export {}",
     "@std/hash": "https://deno.land/std@0.114.0/hash/sha256.ts",
-    "@stubClass": "https://raw.githubusercontent.com/vhusername123/StubClass/master/mod.ts"
+    "@stubClass": "https://raw.githubusercontent.com/vhusername123/StubClass/refs/tags/0.0.003/mod.ts"
   },
   "scopes": {
     "https://raw.githubusercontent.com/Zhomart/dex/": {
