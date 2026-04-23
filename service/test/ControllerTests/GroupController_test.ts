@@ -12,6 +12,7 @@ import { Group } from "../../src/classes/Entities/Group.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { Invitation } from "../../src/classes/Values/Invitation.ts";
 import { NotFoundError } from "../../src/classes/errors/NotFoundError.ts";
+import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
 
 Deno.test("GroupController", async (t) => {
   const goodReturn = "returned" as unknown;
@@ -185,4 +186,46 @@ Deno.test("GroupController", async (t) => {
       rejected: ["123"],
     });
   });
+  await t.step(
+    "all methods return errorHandle",
+    async (st) => {
+      //@ts-ignore protected member
+      const errorHandleStub = stub(
+        groupController,
+        //@ts-ignore type safety override makes problems
+        "errorHandle",
+        () => goodReturn,
+      );
+      await st.step("when there is no User Logged in", async () => {
+        mockContext.reset(true);
+        const errorObject = new Error("generic");
+        mockContext.registerOutput("get", errorObject, true);
+        const returned: unknown[] = [];
+        returned.push(
+          await groupController.delete(
+            mockContext.this,
+          ),
+          await groupController.createGroup(mockContext.this),
+          await groupController.listMyGroups(
+            mockContext.this,
+          ),
+          await groupController.inviteUsers(
+            mockContext.this,
+          ),
+          await groupController.acceptInvitation(
+            mockContext.this,
+          ),
+        );
+
+        assertResponsesAndErrors(
+          returned,
+          goodReturn,
+          errorHandleStub,
+          errorObject,
+          mockContext as unknown as TestContext,
+          fakeMe as unknown as TestUser,
+        );
+      });
+    },
+  );
 });
