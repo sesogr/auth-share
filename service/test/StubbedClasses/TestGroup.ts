@@ -1,5 +1,5 @@
 import { Stubbed, StubFullType } from "@stubClass";
-import { Group } from "../../src/classes/Entities/Group.ts";
+import { Group, OwnedGroups } from "../../src/classes/Entities/Group.ts";
 
 export class TestGroup extends StubFullType<Group> {
   private constructor() {
@@ -20,7 +20,10 @@ export class TestGroup extends StubFullType<Group> {
       "getDisplayName",
     ]);
   }
-  static create(): Stubbed<Group> {
+  static create(): Stubbed<Group> & { owned: OwnedGroups } {
     return new TestGroup();
+  }
+  get owned() {
+    return this as unknown as OwnedGroups;
   }
 }

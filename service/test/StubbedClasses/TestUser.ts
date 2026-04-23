@@ -1,9 +1,15 @@
 import { Stubbed, StubFullType } from "@stubClass";
-import { User } from "../../src/classes/Entities/User.ts";
+import { User, ValidatedUser } from "../../src/classes/Entities/User.ts";
 
 export class TestUser extends StubFullType<User> {
-  static create(): Stubbed<User> & { _credentials: TestCredentials } {
+  static create(): Stubbed<User> & {
+    _credentials: TestCredentials;
+    validated: ValidatedUser;
+  } {
     return new TestUser();
+  }
+  get validated(): ValidatedUser {
+    return this as unknown as ValidatedUser;
   }
   readonly _credentials: TestCredentials;
   private constructor() {
