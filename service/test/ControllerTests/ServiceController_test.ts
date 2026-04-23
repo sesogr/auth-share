@@ -21,6 +21,7 @@ import { Stubbed } from "@stubClass";
 import { Group } from "../../src/classes/Entities/Group.ts";
 
 Deno.test("ServiceController", async (t) => {
+  const goodReturn = "returned" as unknown;
   const serviceRepo = TestServiceRepo.create();
   const ramLogger = new RamOnlyLog();
   const userRepo = TestUserRepo.create() as Stubbed<RepositoryView<User>>;
@@ -76,7 +77,9 @@ Deno.test("ServiceController", async (t) => {
       mockContext.reset();
       serviceRepo.reset();
       mockContext.req.registerOutput("json", convertedServiceList[0]);
-      await serviceController.add(mockContext.this); //todo add return
+      mockContext.registerOutput("body", goodReturn);
+      const returned = await serviceController.add(mockContext.this); //todo add return
+      assertEquals(returned, goodReturn);
       const savedService = serviceRepo.stub["save"].args[0][0];
       assertEquals(savedService.credentials, serviceList[0].credentials);
       assertEquals(
@@ -145,11 +148,11 @@ Deno.test("ServiceController", async (t) => {
         "promoteUser",
         new NotFoundError("", "", ""),
       );
-      mockContext.registerOutput("json", Promise.resolve("returned"));
+      mockContext.registerOutput("json", Promise.resolve(goodReturn));
       const returned = (await serviceController.promoteUsersOfService(
         mockContext.this,
       )) as unknown as string;
-      assertEquals(returned, "returned");
+      assertEquals(returned, goodReturn);
       assertEquals(serviceRepo.lastArgs("findById"), [serviceData.id]);
       assertEquals(mockedService.stub["checkOwner"].args[0], [fakeMe]);
       assertEquals(serviceRepo.lastArgs("save"), [mockedService]);
@@ -185,11 +188,11 @@ Deno.test("ServiceController", async (t) => {
       mockedService.registerOutput("acceptInvitation", new Error("generic"));
       mockedUser.registerOutput("convertToShort", idNameMap, true);
       mockedGroup.registerOutput("convertToShort", idNameMap, true);
-      mockContext.registerOutput("json", Promise.resolve("returned"));
+      mockContext.registerOutput("json", Promise.resolve(goodReturn));
       const returned = await serviceController.acceptInvitation(
         mockContext.this,
       ) as unknown as string;
-      assertEquals(returned, "returned");
+      assertEquals(returned, goodReturn);
       assertEquals(mockContext.lastArgs("json"), [{
         fulfilled: [invite.toString()],
         rejected: ["generic"],
@@ -215,10 +218,9 @@ Deno.test("ServiceController", async (t) => {
         "json",
         Promise.resolve(convertedServiceList[0]),
       );
-      mockContext.registerOutput("body", "returned");
-      const returned =
-        (await serviceController.delete(mockContext.this)) as unknown as string;
-      assertEquals(returned, "returned");
+      mockContext.registerOutput("body", goodReturn);
+      const returned = await serviceController.delete(mockContext.this);
+      assertEquals(returned, goodReturn);
       assertEquals(mockContext.lastArgs("body"), [null, 204]);
       assertEquals(serviceRepo.lastArgs("findById"), [
         convertedServiceList[0].id,
@@ -229,51 +231,53 @@ Deno.test("ServiceController", async (t) => {
   });
 
   await t.step(
-    "every controller method returns errorHandle if it catches an error",
-    async () => {
+    "all methods return errorHandle",
+    async (st) => {
       //@ts-ignore protected member
       const errorHandleStub = stub(
         serviceController,
         //@ts-ignore type safety override makes problems
         "errorHandle",
-        () => "returned",
+        () => goodReturn,
       );
-      mockContext.reset(true);
-      const errorObject = new Error("generic");
-      mockContext.registerOutput("get", errorObject, true);
-      const returned: string[] = [];
-      returned.push(
-        await serviceController.listMyServices(
-          mockContext.this,
-        ) as unknown as string,
-        await serviceController.add(mockContext.this) as unknown as string,
-        await serviceController.addUsersToService(
-          mockContext.this,
-        ) as unknown as string,
-        await serviceController.promoteUsersOfService(
-          mockContext.this,
-        ) as unknown as string,
-        await serviceController.acceptInvitation(
-          mockContext.this,
-        ) as unknown as string,
-        await serviceController.delete(mockContext.this) as unknown as string,
-      );
+      await st.step("when there is no User Logged in", async () => {
+        mockContext.reset(true);
+        const errorObject = new Error("generic");
+        mockContext.registerOutput("get", errorObject, true);
+        const returned: unknown[] = [];
+        returned.push(
+          await serviceController.listMyServices(
+            mockContext.this,
+          ),
+          await serviceController.add(mockContext.this),
+          await serviceController.addUsersToService(
+            mockContext.this,
+          ),
+          await serviceController.promoteUsersOfService(
+            mockContext.this,
+          ),
+          await serviceController.acceptInvitation(
+            mockContext.this,
+          ),
+          await serviceController.delete(mockContext.this),
+        );
 
-      function createListWithCountOfMethodCalls<K>(returned1: K): K[] {
-        return [...returned].map((_) => returned1);
-      }
+        function createListWithCountOfMethodCalls<K>(returned1: K): K[] {
+          return [...returned].map((_) => returned1);
+        }
 
-      assertEquals(returned, createListWithCountOfMethodCalls("returned"));
-      assertEquals(
-        errorHandleStub.calls.length,
-        returned.length,
-      );
-      assertEquals(
-        errorHandleStub.calls.map((e) => e.args),
-        createListWithCountOfMethodCalls([errorObject, mockContext]),
-      );
-      mockContext.reset(true);
-      mockContext.registerOutput("get", fakeMe, true);
+        assertEquals(returned, createListWithCountOfMethodCalls(goodReturn));
+        assertEquals(
+          errorHandleStub.calls.length,
+          returned.length,
+        );
+        assertEquals(
+          errorHandleStub.calls.map((e) => e.args),
+          createListWithCountOfMethodCalls([errorObject, mockContext]),
+        );
+        mockContext.reset(true);
+        mockContext.registerOutput("get", fakeMe, true);
+      });
     },
   );
 });
