@@ -19,6 +19,7 @@ import { stub } from "@std/testing/mock";
 import { RepositoryView } from "../../interfaceTypes/RepositoryView.ts";
 import { Stubbed } from "@stubClass";
 import { Group } from "../../src/classes/Entities/Group.ts";
+import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
 
 Deno.test("ServiceController", async (t) => {
   const goodReturn = "returned" as unknown;
@@ -262,21 +263,14 @@ Deno.test("ServiceController", async (t) => {
           await serviceController.delete(mockContext.this),
         );
 
-        function createListWithCountOfMethodCalls<K>(returned1: K): K[] {
-          return [...returned].map((_) => returned1);
-        }
-
-        assertEquals(returned, createListWithCountOfMethodCalls(goodReturn));
-        assertEquals(
-          errorHandleStub.calls.length,
-          returned.length,
+        assertResponsesAndErrors(
+          returned,
+          goodReturn,
+          errorHandleStub,
+          errorObject,
+          mockContext as unknown as TestContext,
+          fakeMe as unknown as TestUser,
         );
-        assertEquals(
-          errorHandleStub.calls.map((e) => e.args),
-          createListWithCountOfMethodCalls([errorObject, mockContext]),
-        );
-        mockContext.reset(true);
-        mockContext.registerOutput("get", fakeMe, true);
       });
     },
   );
