@@ -14,7 +14,8 @@
 # Known Issues
 
 - column mismatches over versions aren't automatically resolved
-    - for test builds deleting the old database volume and restarting the
-      containers resolves this
+  - for test builds deleting the old database volume and restarting the
+    containers resolves this
 - SELinux blocks podman-compose volume mapping
-    - add :z to volume mappings (either in the ide settings, or in the docker-compose file)
+  - add :z to volume mappings (either in the ide settings, or in the
+    docker-compose file)
