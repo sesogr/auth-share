@@ -30,10 +30,11 @@ export class GroupController extends HeadController {
   }
   async delete(c: Context) {
     try {
+      const ME = this.getMeFromContext(c);
       const groupData: ConvertedGroup = await c.req.json();
       ensureConvertedGroupIntegrity(groupData, ["id"]);
       const group: Group = await this.groupRepository.findById(groupData.id);
-      group.checkOwner(this.getMeFromContext(c));
+      group.checkOwner(ME);
       await this.groupRepository.delete(
         group,
       );
@@ -111,7 +112,7 @@ export class GroupController extends HeadController {
         rejected: rejected.map((e) => e.message),
       });
     } catch (error) {
-      this.errorHandle(error, c);
+      return this.errorHandle(error, c);
     }
   }
 
