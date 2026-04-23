@@ -136,7 +136,7 @@ export class GroupController extends HeadController {
       return c.json({
         fulfilled: fulfilled.map((e) => e.getDisplayName()),
         alreadyIn: alreadyIn.map((e) => e.getDisplayName()),
-        rejected: notFound.map((e) => e.target),
+        rejected: notFound.map((e) => e.key),
       });
     } catch (error) {
       return this.errorHandle(error, c);
