@@ -90,7 +90,7 @@ export class Environment {
     this.checked = false;
   }
   public static load(logger: Logger): void {
-    this.logger = logger.withOwnContext("this");
+    this.logger = logger.withOwnContext("Environment");
     this.FRONT_END_URL = Deno.env.get("FRONT_END_URL")!;
     this.DB_NAME = Deno.env.get("DB_NAME")!;
     this.DB_USER = Deno.env.get("DB_USER")!;

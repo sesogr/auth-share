@@ -31,6 +31,14 @@ Deno.test("GroupController", async (t) => {
     mockServiceRepo.this,
     ramLogger,
   );
+  let errorReturn = "errorReturn" as unknown;
+  //@ts-ignore protected member
+  const errorHandleStub = stub(
+    groupController,
+    //@ts-ignore type safety override makes problems
+    "errorHandle",
+    () => errorReturn,
+  );
   await t.step("delete", async () => {
     mockContext.reset();
     mockGroupRepo.reset();
@@ -189,13 +197,7 @@ Deno.test("GroupController", async (t) => {
   await t.step(
     "all methods return errorHandle",
     async (st) => {
-      //@ts-ignore protected member
-      const errorHandleStub = stub(
-        groupController,
-        //@ts-ignore type safety override makes problems
-        "errorHandle",
-        () => goodReturn,
-      );
+      errorReturn = goodReturn;
       await st.step("when there is no User Logged in", async () => {
         mockContext.reset(true);
         const errorObject = new Error("generic");
