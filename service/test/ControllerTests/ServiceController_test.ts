@@ -23,6 +23,7 @@ import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
 
 Deno.test("ServiceController", async (t) => {
   const goodReturn = "returned" as unknown;
+  let errorReturn = "errorReturn" as unknown;
   const serviceRepo = TestServiceRepo.create();
   const ramLogger = new RamOnlyLog();
   const userRepo = TestUserRepo.create() as Stubbed<RepositoryView<User>>;
@@ -35,6 +36,13 @@ Deno.test("ServiceController", async (t) => {
     userRepo.this,
     groupRepo.this,
     ramLogger,
+  );
+  //@ts-ignore protected member
+  const errorHandleStub = stub(
+    serviceController,
+    //@ts-ignore type safety override makes problems
+    "errorHandle",
+    () => errorReturn,
   );
   const fakeMe = await FakeObjectGen.createFakeUser();
   const serviceList = await Promise.all([
@@ -234,13 +242,7 @@ Deno.test("ServiceController", async (t) => {
   await t.step(
     "all methods return errorHandle",
     async (st) => {
-      //@ts-ignore protected member
-      const errorHandleStub = stub(
-        serviceController,
-        //@ts-ignore type safety override makes problems
-        "errorHandle",
-        () => goodReturn,
-      );
+      errorReturn = goodReturn;
       await st.step("when there is no User Logged in", async () => {
         mockContext.reset(true);
         const errorObject = new Error("generic");
