@@ -41,18 +41,26 @@ export function assertIsStringRecord(
     throw new TypeError("All keys must be strings");
   }
 }
-export function typeCheck<T extends JsTypeofString | [] = "string">(
+export function typeCheck<
+  T extends JsTypeofString | "array",
+>(
   obj: Record<string, unknown>,
   prop: string,
-  type: JsTypeofString = "string",
-  array?: true,
-): asserts obj is Record<string, T> {
+  type: T = "string" as T,
+): asserts obj is T extends "array" ? Record<string, []> : Record<string, T> {
   if (obj[prop] === undefined || obj[prop] === null) {
     throw new MissingDataError(`Missing property: ${prop}`);
   } else if (
-    typeof obj[prop] !== type && (!array || Array.isArray(obj[prop]))
+    (typeof obj[prop]) !== type
   ) {
-    throw new TypeError(`${prop} is not a ${type} ${array ? ": Array" : ""}`);
+    if (type === "array") {
+      if (Array.isArray(obj[prop])) {
+        return;
+      }
+    }
+    throw new TypeError(
+      `${prop} is not a ${type}}`,
+    );
   }
 }
 
@@ -70,7 +78,7 @@ export function indepthTypeCheck(
   if (typeof assertion === "string") {
     if (stringKeys.some((e) => e === assertion)) typeCheck(obj, assertion);
     if (stringArrayKeys.some((e) => e === assertion)) {
-      typeCheck<[]>(obj, assertion, "object", true);
+      typeCheck(obj, assertion, "array");
       obj[assertion].forEach((e) => {
         if (typeof e !== "string") {
           throw new TypeError(`${obj}:${assertion}:${e} is not a string`);
@@ -83,7 +91,7 @@ export function indepthTypeCheck(
     );
     assertion.filter((e) => stringArrayKeys.some((f) => e === f)).forEach(
       (e) => {
-        typeCheck<[]>(obj, e, "object", true);
+        typeCheck(obj, e, "array");
         obj[e].forEach((f) => {
           if (typeof f !== "string") {
             throw new TypeError(`${obj}:${e}:${f} is not a string`);
