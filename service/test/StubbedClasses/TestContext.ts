@@ -4,7 +4,9 @@ import { HonoRequest } from "@hono/hono/request";
 import { Stubbed } from "@stubClass";
 
 export class TestContext extends StubFullType<Context> {
-  req: Stubbed<HonoRequest>;
+  req: Stubbed<HonoRequest> & {
+    raw: TestRequest["raw"] & { headers: Raw["headers"] };
+  };
   res: Stubbed<Context["res"]>;
   private constructor() {
     super([
@@ -31,8 +33,8 @@ export class TestContext extends StubFullType<Context> {
 
   static create() {
     return new TestContext() as Stubbed<Context> & {
-      req: Stubbed<HonoRequest>;
-      res: Stubbed<Context["res"]>;
+      req: TestContext["req"] & { raw: TestRequest["raw"] };
+      res: TestContext["res"];
     };
   }
   override reset(trueReset?: true) {
@@ -43,6 +45,9 @@ export class TestContext extends StubFullType<Context> {
 }
 
 class TestRequest extends StubFullType<HonoRequest> {
+  raw: Stubbed<HonoRequest["raw"]> & {
+    headers: Stubbed<HonoRequest["raw"]["headers"]>;
+  };
   private constructor() {
     super([
       "header",
@@ -58,8 +63,11 @@ class TestRequest extends StubFullType<HonoRequest> {
       "text",
       "json",
     ]);
+    this.raw = Raw.create();
   }
-  static create(): Stubbed<HonoRequest> {
+  static create(): Stubbed<HonoRequest> & {
+    raw: Stubbed<HonoRequest["raw"]> & { headers: Raw["headers"] };
+  } {
     return new TestRequest();
   }
 }
@@ -80,5 +88,24 @@ class TestResponse extends StubFullType<Context["res"]> {
     return new TestResponse();
   }
 }
-
+class Raw extends StubFullType<HonoRequest["raw"]> {
+  headers: Stubbed<HonoRequest["raw"]["headers"]>;
+  private constructor() {
+    super();
+    this.headers = Headers.create();
+  }
+  static create(): Stubbed<HonoRequest["raw"]> & {
+    headers: Stubbed<HonoRequest["raw"]["headers"]>;
+  } {
+    return new Raw();
+  }
+}
+class Headers extends StubFullType<HonoRequest["raw"]["headers"]> {
+  private constructor() {
+    super(["get"]);
+  }
+  static create(): Stubbed<HonoRequest["raw"]["headers"]> {
+    return new Headers();
+  }
+}
 export type { TestRequest, TestResponse };
