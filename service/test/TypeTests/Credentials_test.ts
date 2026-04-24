@@ -5,6 +5,7 @@ import {
 } from "../../src/types/Credentials.ts";
 import { MissingDataError } from "../../src/classes/errors/controllerErrors/MissingDataError.ts";
 import { FormlessError } from "../../src/classes/errors/controllerErrors/FormlessError.ts";
+import { expectType } from "../../interfaceTypes/expectType.ts";
 
 Deno.test("Credentials Type Check", async (t) => {
   const testCredentials = {
@@ -27,8 +28,9 @@ Deno.test("Credentials Type Check", async (t) => {
     assertIsCredentials(testCredentials, "username");
     assertIsCredentials(testCredentials, "password");
     assertIsCredentials(testCredentials, ["username", "password"]);
-    const _typedCredentials: { username: string; password: string } =
-      testCredentials;
+    expectType<{ username: string; password: string }>(
+      testCredentials,
+    );
   });
   await t.step("only username is needed", () => {
     assertIsCredentials(onlyUsernameCredentials, "username");
@@ -54,7 +56,7 @@ Deno.test("Credentials Type Check", async (t) => {
       MissingDataError,
       "password",
     );
-    const _typedCredentials: { username: string } = onlyUsernameCredentials;
+    expectType<{ username: string }>(onlyUsernameCredentials);
   });
   await t.step("only password is needed", () => {
     assertIsCredentials(onlyPasswordCredentials, "password");
@@ -87,7 +89,7 @@ Deno.test("Credentials Type Check", async (t) => {
       MissingDataError,
       "username",
     );
-    const _typedCredentials: { password: string } = onlyPasswordCredentials;
+    expectType<{ password: string }>(onlyPasswordCredentials);
   });
   await t.step("errors related to additional keys type problems", () => {
     assertThrows(

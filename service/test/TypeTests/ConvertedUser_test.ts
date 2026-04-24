@@ -3,9 +3,10 @@ import {
   ConvertedUser,
   ensureConvertedUserIntegrity,
 } from "../../src/types/ConvertedUser.ts";
+import { expectType } from "../../interfaceTypes/expectType.ts";
 
 Deno.test("ConvertedUser Type Check", async (t) => {
-  const _allKeys: (keyof ConvertedUser)[] = [
+  const allKeys: (keyof ConvertedUser)[] = [
     "id",
     "credentials",
     "displayname",
@@ -15,7 +16,7 @@ Deno.test("ConvertedUser Type Check", async (t) => {
     "userGroupInvitations",
     "callable",
   ];
-  const completeUser: unknown = {
+  const completeUser: { [k in typeof allKeys[number]]: undefined | unknown } = {
     callable: ["callable 0"],
     id: "id",
     credentials: {
@@ -44,10 +45,10 @@ Deno.test("ConvertedUser Type Check", async (t) => {
     ensureConvertedUserIntegrity(completeUser, "callable");
     ensureConvertedUserIntegrity(completeUser, "owned");
     ensureConvertedUserIntegrity(completeUser, "ownedGroups");
-    const _typedUser: AllRequired<ConvertedUser> = completeUser;
+    expectType<AllRequired<ConvertedUser>>(completeUser);
     const completeUser2 = completeUser as unknown;
     ensureConvertedUserIntegrity(completeUser2);
-    const _typedUser2: AllRequired<ConvertedUser> = completeUser2;
+    expectType<AllRequired<ConvertedUser>>(completeUser2);
   });
   await t.step("missing key throws errors", () => {
     ensureConvertedUserIntegrity(idExists, "id");

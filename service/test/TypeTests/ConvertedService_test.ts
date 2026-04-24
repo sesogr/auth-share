@@ -3,6 +3,7 @@ import {
   ConvertedService,
   ensureConvertedServiceIntegrity,
 } from "../../src/types/ConvertedService.ts";
+import { expectType } from "../../interfaceTypes/expectType.ts";
 
 Deno.test("ConvertedService Type Check", async (t) => {
   const allKeys: (keyof ConvertedService)[] = [
@@ -46,10 +47,10 @@ Deno.test("ConvertedService Type Check", async (t) => {
     ensureConvertedServiceIntegrity(completeService, "users");
     ensureConvertedServiceIntegrity(completeService, "groups");
     ensureConvertedServiceIntegrity(completeService, "sentInvitations");
-    const _typedService: AllRequired<ConvertedService> = completeService;
+    expectType<AllRequired<ConvertedService>>(completeService);
     const completeService2 = completeService as unknown;
     ensureConvertedServiceIntegrity(completeService2);
-    const _typedService2: AllRequired<ConvertedService> = completeService2;
+    expectType<AllRequired<ConvertedService>>(completeService2);
   });
   await t.step("missing key throws errors", () => {
     ensureConvertedServiceIntegrity(idExists, "id");
