@@ -1,4 +1,9 @@
-import { assertIsStringRecord, FilterForValues, typeCheck } from "./types.ts";
+import {
+  assertIsStringRecord,
+  checkForAdditionalKeys,
+  FilterForValues,
+  typeCheck,
+} from "./types.ts";
 
 export type Credentials = {
   username?: string;
@@ -16,6 +21,7 @@ export function assertIsCredentials<K extends keyof Credentials = never>(
     "password",
     "username",
   ];
+  checkForAdditionalKeys(obj, allKeys);
   if (assertion) {
     if (Array.isArray(assertion)) {
       for (const key of assertion) {
@@ -26,7 +32,7 @@ export function assertIsCredentials<K extends keyof Credentials = never>(
     }
   } else {
     for (const prop of allKeys) {
-      typeCheck(obj, prop, "object", true);
+      typeCheck(obj, prop, "string");
     }
   }
 }

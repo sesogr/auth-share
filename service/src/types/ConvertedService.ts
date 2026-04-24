@@ -98,7 +98,7 @@ function ensureConvertedServiceIntegrity(
       typeCheck(obj, prop);
     }
     for (const prop of stringArrayKeys) {
-      typeCheck<[]>(obj, prop, "object", true);
+      typeCheck(obj, prop, "array");
       obj[prop].forEach((e) => {
         if (typeof e !== "string") {
           throw new TypeError(`${obj}:${prop}:${e} is not a string`);
