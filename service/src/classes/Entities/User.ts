@@ -8,9 +8,10 @@ import { Entity } from "../Entity.ts";
 import { Session } from "../Session.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ValidationError } from "../errors/ValidationError.ts";
-export type ValidatedUser = User & { zzz: never };
+import { ValidatedUser } from "../../../interfaceTypes/ValidatedUser.ts";
+import { UserI } from "../../../interfaceTypes/UserI.ts";
 
-export class User extends Entity {
+export class User extends Entity implements UserI {
   private validated: boolean = false;
   public get sessions(): Session[] {
     return [...this._sessions];
@@ -131,15 +132,6 @@ export class User extends Entity {
     this._sessions.push(session);
     return { token, session };
   }
-
-  removeInvitation(invite: Invitation) {
-    this.checkValidation();
-    this.userGroupInvitations = this.userGroupInvitations.filter(
-      (currInvitation) => {
-        return currInvitation.equals(invite);
-      },
-    );
-  }
   changeUserCredentials(_newCredentials: UserCredential) {
     this.checkValidation();
     this.credentials = _newCredentials;
@@ -153,9 +145,10 @@ export class User extends Entity {
   toJsonString(): string {
     return JSON.stringify(this.toConvertedUser());
   }
+
   private toConvertedUser(): ConvertedUser {
-    if (this.validated) {
-      return {
+    return this.validated
+      ? {
         displayname: this.username,
         owned: this.listServices(true),
         credentials: { username: this.credentials.username },
@@ -165,11 +158,10 @@ export class User extends Entity {
         ),
         ownedGroups: this.listJoinedGroups(true),
         groups: this.listJoinedGroups(),
+      }
+      : {
+        displayname: this.username,
       };
-    }
-    return {
-      displayname: this.username,
-    };
   }
 
   toJson(): ConvertedUser {

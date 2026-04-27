@@ -8,7 +8,7 @@ import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
 import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
 import { ConvertedService } from "../../src/types/ConvertedService.ts";
-import { ValidatedUser } from "../../src/classes/Entities/User.ts";
+import { User } from "../../src/classes/Entities/User.ts";
 
 const serviceCredential = new ServiceCredential("", "");
 const userShort = await FakeObjectGen.createFakeUser(
@@ -97,7 +97,7 @@ Deno.test("Service Class", async (t) => {
         getGroupname: "asd",
       }] as AllowedGroupServiceMap[],
     );
-    service.checkOwner({ getId: () => "bcd" } as ValidatedUser);
+    service.checkOwner({ getId: () => "bcd" } as User);
     const data: ConvertedService = {
       credentials: {
         username: service.credentials.username!,

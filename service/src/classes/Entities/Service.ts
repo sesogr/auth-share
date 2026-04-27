@@ -6,11 +6,12 @@ import { Entity } from "../Entity.ts";
 import { Group } from "./Group.ts";
 import { Invitation } from "../Values/Invitation.ts";
 import { ServiceCredential } from "../Values/ServiceCredential.ts";
-import { User, ValidatedUser } from "./User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { DuplicateError } from "../errors/DuplicateError.ts";
 import { HasInvitations } from "../../../interfaceTypes/HasInvitations.ts";
 import { IdNameMap } from "../Values/IdNameMap.ts";
+import { ValidatedUser } from "../../../interfaceTypes/ValidatedUser.ts";
+import { UserI } from "../../../interfaceTypes/UserI.ts";
 
 export type OwnedService = { zzz: never } & Service;
 export class Service extends Entity implements HasInvitations {
@@ -71,7 +72,7 @@ export class Service extends Entity implements HasInvitations {
     );
   }
 
-  checkOwner(user: User): asserts this is OwnedService {
+  checkOwner(user: UserI): asserts this is OwnedService {
     if (!this.allowedUsers.find((e) => e.getUserId == user.getId())) {
       throw new AuthorizationError(`You are not an Owner`);
     }
@@ -130,7 +131,7 @@ export class Service extends Entity implements HasInvitations {
       currElement.getGroupname;
     return this.allowedGroups.map(mapCallback);
   }
-  giveAuthorizationToUser(user: User): void {
+  giveAuthorizationToUser(user: UserI): void {
     const userMap = user.convertToShort();
     if (this.allowedUsers.some((e) => userMap.displayname === e.getUsername)) {
       throw new DuplicateError(
@@ -174,7 +175,7 @@ export class Service extends Entity implements HasInvitations {
   toJson() {
     return this.convertToSerializableObj();
   }
-  sendInvitation(receiver: Group, sender: User) {
+  sendInvitation(receiver: Group, sender: UserI) {
     const invitation = new Invitation(
       sender.convertToShort(),
       this.convertToShort(),

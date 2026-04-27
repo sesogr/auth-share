@@ -1,5 +1,4 @@
 import { HeadController } from "../../src/classes/controller/HeadController.ts";
-import { ValidatedUser } from "../../src/classes/Entities/User.ts";
 import { Context } from "@hono/hono";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
 import { TestContext } from "../StubbedClasses/TestContext.ts";
@@ -9,6 +8,7 @@ import { SessionError } from "../../src/classes/errors/controllerErrors/SessionE
 import { ControllerError } from "../../src/classes/errors/controllerErrors/ControllerError.ts";
 import { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 import { Logger } from "../../interfaceTypes/Logger.ts";
+import { ValidatedUser } from "../../interfaceTypes/ValidatedUser.ts";
 
 class _unprotectHeadController extends HeadController {
   constructor(logging: Logger) {

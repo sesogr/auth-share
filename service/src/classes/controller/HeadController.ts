@@ -1,8 +1,9 @@
-import { User, ValidatedUser } from "../Entities/User.ts";
+import { User } from "../Entities/User.ts";
 import { Context } from "@hono/hono";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { ControllerError } from "../errors/controllerErrors/ControllerError.ts";
 import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { ValidatedUser } from "../../../interfaceTypes/ValidatedUser.ts";
 
 export abstract class HeadController {
   protected constructor(readonly logging: Logger) {

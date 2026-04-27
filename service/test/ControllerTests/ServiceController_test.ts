@@ -20,13 +20,14 @@ import { RepositoryView } from "../../interfaceTypes/RepositoryView.ts";
 import { Stubbed } from "@stubClass";
 import { Group } from "../../src/classes/Entities/Group.ts";
 import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
+import { UserI } from "../../interfaceTypes/UserI.ts";
 
 Deno.test("ServiceController", async (t) => {
   const goodReturn = "returned" as unknown;
   let errorReturn = "errorReturn" as unknown;
   const serviceRepo = TestServiceRepo.create();
   const ramLogger = new RamOnlyLog();
-  const userRepo = TestUserRepo.create() as Stubbed<RepositoryView<User>>;
+  const userRepo = TestUserRepo.create() as Stubbed<RepositoryView<UserI>>;
   const groupRepo = TestGroupRepo.create() as Stubbed<RepositoryView<Group>>;
   const mockedService = TestService.create();
   const mockedUser = TestUser.create();

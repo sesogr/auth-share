@@ -8,7 +8,6 @@ import {
 import { Group } from "../Entities/Group.ts";
 import { PromisesUtil } from "../PromissesUtil.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
-import { User } from "../Entities/User.ts";
 import {
   ConvertedUser,
   ensureConvertedUserIntegrity,
@@ -18,11 +17,12 @@ import { Logger } from "../../../interfaceTypes/Logger.ts";
 import { RepositoryView } from "../../../interfaceTypes/RepositoryView.ts";
 import { Service } from "../Entities/Service.ts";
 import { WrongInvitationTypeError } from "../errors/controllerErrors/ConflictError/WrongInvitationTypeError.ts";
+import { UserI } from "../../../interfaceTypes/UserI.ts";
 
 export class GroupController extends HeadController {
   constructor(
     private readonly groupRepository: GroupRepository,
-    private readonly userRepository: RepositoryView<User>,
+    private readonly userRepository: RepositoryView<UserI>,
     private readonly serviceRepository: RepositoryView<Service>,
     logging: Logger,
   ) {
@@ -89,7 +89,7 @@ export class GroupController extends HeadController {
           const object: Group = await this.groupRepository.findByDisplayName(
             obj,
           );
-          const senderUser: User = await this.userRepository.findByDisplayName(
+          const senderUser = await this.userRepository.findByDisplayName(
             sender,
           );
           object.checkOwner(senderUser);
@@ -129,7 +129,7 @@ export class GroupController extends HeadController {
         ),
       );
       const { rejected: notFound, fulfilled: userlist } = PromisesUtil
-        .splitSettled<User, NotFoundError>(settledUsers);
+        .splitSettled<UserI, NotFoundError>(settledUsers);
       const { fulfilled, alreadyIn } = group.sendMultipleInvitations(
         ME,
         userlist,

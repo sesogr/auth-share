@@ -7,7 +7,6 @@ import { Context } from "@hono/hono";
 import { Service } from "../Entities/Service.ts";
 import { ServiceCredential } from "../Values/ServiceCredential.ts";
 import { HeadController } from "./HeadController.ts";
-import { User } from "../Entities/User.ts";
 import { NotFoundError } from "../errors/NotFoundError.ts";
 import { PromisesUtil } from "../PromissesUtil.ts";
 import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
@@ -18,11 +17,12 @@ import { RepositoryView } from "../../../interfaceTypes/RepositoryView.ts";
 import { ensureConvertedGroupIntegrity } from "../../types/ConvertedGroup.ts";
 import { WrongInvitationTypeError } from "../errors/controllerErrors/ConflictError/WrongInvitationTypeError.ts";
 import { Invitation } from "../Values/Invitation.ts";
+import { UserI } from "../../../interfaceTypes/UserI.ts";
 
 export class ServiceController extends HeadController {
   constructor(
     private readonly serviceRepository: ServiceRepository,
-    private readonly userRepository: RepositoryView<User>,
+    private readonly userRepository: RepositoryView<UserI>,
     private readonly groupRepository: RepositoryView<Group>,
     logging: Logger,
   ) {
@@ -82,7 +82,7 @@ export class ServiceController extends HeadController {
         serviceData.id,
       );
       service.checkOwner(ME);
-      const settledRecords: PromiseSettledResult<User>[] = await Promise
+      const settledRecords: PromiseSettledResult<UserI>[] = await Promise
         .allSettled(
           serviceData.users.map((e) =>
             this.userRepository.findByDisplayName(e)
@@ -90,7 +90,7 @@ export class ServiceController extends HeadController {
         );
       const { fulfilled: users, rejected: notfound } = PromisesUtil
         .splitSettled<
-          User,
+          UserI,
           NotFoundError
         >(settledRecords);
       const alreadyAuthorized: ConvertedUser[] = [];
@@ -181,7 +181,7 @@ export class ServiceController extends HeadController {
             .findByDisplayName(
               objname,
             );
-          const sender: User = await this.userRepository
+          const sender = await this.userRepository
             .findByDisplayName(
               sendername,
             );

@@ -6,9 +6,11 @@ import { AllowedUserGroupMap } from "../Values/AllowedUserGroupMap.ts";
 import { Entity } from "../Entity.ts";
 import { IdNameMap } from "../Values/IdNameMap.ts";
 import { Invitation } from "../Values/Invitation.ts";
-import { User, ValidatedUser } from "./User.ts";
+import { User } from "./User.ts";
 import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 import { HasInvitations } from "../../../interfaceTypes/HasInvitations.ts";
+import { ValidatedUser } from "../../../interfaceTypes/ValidatedUser.ts";
+import { UserI } from "../../../interfaceTypes/UserI.ts";
 
 export type OwnedGroups = Group & { zzz: never };
 
@@ -41,7 +43,7 @@ export class Group extends Entity implements HasInvitations {
     return this.groupname;
   }
 
-  checkOwner(user: User): asserts this is OwnedGroups {
+  checkOwner(user: UserI): asserts this is OwnedGroups {
     if (!user.convertToShort().equals(this.owner)) {
       throw new AuthorizationError(
         `${user.getDisplayName()} doesn't own this Group`,
@@ -50,12 +52,12 @@ export class Group extends Entity implements HasInvitations {
     this.owned = true;
   }
 
-  giveAuthorizationToUser(user: IdNameMap | User): void {
+  giveAuthorizationToUser(user: IdNameMap | UserI): void {
     let userinfo: IdNameMap;
     if (user instanceof User) {
       userinfo = user.convertToShort();
     } else {
-      userinfo = user;
+      userinfo = user as IdNameMap;
     }
     if (this.allowedUser.some((e) => e.getUserId == userinfo.id)) {
       throw new DuplicateError("User is already allowed");
@@ -112,7 +114,7 @@ export class Group extends Entity implements HasInvitations {
   }
   sendInvitation(
     senderReference: ValidatedUser,
-    receiverReference: User,
+    receiverReference: UserI,
   ) {
     this.checkOwner(senderReference);
     const invitation = new Invitation(
@@ -129,10 +131,10 @@ export class Group extends Entity implements HasInvitations {
   }
   sendMultipleInvitations(
     senderReference: ValidatedUser,
-    receiverReferences: User[],
-  ): { fulfilled: User[]; alreadyIn: User[] } {
+    receiverReferences: UserI[],
+  ): { fulfilled: UserI[]; alreadyIn: UserI[] } {
     this.checkOwner(senderReference);
-    const result: { fulfilled: User[]; alreadyIn: User[] } = {
+    const result: { fulfilled: UserI[]; alreadyIn: UserI[] } = {
       fulfilled: [],
       alreadyIn: [],
     };

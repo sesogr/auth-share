@@ -1,9 +1,11 @@
 import { faker } from "@jackfiszr/faker";
-import { User, ValidatedUser } from "./Entities/User.ts";
+import { User } from "./Entities/User.ts";
 import { UserCredential } from "./Values/UserCredential.ts";
 import { Group } from "./Entities/Group.ts";
 import { Service } from "./Entities/Service.ts";
 import { ServiceCredential } from "./Values/ServiceCredential.ts";
+import { ValidatedUser } from "../../interfaceTypes/ValidatedUser.ts";
+import { UserI } from "../../interfaceTypes/UserI.ts";
 
 export class FakeObjectGen {
   static async createFakeUser(
@@ -60,8 +62,8 @@ export class FakeObjectGen {
     );
   }
 
-  static async generateFakeUsers(count: number = 10): Promise<User[]> {
-    const fakeUserList: User[] = [];
+  static async generateFakeUsers(count: number = 10): Promise<UserI[]> {
+    const fakeUserList: UserI[] = [];
     for (let i = 0; i < count; i++) {
       const fakeUser = await FakeObjectGen.createFakeUser();
       fakeUserList.push(fakeUser);

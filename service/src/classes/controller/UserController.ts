@@ -10,6 +10,8 @@ import { Environment } from "../Environment.ts";
 import { ensureConvertedUserIntegrity } from "../../types/ConvertedUser.ts";
 import { SessionError } from "../errors/controllerErrors/SessionError.ts";
 import { Logger } from "../../../interfaceTypes/Logger.ts";
+import { ValidatedUser } from "../../../interfaceTypes/ValidatedUser.ts";
+import { UserI } from "../../../interfaceTypes/UserI.ts";
 
 export class UserController extends HeadController {
   constructor(
@@ -25,7 +27,7 @@ export class UserController extends HeadController {
       if (!sessionToken) {
         return this.errorHandle(new SessionError("No session token"), c);
       }
-      const currentUser: User = await this.userRepository.findBySessionToken(
+      const currentUser: UserI = await this.userRepository.findBySessionToken(
         sessionToken,
       );
       currentUser.validateSession(sessionToken);
@@ -60,7 +62,7 @@ export class UserController extends HeadController {
   async changePassword(c: Context) {
     try {
       const requestData: ConvertedUser = await c.req.json();
-      const me: User = this.getMeFromContext(c);
+      const me = this.getMeFromContext(c);
       ensureConvertedUserIntegrity(requestData, "credentials");
       const newPassword: string = requestData.credentials.password;
 
@@ -123,7 +125,7 @@ export class UserController extends HeadController {
     try {
       const requestData: ConvertedUser = await c.req.json();
       ensureConvertedUserIntegrity(requestData, "displayname");
-      const me: User = this.getMeFromContext(c);
+      const me: ValidatedUser = this.getMeFromContext(c);
       me.setDisplayName(requestData.displayname);
       await this.userRepository.save(me);
       return c.body(null, 204);

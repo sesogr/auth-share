@@ -19,11 +19,12 @@ import { RuntimeError } from "../../errors/RuntimeError.ts";
 import { DbSessions } from "./Models/DbSessions.ts";
 import { Session } from "../../Session.ts";
 import { DbRepository } from "./DbRepository.ts";
-import { Entity } from "../../Entity.ts";
 import { ConflictError } from "../../errors/controllerErrors/ConflictError/ConflictError.ts";
 import { Logger } from "../../../../interfaceTypes/Logger.ts";
+import { ValidatedUser } from "../../../../interfaceTypes/ValidatedUser.ts";
+import { UserI } from "../../../../interfaceTypes/UserI.ts";
 
-export class DbUserRepository extends DbRepository<User>
+export class DbUserRepository extends DbRepository<UserI>
   implements UserRepository {
   constructor(logging: Logger) {
     super(
@@ -34,7 +35,7 @@ export class DbUserRepository extends DbRepository<User>
     );
   }
 
-  override async delete(item: Entity): Promise<void> {
+  override async delete(item: ValidatedUser): Promise<void> {
     const groups = await DbGroup.where(DbGroup.field("owner"), item.getId())
       .all();
     if (groups.length > 0) {
@@ -99,7 +100,7 @@ export class DbUserRepository extends DbRepository<User>
     }
   }
 
-  async findByUserName(name: string): Promise<User> {
+  async findByUserName(name: string): Promise<UserI> {
     const aUser = await DbUserCredential.where("username", name).first();
     if (!aUser || !aUser.username) {
       throw new NotFoundError("user", "username", name);
@@ -107,7 +108,7 @@ export class DbUserRepository extends DbRepository<User>
     return this.hydrate(aUser.dbuserId);
   }
 
-  async findBySessionToken(token: string): Promise<User> {
+  async findBySessionToken(token: string): Promise<UserI> {
     const sessionId = Session.fromSessionTokenToSessionId(token);
     const sessionData = await DbSessions.where("id", sessionId).first();
     return this.hydrate(sessionData.dbuserId);
@@ -136,7 +137,7 @@ export class DbUserRepository extends DbRepository<User>
   }
 
   //User_ID=searchedId
-  async hydrate(searchedId: string): Promise<User> {
+  async hydrate(searchedId: string): Promise<UserI> {
     const queryData = await DbUser
       .select(
         DbUser.field("displayname", "username"),

@@ -6,6 +6,14 @@ import { Session } from "../../src/classes/Session.ts";
 import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
 import { Invitation } from "../../src/classes/Values/Invitation.ts";
 import { AllowedUserGroupMap } from "../../src/classes/Values/AllowedUserGroupMap.ts";
+import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
+import { expectType } from "../../interfaceTypes/expectType.ts";
+import { ValidationError } from "../../src/classes/errors/ValidationError.ts";
+import type {
+  ValidatedUser,
+  ValidatedUserMethods,
+} from "../../interfaceTypes/ValidatedUser.ts";
+
 Deno.test("UserClass", async (t) => {
   const [name, hash, salt, displayname] = ["as", "cd", "jd", "da"];
   const uc = new UserCredential(name, hash, salt);
@@ -78,24 +86,60 @@ Deno.test("UserClass", async (t) => {
 
     await st.step("notValidated", () => {
       assertEquals({ displayname: username }, user.toJson());
+      assertEquals(
+        user.toJsonString(),
+        JSON.stringify({ displayname: username }),
+      );
     });
     user.validateSession("");
     await st.step("validated", () => {
+      const userdata: ConvertedUser = {
+        displayname: user.getDisplayName(),
+        owned: userServiceMap.filter((e) => e.isOwner).map((e) =>
+          e.getServicename
+        ),
+        userGroupInvitations: [invitation.toString()],
+        credentials: credentialData,
+        ownedGroups: userGroupMap.filter((e) => e.isOwner).map((e) =>
+          e.getGroupname
+        ),
+        groups: userGroupMap.map((e) => e.getGroupname),
+        callable: userServiceMap.map((e) => e.getServicename),
+      };
       assertEquals(
-        {
-          displayname: user.getDisplayName(),
-          owned: userServiceMap.filter((e) => e.isOwner).map((e) =>
-            e.getServicename
-          ),
-          userGroupInvitations: [invitation.toString()],
-          credentials: credentialData,
-          ownedGroups: userGroupMap.filter((e) => e.isOwner).map((e) =>
-            e.getGroupname
-          ),
-          groups: userGroupMap.map((e) => e.getGroupname),
-          callable: userServiceMap.map((e) => e.getServicename),
-        },
+        userdata,
         user.toJson(),
+      );
+      assertEquals(
+        JSON.parse(JSON.stringify(userdata)),
+        JSON.parse(user.toJsonString()),
+      );
+    });
+  });
+  await t.step("check Validation", () => {
+    let user: User = new User({} as UserCredential);
+    assertThrows(() => {
+      user.checkValidation();
+    }, ValidationError);
+    user = User.createUser({} as UserCredential, "abc");
+    user.checkValidation();
+    expectType<ValidatedUser>(user);
+  });
+  await t.step("checkValidation gets called for all privileged methods", () => {
+    const privilegedMethods: (keyof ValidatedUserMethods)[] = [
+      "setDisplayName",
+      "changeUserCredentials",
+      "listJoinedGroups",
+      "listServices",
+    ];
+    const user: User = new User({} as UserCredential, "hello");
+    privilegedMethods.forEach((e) => {
+      assertThrows(
+        () => {
+          user[e]("asdf" as never);
+        },
+        ValidationError,
+        "hello is not validated",
       );
     });
   });

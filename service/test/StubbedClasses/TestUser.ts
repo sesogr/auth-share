@@ -1,5 +1,6 @@
 import { Stubbed, StubFullType } from "@stubClass";
-import { User, ValidatedUser } from "../../src/classes/Entities/User.ts";
+import { User } from "../../src/classes/Entities/User.ts";
+import { ValidatedUser } from "../../interfaceTypes/ValidatedUser.ts";
 
 export class TestUser extends StubFullType<User> {
   static create(): Stubbed<User> & {
@@ -28,7 +29,6 @@ export class TestUser extends StubFullType<User> {
       "setDisplayName",
       "toJson",
       "listUserGroupInvitation",
-      "removeInvitation",
       "listServices",
       "getCredentials",
     ]);
