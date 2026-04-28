@@ -2,7 +2,10 @@ import { EnvError } from "./errors/EnvError.ts";
 import { Logger } from "../../interfaceTypes/Logger.ts";
 
 export class Environment {
-  private static logger: Logger;
+  static set logger(value: Logger) {
+    this._logger = value.withOwnContext("Environment");
+  }
+  private static _logger: Logger;
   private static _FRONT_END_URL: string;
   public static get FRONT_END_URL(): string {
     if (!this.checked) {
@@ -90,7 +93,7 @@ export class Environment {
     this.checked = false;
   }
   public static load(logger: Logger): void {
-    this.logger = logger.withOwnContext("Environment");
+    this._logger = logger.withOwnContext("Environment");
     this.FRONT_END_URL = Deno.env.get("FRONT_END_URL")!;
     this.DB_NAME = Deno.env.get("DB_NAME")!;
     this.DB_USER = Deno.env.get("DB_USER")!;
