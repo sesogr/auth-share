@@ -49,6 +49,9 @@ Deno.test("ConvertedUser Type Check", async (t) => {
     const completeUser2 = completeUser as unknown;
     ensureConvertedUserIntegrity(completeUser2);
     expectType<AllRequired<ConvertedUser>>(completeUser2);
+    const completeUser3 = completeUser as unknown;
+    ensureConvertedUserIntegrity(completeUser3, allKeys);
+    expectType<AllRequired<ConvertedUser>>(completeUser3);
   });
   await t.step("missing key throws errors", () => {
     ensureConvertedUserIntegrity(idExists, "id");
@@ -66,6 +69,15 @@ Deno.test("ConvertedUser Type Check", async (t) => {
     });
     assertThrows(() => {
       ensureConvertedUserIntegrity(displaynameExists, ["id"]);
+    });
+    assertThrows(() => {
+      ensureConvertedUserIntegrity(idExists, ["credentials"]);
+    });
+    assertThrows(() => {
+      ensureConvertedUserIntegrity(displaynameExists, "credentials");
+    });
+    assertThrows(() => {
+      ensureConvertedUserIntegrity(displaynameExists);
     });
     assertThrows(() => {
       ensureConvertedUserIntegrity(displaynameExists, "id");

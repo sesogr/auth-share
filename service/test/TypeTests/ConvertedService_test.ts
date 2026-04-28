@@ -4,6 +4,7 @@ import {
   ensureConvertedServiceIntegrity,
 } from "../../src/types/ConvertedService.ts";
 import { expectType } from "../../interfaceTypes/expectType.ts";
+import { AllRequired } from "./AllRequired.ts";
 
 Deno.test("ConvertedService Type Check", async (t) => {
   const allKeys: (keyof ConvertedService)[] = [
@@ -67,7 +68,16 @@ Deno.test("ConvertedService Type Check", async (t) => {
       ensureConvertedServiceIntegrity(idExists, ["serviceName"]);
     });
     assertThrows(() => {
+      ensureConvertedServiceIntegrity(idExists, "credentials");
+    });
+    assertThrows(() => {
+      ensureConvertedServiceIntegrity(idExists, ["credentials"]);
+    });
+    assertThrows(() => {
       ensureConvertedServiceIntegrity(serviceNameExists, ["id"]);
+    });
+    assertThrows(() => {
+      ensureConvertedServiceIntegrity(serviceNameExists);
     });
     assertThrows(() => {
       ensureConvertedServiceIntegrity(serviceNameExists, "id");
@@ -105,7 +115,3 @@ Deno.test("ConvertedService Type Check", async (t) => {
     );
   });
 });
-
-type AllRequired<T> = {
-  [P in keyof T]-?: Exclude<T[P], undefined>;
-};
