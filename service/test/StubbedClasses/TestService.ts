@@ -1,5 +1,5 @@
 import { Stubbed, StubFullType } from "@stubClass";
-import { OwnedService, Service } from "../../src/classes/Entities/Service.ts";
+import { Service } from "../../src/classes/Entities/Service.ts";
 import { ServiceCredential } from "../../src/classes/Values/ServiceCredential.ts";
 
 export class TestService extends StubFullType<Service> {
@@ -24,10 +24,7 @@ export class TestService extends StubFullType<Service> {
       "serviceTestName:serviceTestPassword",
     );
   }
-  static create(): Stubbed<Service> & { owned: OwnedService } {
+  static create(): Stubbed<Service> {
     return new TestService();
-  }
-  get owned() {
-    return this as unknown as OwnedService;
   }
 }
