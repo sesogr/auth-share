@@ -1,6 +1,7 @@
 import { ValueClass } from "../ValueClass.ts";
 import { bcryptAdapter } from "../../adapter/bcryptAdapter.ts";
 import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
+
 export class UserCredential extends ValueClass<UserCredential> {
   constructor(
     readonly username: string,
@@ -51,10 +52,3 @@ export class UserCredential extends ValueClass<UserCredential> {
     );
   }
 }
-
-// Deno.test("jdsj", () => {
-//   console.log(new UserCredential("a", "b").toString());
-// });
-//Deno.test("With from valueClass", () => {
-//  console.log(new UserCredential("a", "b").with({ "username": "c" }));
-//});
