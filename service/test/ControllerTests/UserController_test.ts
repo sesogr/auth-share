@@ -7,12 +7,13 @@ import { stub } from "@std/testing/mock";
 import { TestUser } from "../StubbedClasses/TestUser.ts";
 import { assertEquals } from "@std/assert";
 import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
+import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
 
 Deno.test("UserController - Test", async (t) => {
   const goodReturn = "returned";
   const userRepo = TestUserRepo.create();
   const userController = new UserController(userRepo.this, new RamOnlyLog());
-  const errorReturned = "errorReturned";
+  let errorReturned = "errorReturned";
   //@ts-ignore protected member
   const errorHandleStub = stub(userController, "errorHandle", () => {
     return errorReturned;
@@ -119,13 +120,11 @@ Deno.test("UserController - Test", async (t) => {
     userRepo.reset();
     sessionToken = "123";
     const deleteCookieStub = stub(HonoCookieAdapter, "deleteCookie");
-    userRepo.registerOutput("findBySessionToken", mockedUser);
     mockContext.registerOutput("body", goodReturn);
     const returned = await userController.logOut(
       mockContext.this,
     ) as unknown as string;
     assertEquals(returned, goodReturn);
-    assertEquals(userRepo.lastArgs("findBySessionToken"), [sessionToken]);
     assertEquals(mockedUser.stub["deleteSessionByToken"].args[0], [
       sessionToken,
     ]);
@@ -133,5 +132,39 @@ Deno.test("UserController - Test", async (t) => {
     assertEquals(deleteCookieStub.calls[0].args, [mockContext.this, "session"]);
     assertEquals(mockContext.lastArgs("body"), [null, 200]);
     assertEquals(userRepo.lastArgs("save"), [mockedUser]);
+  });
+  await t.step("all methods return errorHandle", async (st) => {
+    sessionToken = "123";
+    errorReturned = goodReturn;
+    await st.step("user logged in required", async () => {
+      while (errorHandleStub.calls.length) errorHandleStub.calls.pop();
+      mockContext.reset(true);
+      userRepo.reset();
+      userRepo.registerOutput("findBySessionToken", mockedUser);
+      const errorObject = new Error("generic");
+      mockContext.registerOutput("get", errorObject, true);
+      mockContext.registerOutput("set", errorObject);
+      const returnedList: unknown[] = [];
+      returnedList.push(
+        userController.listMyServices(mockContext.this),
+        await userController.logOut(mockContext.this),
+        await userController.changeDisplayName(mockContext.this),
+        await userController.changePassword(mockContext.this),
+        await userController.delete(mockContext.this),
+        userController.read(mockContext.this),
+        await userController.authMiddleware(
+          mockContext.this,
+          () => Promise.resolve(),
+        ),
+      );
+      assertResponsesAndErrors(
+        returnedList,
+        goodReturn,
+        errorHandleStub,
+        errorObject,
+        mockContext as unknown as TestContext,
+        mockedUser as unknown as TestUser,
+      );
+    });
   });
 });

@@ -61,8 +61,8 @@ export class UserController extends HeadController {
 
   async changePassword(c: Context) {
     try {
-      const requestData: ConvertedUser = await c.req.json();
       const me = this.getMeFromContext(c);
+      const requestData: ConvertedUser = await c.req.json();
       ensureConvertedUserIntegrity(requestData, "credentials");
       const newPassword: string = requestData.credentials.password;
 
@@ -78,8 +78,8 @@ export class UserController extends HeadController {
 
   async logOut(c: Context) {
     try {
+      const user = this.getMeFromContext(c);
       const sessionToken = HonoCookieAdapter.saveGetCookie(c, "session");
-      const user = await this.userRepository.findBySessionToken(sessionToken);
       user.deleteSessionByToken(sessionToken);
       await this.userRepository.save(user);
       HonoCookieAdapter.deleteCookie(c, "session");
@@ -123,9 +123,9 @@ export class UserController extends HeadController {
 
   async changeDisplayName(c: Context) {
     try {
+      const me: ValidatedUser = this.getMeFromContext(c);
       const requestData: ConvertedUser = await c.req.json();
       ensureConvertedUserIntegrity(requestData, "displayname");
-      const me: ValidatedUser = this.getMeFromContext(c);
       me.setDisplayName(requestData.displayname);
       await this.userRepository.save(me);
       return c.body(null, 204);
