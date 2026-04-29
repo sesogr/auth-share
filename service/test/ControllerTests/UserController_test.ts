@@ -1,13 +1,13 @@
-import { UserController } from "../../src/classes/controller/UserController.ts";
-import { RamOnlyLog } from "../RamOnlyLog.ts";
-import { TestUserRepo } from "../StubbedClasses/TestUserRepo.ts";
-import { TestContext } from "../StubbedClasses/TestContext.ts";
+import {UserController} from "../../src/classes/controller/UserController.ts";
+import {RamOnlyLog} from "../RamOnlyLog.ts";
+import {TestUserRepo} from "../StubbedClasses/TestUserRepo.ts";
+import {TestContext} from "../StubbedClasses/TestContext.ts";
 import HonoCookieAdapter from "../../src/adapter/HonoCookieAdapter.ts";
-import { stub } from "@std/testing/mock";
-import { TestUser } from "../StubbedClasses/TestUser.ts";
-import { assertEquals } from "@std/assert";
-import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
-import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
+import {stub} from "@std/testing/mock";
+import {TestUser} from "../StubbedClasses/TestUser.ts";
+import {assertEquals} from "@std/assert";
+import {ConvertedUser} from "../../src/types/ConvertedUser.ts";
+import {assertResponsesAndErrors} from "./assertResponsesAndErrors.ts";
 
 Deno.test("UserController - Test", async (t) => {
   const goodReturn = "returned";
@@ -156,6 +156,27 @@ Deno.test("UserController - Test", async (t) => {
           mockContext.this,
           () => Promise.resolve(),
         ),
+      );
+      assertResponsesAndErrors(
+        returnedList,
+        goodReturn,
+        errorHandleStub,
+        errorObject,
+        mockContext as unknown as TestContext,
+        mockedUser as unknown as TestUser,
+      );
+    });
+    await st.step("user not needed to be logged in", async () => {
+      while (errorHandleStub.calls.length) errorHandleStub.calls.pop();
+      mockContext.reset();
+      userRepo.reset();
+      const _methodList = ["login", "create"];
+      const errorObject = new Error("generic");
+      mockContext.req.registerOutput("json", errorObject, true);
+      const returnedList: unknown[] = [];
+      returnedList.push(
+        await userController.logIn(mockContext.this),
+        await userController.create(mockContext.this),
       );
       assertResponsesAndErrors(
         returnedList,
