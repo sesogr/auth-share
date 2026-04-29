@@ -9,6 +9,7 @@ import { ConvertedGroup } from "../../src/types/types.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
 import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupServiceMap.ts";
 import { AllowedUserGroupMap } from "../../src/classes/Values/AllowedUserGroupMap.ts";
+import { TestUser } from "../StubbedClasses/TestUser.ts";
 
 const userCredential = new UserCredential("Hans Meiser", "abcdef", "");
 
@@ -141,5 +142,75 @@ Deno.test("Group Class", async (t) => {
     };
     assertEquals(group.toJson(), convGroup);
     assertEquals(group.toJsonString(), JSON.stringify(convGroup));
+  });
+
+  await t.step("privileged methods throw when not privileged", () => {
+    const group = new Group("asdf", new IdNameMap("id", "name"));
+    assertThrows(() => {
+      group.giveAuthorizationToUser(user);
+    });
+    assertThrows(() => {
+      group.sendMultipleInvitations(user, [user2]);
+    });
+    assertThrows(() => {
+      group.sendInvitation(user, user2);
+    });
+    assertThrows(() => {
+      group.acceptInvitation({} as Invitation);
+    });
+    assertThrows(() => {
+      group.listSentInvitation();
+    });
+    assertThrows(() => {
+      group.listServiceInvitation();
+    });
+    assertThrows(() => {
+      group.sentInvitations;
+    });
+  });
+
+  await t.step("accept invitation", async (st) => {
+    const group = await FakeObjectGen.createFakeGroup();
+    const owner = TestUser.create();
+    const ownerObject = group.getOwner();
+    await st.step("not found", () => {
+      assertThrows(() => {
+        group.acceptInvitation({} as Invitation);
+      });
+    });
+    await st.step("found", () => {
+      owner.reset();
+      owner.registerOutput("convertToShort", ownerObject, true);
+      group.sendInvitation(owner.validated, user2);
+      const [invite] = group.listSentInvitation();
+      group.acceptInvitation(invite);
+      assertArrayIncludes(group.listAllowedUsers(), [user2.getId()]);
+    });
+  });
+  await t.step("invite multiple", async (st) => {
+    const group = await FakeObjectGen.createFakeGroup();
+    const owner = TestUser.create();
+    const user3 = await FakeObjectGen.createFakeUser();
+    await st.step("2 sended", () => {
+      const ownerObject = group.getOwner();
+      owner.registerOutput("convertToShort", ownerObject, true);
+      group.sendMultipleInvitations(owner.validated, [user2, user3]);
+      const [invite1, invite2] = group.listSentInvitation();
+      group.acceptInvitation(invite1);
+      group.acceptInvitation(invite2);
+      assertArrayIncludes(group.listAllowedUsers(), [
+        user2.getId(),
+        user3.getId(),
+      ]);
+    });
+    await st.step("duplicate sended", () => {
+      const returned = group.sendMultipleInvitations(owner.validated, [
+        user2,
+        user2,
+        user3,
+        user3,
+      ]);
+      assertArrayIncludes(returned.alreadyIn, [user2, user3]);
+    });
   });
 });

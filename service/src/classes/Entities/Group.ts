@@ -7,7 +7,6 @@ import { Entity } from "../Entity.ts";
 import { IdNameMap } from "../Values/IdNameMap.ts";
 import { Invitation } from "../Values/Invitation.ts";
 import { User } from "./User.ts";
-import { AlreadyTakenError } from "../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 import { HasInvitations } from "../../../interfaceTypes/HasInvitations.ts";
 import { ValidatedUser } from "../../../interfaceTypes/ValidatedUser.ts";
 import { UserI } from "../../../interfaceTypes/UserI.ts";
@@ -20,6 +19,7 @@ export class Group extends Entity implements HasInvitations {
   }
 
   public get sentInvitations(): Invitation[] {
+    this.checkOwned();
     return [...this._sentInvitations];
   }
 
@@ -53,6 +53,7 @@ export class Group extends Entity implements HasInvitations {
   }
 
   giveAuthorizationToUser(user: IdNameMap | UserI): void {
+    this.checkOwned();
     let userinfo: IdNameMap;
     if (user instanceof User) {
       userinfo = user.convertToShort();
@@ -77,9 +78,11 @@ export class Group extends Entity implements HasInvitations {
   }
 
   listServiceInvitation(): Invitation[] {
+    this.checkOwned();
     return [...this.serviceInvitations];
   }
   acceptInvitation(invitation: Invitation): void {
+    this.checkOwned();
     const realInviteIndex = this._sentInvitations.findIndex((e) =>
       e.equals(invitation)
     );
@@ -117,6 +120,7 @@ export class Group extends Entity implements HasInvitations {
     receiverReference: UserI,
   ) {
     this.checkOwner(senderReference);
+    this.checkOwned();
     const invitation = new Invitation(
       senderReference.convertToShort(),
       this.convertToShort(),
@@ -134,6 +138,7 @@ export class Group extends Entity implements HasInvitations {
     receiverReferences: UserI[],
   ): { fulfilled: UserI[]; alreadyIn: UserI[] } {
     this.checkOwner(senderReference);
+    this.checkOwned();
     const result: { fulfilled: UserI[]; alreadyIn: UserI[] } = {
       fulfilled: [],
       alreadyIn: [],
@@ -143,7 +148,7 @@ export class Group extends Entity implements HasInvitations {
         this.sendInvitation(senderReference, user);
         result.fulfilled.push(user);
       } catch (e) {
-        if (e instanceof AlreadyTakenError) {
+        if (e instanceof DuplicateError) {
           result.alreadyIn.push(user);
         }
       }
@@ -178,7 +183,11 @@ export class Group extends Entity implements HasInvitations {
       serviceInvitations: this.serviceInvitations.map((e) => e.toString()),
     };
   }
-
+  checkOwned(): asserts this is OwnedGroups {
+    if (!this.owned) {
+      throw new AuthorizationError(this.getDisplayName() + " is not owned");
+    }
+  }
   toJson() {
     return this.showAll();
   }
