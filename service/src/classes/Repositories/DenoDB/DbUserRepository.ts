@@ -117,13 +117,13 @@ export class DbUserRepository extends DbRepository<UserI>
 
   async add(item: User): Promise<void> {
     if (
-      DbUserCredential.select(DbUserCredential.field("username")).where(
+      (await DbUserCredential.select(DbUserCredential.field("username")).where(
         DbUserCredential.field("user_id"),
-        user.getId(),
-      ).first()
+        item.getId(),
+      ).first()).username === item.getCredentials().username
     ) {
       throw new AlreadyTakenError(
-        item.username + " already exists",
+        item.getCredentials().username + " already exists",
         "username",
       );
     }
