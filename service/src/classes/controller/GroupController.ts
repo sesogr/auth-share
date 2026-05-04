@@ -18,6 +18,7 @@ import { RepositoryView } from "../../../interfaceTypes/RepositoryView.ts";
 import { Service } from "../Entities/Service.ts";
 import { WrongInvitationTypeError } from "../errors/controllerErrors/ConflictError/WrongInvitationTypeError.ts";
 import { UserI } from "../../../interfaceTypes/UserI.ts";
+import { AuthorizationError } from "../errors/controllerErrors/AuthorizationError.ts";
 
 export class GroupController extends HeadController {
   constructor(
@@ -28,6 +29,7 @@ export class GroupController extends HeadController {
   ) {
     super(logging.withOwnContext("GroupController"));
   }
+
   async delete(c: Context) {
     try {
       const ME = this.getMeFromContext(c);
@@ -43,6 +45,7 @@ export class GroupController extends HeadController {
       return this.errorHandle(error, c);
     }
   }
+
   async listMyGroups(c: Context) {
     try {
       const ME = this.getMeFromContext(c);
@@ -79,7 +82,9 @@ export class GroupController extends HeadController {
         userData.userGroupInvitations.map(async (invitationStr) => {
           const [sender, obj, receiver, type] = invitationStr.split(":");
           if (receiver !== ME.getDisplayName()) {
-            throw new Error();
+            throw new AuthorizationError(
+              "You are not the receiver of this invitation",
+            );
           }
           if (type !== "group") {
             throw new WrongInvitationTypeError(
