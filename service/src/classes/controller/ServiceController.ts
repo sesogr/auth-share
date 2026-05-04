@@ -18,6 +18,7 @@ import { ensureConvertedGroupIntegrity } from "../../types/ConvertedGroup.ts";
 import { WrongInvitationTypeError } from "../errors/controllerErrors/ConflictError/WrongInvitationTypeError.ts";
 import { Invitation } from "../Values/Invitation.ts";
 import { UserI } from "../../../interfaceTypes/UserI.ts";
+import { DuplicateError } from "../errors/DuplicateError.ts";
 
 export class ServiceController extends HeadController {
   constructor(
@@ -100,7 +101,7 @@ export class ServiceController extends HeadController {
           service.giveAuthorizationToUser(u);
           fulfilledUsers.push(u.toJson());
         } catch (error) {
-          if (error instanceof AlreadyTakenError) {
+          if (error instanceof DuplicateError) {
             alreadyAuthorized.push(u.toJson());
           }
         }

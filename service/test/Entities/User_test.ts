@@ -13,13 +13,31 @@ import type {
   ValidatedUser,
   ValidatedUserMethods,
 } from "../../interfaceTypes/ValidatedUser.ts";
+import { SessionError } from "../../src/classes/errors/controllerErrors/SessionError.ts";
 
 Deno.test("UserClass", async (t) => {
   const [name, hash, salt, displayname] = ["as", "cd", "jd", "da"];
   const uc = new UserCredential(name, hash, salt);
-  stub(Session, "create", () => new Session("asd", new Date(2027, 12), "asd"));
-  stub(Session, "fromSessionTokenToSessionId", () => "asd");
-
+  const [userId, sessionToken, sessionId, sessionExpiresDate] = [
+    "userId",
+    "SessionToken",
+    "sessionId",
+    new Date(2027, 12),
+  ];
+  const session = new Session(sessionId, sessionExpiresDate, userId);
+  stub(
+    Session,
+    "create",
+    () => {
+      return session;
+    },
+  );
+  stub(Session, "fromSessionTokenToSessionId", (token: string) => {
+    return token === sessionToken ? sessionId : "error";
+  });
+  stub(Session, "generateRandomSessionToken", () => sessionToken);
+  let nowNumber = Date.now();
+  stub(Date, "now", () => nowNumber);
   await t.step("creation", async (st) => {
     await st.step("name too long", () => {
       assertThrows(() => {
@@ -91,8 +109,9 @@ Deno.test("UserClass", async (t) => {
         JSON.stringify({ displayname: username }),
       );
     });
-    user.validateSession("");
     await st.step("validated", () => {
+      //@ts-ignore private
+      user.validated = true;
       const userdata: ConvertedUser = {
         displayname: user.getDisplayName(),
         owned: userServiceMap.filter((e) => e.isOwner).map((e) =>
@@ -114,6 +133,8 @@ Deno.test("UserClass", async (t) => {
         JSON.parse(JSON.stringify(userdata)),
         JSON.parse(user.toJsonString()),
       );
+      //@ts-ignore private
+      user.validated = false;
     });
   });
   await t.step("check Validation", () => {
@@ -131,6 +152,7 @@ Deno.test("UserClass", async (t) => {
       "changeUserCredentials",
       "listJoinedGroups",
       "listServices",
+      "listUserGroupInvitation",
     ];
     const user: User = new User({} as UserCredential, "hello");
     privilegedMethods.forEach((e) => {
@@ -141,6 +163,45 @@ Deno.test("UserClass", async (t) => {
         ValidationError,
         "hello is not validated",
       );
+    });
+    //@ts-ignore private
+    user.validated = true;
+    privilegedMethods.forEach((e) => {
+      user[e]("asdf" as never);
+    });
+  });
+  await t.step("Session management", async (st) => {
+    const user: User = new User({} as UserCredential, "username", userId);
+    const returned = user.createSession();
+    await st.step("creation", () => {
+      assertEquals(returned, { token: sessionToken, session });
+      user.validateSession(sessionToken);
+      assertThrows(
+        () => {
+          user.validateSession("error");
+        },
+        SessionError,
+        "not found!",
+      );
+    });
+    await st.step("variousValidationBranches", () => {
+      nowNumber = sessionExpiresDate.getTime() - 10000;
+      user.validateSession(sessionToken);
+      assertEquals(
+        session.expiresAt.getTime(),
+        Date.now() + Session.MAX_DURATION_MS,
+      );
+      nowNumber = Infinity;
+      assertThrows(() => {
+        user.validateSession(sessionToken);
+      });
+      nowNumber = -Infinity;
+      user.createSession();
+      user.validateSession(sessionToken);
+      user.deleteSessionByToken(sessionToken);
+      assertThrows(() => {
+        user.validateSession(sessionToken);
+      });
     });
   });
 });

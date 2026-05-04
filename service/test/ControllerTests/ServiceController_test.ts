@@ -1,4 +1,3 @@
-import { ServiceController } from "../../src/classes/controller/ServiceController.ts";
 import { User } from "../../src/classes/Entities/User.ts";
 import { assertEquals } from "@std/assert";
 import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
@@ -22,6 +21,7 @@ import { Group } from "../../src/classes/Entities/Group.ts";
 import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
 import { UserI } from "../../interfaceTypes/UserI.ts";
 import { ConvertedService } from "../../src/types/ConvertedService.ts";
+import { ServiceController } from "../../src/classes/controller/ServiceController.ts";
 
 Deno.test("ServiceController", async (t) => {
   const goodReturn = "returned" as unknown;
@@ -107,9 +107,11 @@ Deno.test("ServiceController", async (t) => {
       serviceRepo.reset();
       userRepo.reset();
       const serviceData = { ...convertedServiceList[0] };
+      const oldUsers = [...serviceData.users!];
       serviceData.users = [
-        ...serviceData.users!,
+        ...oldUsers,
         userList[0].getDisplayName(),
+        userList[1].getDisplayName(),
         userList[1].getDisplayName(),
       ];
       mockContext.req.registerOutput("json", serviceData);
@@ -122,6 +124,11 @@ Deno.test("ServiceController", async (t) => {
         "findByDisplayName",
         Promise.resolve(userList[1]),
       );
+      userRepo.registerOutput(
+        "findByDisplayName",
+        Promise.resolve(userList[1]),
+      );
+
       await serviceController.addUsersToService(mockContext.this);
       const savedService = serviceRepo.stub["save"].args[0][0];
       const response = mockContext.lastArgs("json") as [{
@@ -129,14 +136,20 @@ Deno.test("ServiceController", async (t) => {
         rejected: NotFoundError[];
         alreadyIn: AlreadyTakenError[];
       }, number];
-
+      serviceData.users = [
+        ...oldUsers,
+        userList[0].getDisplayName(),
+        userList[1].getDisplayName(),
+      ];
       assertEquals(savedService.toJson(), serviceData);
       assertEquals(
         response[0].resolved,
         [userList[0], userList[1]].map((e) => e.toJson()),
       );
       assertEquals(response[0].rejected, []);
-      assertEquals(response[0].alreadyIn, []);
+      assertEquals(response[0].alreadyIn, [{
+        displayname: userList[1].getDisplayName(),
+      }] as unknown);
       assertEquals(response[1], 200);
     });
   });
@@ -180,6 +193,10 @@ Deno.test("ServiceController", async (t) => {
       groupData["serviceInvitations"] = [1, 2].map(
         (_) => "sender:obj:receiver:service",
       );
+      const wrongInvType = "sender:obj:receiver:group";
+      groupData["serviceInvitations"].push(wrongInvType);
+      const wrongReceiver = "sender:obj:wrongReceiver:service";
+      groupData["serviceInvitations"].push(wrongReceiver);
       mockContext.reset();
       groupRepo.reset();
       mockedGroup.reset();
@@ -206,7 +223,11 @@ Deno.test("ServiceController", async (t) => {
       assertEquals(returned, goodReturn);
       assertEquals(mockContext.lastArgs("json"), [{
         fulfilled: [invite.toString()],
-        rejected: ["generic"],
+        rejected: [
+          "generic",
+          wrongInvType + " is not a service invitation",
+          wrongReceiver + " is not for this Group",
+        ],
       }]);
       assertEquals(mockedGroup.stub["checkOwner"].args[0], [fakeMe]);
       assertEquals(mockedService.stub["checkOwner"].args[0], [mockedUser.this]);
@@ -244,6 +265,7 @@ Deno.test("ServiceController", async (t) => {
     mockContext.reset();
     mockedUser.reset();
     mockedService.reset();
+    mockedGroup.reset();
     serviceRepo.reset();
     const data: ConvertedService = {
       "id": "123",
@@ -313,6 +335,7 @@ Deno.test("ServiceController", async (t) => {
             mockContext.this,
           ),
           await serviceController.delete(mockContext.this),
+          await serviceController.inviteGroupsToService(mockContext.this),
         );
 
         assertResponsesAndErrors(
