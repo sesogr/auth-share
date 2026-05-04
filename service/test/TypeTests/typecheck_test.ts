@@ -1,5 +1,10 @@
 import { assertThrows } from "@std/assert";
-import { checkForAdditionalKeys, typeCheck } from "../../src/types/types.ts";
+import {
+  assertIsStringRecord,
+  checkForAdditionalKeys,
+  indepthTypeCheck,
+  typeCheck,
+} from "../../src/types/types.ts";
 import { FormlessError } from "../../src/classes/errors/controllerErrors/FormlessError.ts";
 
 Deno.test("Typechecks", async (t) => {
@@ -98,5 +103,26 @@ Deno.test("Typechecks", async (t) => {
         typeCheck({ boolean: true }, "boolean", "boolean");
       });
     });
+  });
+  await t.step("assert Is String Record", () => {
+    assertThrows(
+      () => {
+        const symbol = Symbol("sym");
+        const tObject = { asd: "asd", [symbol]: "hallo" };
+        assertIsStringRecord(tObject);
+      },
+      TypeError,
+      "All keys must be strings",
+    );
+  });
+  await t.step("indepth type check", () => {
+    assertThrows(
+      () => {
+        const obj = { asb: [123] };
+        indepthTypeCheck(["asb"], ["as"], obj, ["asb"]);
+      },
+      TypeError,
+      "123 is not a string",
+    );
   });
 });
