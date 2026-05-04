@@ -21,6 +21,7 @@ import { Stubbed } from "@stubClass";
 import { Group } from "../../src/classes/Entities/Group.ts";
 import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
 import { UserI } from "../../interfaceTypes/UserI.ts";
+import { ConvertedService } from "../../src/types/ConvertedService.ts";
 
 Deno.test("ServiceController", async (t) => {
   const goodReturn = "returned" as unknown;
@@ -239,7 +240,55 @@ Deno.test("ServiceController", async (t) => {
       assertEquals(serviceRepo.lastArgs("delete"), [mockedService]);
     });
   });
-
+  await t.step("invite Groups to Service", async () => {
+    mockContext.reset();
+    mockedUser.reset();
+    mockedService.reset();
+    serviceRepo.reset();
+    const data: ConvertedService = {
+      "id": "123",
+      sentInvitations: [
+        "group1",
+        "group2",
+        "group3",
+        "group4",
+      ],
+    };
+    mockContext.req.registerOutput("json", data);
+    serviceRepo.registerOutput("findById", mockedService);
+    groupRepo.registerOutput("findByDisplayName", mockedGroup);
+    const rejection = Promise.reject(
+      new NotFoundError("group", "displayname", "group"),
+    );
+    groupRepo.registerOutput(
+      "findByDisplayName",
+      rejection,
+    );
+    groupRepo.registerOutput(
+      "findByDisplayName",
+      rejection,
+    );
+    mockedGroup.registerOutput("getDisplayName", "group1");
+    mockedGroup.registerOutput("getDisplayName", "group2");
+    groupRepo.registerOutput("findByDisplayName", mockedGroup);
+    mockContext.registerOutput("json", goodReturn);
+    mockedService.registerOutput("sendInvitation");
+    mockedService.registerOutput("sendInvitation", new Error("generic"));
+    const returned = await serviceController.inviteGroupsToService(
+      mockContext.this,
+    );
+    assertEquals(returned, goodReturn);
+    assertEquals(mockContext.lastArgs("json"), [{
+      rejected: ["group", "group"],
+      fulfilled: ["group1"],
+      alreadyIn: ["group2"],
+    }]);
+    assertEquals(mockedService.lastArgs("sendInvitation"), [
+      mockedGroup,
+      fakeMe,
+    ]);
+    assertEquals(mockedService.counter("sendInvitation"), 2);
+  });
   await t.step(
     "all methods return errorHandle",
     async (st) => {
