@@ -23,6 +23,7 @@ import { ConflictError } from "../../errors/controllerErrors/ConflictError/Confl
 import { Logger } from "../../../../interfaceTypes/Logger.ts";
 import { ValidatedUser } from "../../../../interfaceTypes/ValidatedUser.ts";
 import { UserI } from "../../../../interfaceTypes/UserI.ts";
+import { AlreadyTakenError } from "../../errors/controllerErrors/ConflictError/AlreadyTakenError.ts";
 
 export class DbUserRepository extends DbRepository<UserI>
   implements UserRepository {
@@ -115,6 +116,17 @@ export class DbUserRepository extends DbRepository<UserI>
   }
 
   async add(item: User): Promise<void> {
+    if (
+      DbUserCredential.select(DbUserCredential.field("username")).where(
+        DbUserCredential.field("user_id"),
+        user.getId(),
+      ).first()
+    ) {
+      throw new AlreadyTakenError(
+        item.username + " already exists",
+        "username",
+      );
+    }
     try {
       await DbUser.create({
         displayname: item.getDisplayName(),
