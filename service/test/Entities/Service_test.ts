@@ -1,7 +1,11 @@
-import { assertArrayIncludes, assertEquals, assertFalse } from "@std/assert";
-import { Service } from "../../src/classes/Entities/Service.ts";
+import {
+  assertArrayIncludes,
+  assertEquals,
+  assertFalse,
+  assertThrows,
+} from "@std/assert";
+import { OwnedService, Service } from "../../src/classes/Entities/Service.ts";
 import { ServiceCredential } from "../../src/classes/Values/ServiceCredential.ts";
-import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
 import { Invitation } from "../../src/classes/Values/Invitation.ts";
 import { Group } from "../../src/classes/Entities/Group.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";
@@ -9,34 +13,39 @@ import { AllowedGroupServiceMap } from "../../src/classes/Values/AllowedGroupSer
 import { AllowedUserServiceMap } from "../../src/classes/Values/AllowedUserServiceMap.ts";
 import { ConvertedService } from "../../src/types/ConvertedService.ts";
 import { User } from "../../src/classes/Entities/User.ts";
+import { TestUser } from "../StubbedClasses/TestUser.ts";
+import { TestGroup } from "../StubbedClasses/TestGroup.ts";
+import { DuplicateError } from "../../src/classes/errors/DuplicateError.ts";
+import { NotFoundError } from "../../src/classes/errors/NotFoundError.ts";
+import { AuthorizationError } from "../../src/classes/errors/controllerErrors/AuthorizationError.ts";
 
-const serviceCredential = new ServiceCredential("", "");
-const userShort = await FakeObjectGen.createFakeUser(
-  undefined,
-  undefined,
-  "uwe",
-);
-const user2Short = await FakeObjectGen.createFakeUser(
-  undefined,
-  undefined,
-  "swe",
-);
-const user = await FakeObjectGen.createFakeUser();
-const user2 = await FakeObjectGen.createFakeUser();
-const service = Service.createService(
-  serviceCredential,
-  "sag",
-  "asdf",
-  userShort,
-);
 Deno.test("Service Class", async (t) => {
+  const serviceCredential = new ServiceCredential("", "");
+  const ownerData = new IdNameMap("ownerId", "ownerName");
+  const userData = new IdNameMap("userId", "userName");
+  const senderData = new IdNameMap("senderId", "senderName");
+  const receiverData = new IdNameMap("receiverId", "receiverName");
+  const fakeUser = TestUser.create();
+  const fakeGroup = TestGroup.create();
+  fakeUser.registerOutput("convertToShort", ownerData);
+  fakeUser.registerOutput("getId", ownerData.id);
+  const service: OwnedService = Service.createService(
+    serviceCredential,
+    "sag",
+    "asdf",
+    fakeUser.this,
+  );
   await t.step("Service Creates", () => {
     const owners: string[] = service.listAllowedUsers(true);
-    assertArrayIncludes(owners, [userShort.getDisplayName()]);
+    assertArrayIncludes(owners, [ownerData.displayname]);
     assertEquals(service.serviceUrl, "asdf");
     assertEquals(service.credentials, serviceCredential);
   });
-
+  await t.step("check owner throws when not an owner", () => {
+    assertThrows(() => {
+      service.checkOwner(fakeUser.this);
+    }, AuthorizationError);
+  });
   await t.step("lists that should be empty are empty", () => {
     assertEquals(
       service.listAllowedGroups().length +
@@ -46,25 +55,92 @@ Deno.test("Service Class", async (t) => {
   });
 
   await t.step(
-    "Service Authorize new User successfully puts User into owners",
-    () => {
-      service.giveAuthorizationToUser(user2Short);
-      assertArrayIncludes(service.listAllowedUsers(), [
-        user2Short.getDisplayName(),
-      ]);
+    "give Authorization to User",
+    async (st) => {
+      await st.step("works", () => {
+        fakeUser.registerOutput("convertToShort", userData);
+        service.giveAuthorizationToUser(fakeUser.this);
+        assertArrayIncludes(service.listAllowedUsers(), [
+          userData.displayname,
+        ]);
+      });
+      await st.step("throws when already given", () => {
+        fakeUser.registerOutput("convertToShort", userData);
+        assertThrows(
+          () => {
+            service.giveAuthorizationToUser(fakeUser.this);
+          },
+          DuplicateError,
+          userData.displayname,
+        );
+      });
     },
   );
-  await t.step("send invitation", () => {
+  await t.step("promote user", async (st) => {
+    await st.step("NotFound throws", () => {
+      assertThrows(
+        () => {
+          service.promoteUser("error");
+        },
+        NotFoundError,
+      );
+    });
+    await st.step("Duplicate throws", () => {
+      assertThrows(
+        () => {
+          service.promoteUser(ownerData.displayname);
+        },
+        DuplicateError,
+      );
+    });
+    await st.step("worked", () => {
+      service.promoteUser(userData.displayname);
+      assertArrayIncludes(service.listAllowedUsers(), [
+        ownerData.displayname,
+        userData.displayname,
+      ]);
+    });
+  });
+  await t.step("send invitation", async (st) => {
+    fakeUser.registerOutput("convertToShort", senderData);
+    fakeGroup.registerOutput("convertToShort", receiverData);
+    fakeUser.registerOutput("convertToShort", senderData);
+    fakeGroup.registerOutput("convertToShort", receiverData);
     const testInvite = new Invitation(
-      user.convertToShort(),
+      senderData,
       service.convertToShort(),
-      user2.convertToShort(),
+      receiverData,
       "service",
     );
-    service.sendInvitation(user2 as unknown as Group, user);
-    assertFalse(!service.sentInvitations.some((e) => e.equals(testInvite)));
+    await st.step("worked", () => {
+      service.sendInvitation(fakeGroup.this, fakeUser.this);
+      assertFalse(!service.sentInvitations.some((e) => e.equals(testInvite)));
+    });
+    await st.step("already send", () => {
+      assertThrows(() => {
+        service.sendInvitation(fakeGroup.this, fakeUser.this);
+      }, DuplicateError);
+    });
   });
-
+  await t.step("accept invitation", async (st) => {
+    const testInvite = new Invitation(
+      senderData,
+      service.convertToShort(),
+      receiverData,
+      "service",
+    );
+    await st.step("worked", () => {
+      service.acceptInvitation(testInvite);
+      assertArrayIncludes(service.listAllowedGroups(), [
+        receiverData.displayname,
+      ]);
+    });
+    await st.step("not found", () => {
+      assertThrows(() => {
+        service.acceptInvitation({} as Invitation);
+      }, NotFoundError);
+    });
+  });
   await t.step("group authorization", () => {
     const fakeGroup = {
       convertToShort: () => {
@@ -72,7 +148,7 @@ Deno.test("Service Class", async (t) => {
       },
     } as Group;
     service.giveAuthorizationToGroup(fakeGroup);
-    assertEquals(
+    assertArrayIncludes(
       service.listAllowedGroups(),
       [fakeGroup.convertToShort().displayname],
     );
