@@ -104,22 +104,27 @@ Deno.test("GroupController", async (t) => {
     assertEquals(mockContext.lastArgs("body"), [null, 204]);
   });
   await t.step("acceptInvitation", async () => {
-    const counts = [0, 1, 2, 3];
     mockContext.reset();
     mockUser.reset();
     mockGroup.reset();
     fakeMe.reset();
     mockGroupRepo.reset();
-    fakeMe.registerOutput("getDisplayName", "3", true);
-    const invitationsData = counts.map(
-      () => "1:2:3:group",
-    );
+    fakeMe.registerOutput("getDisplayName", "1");
+    fakeMe.registerOutput("getDisplayName", "3");
+    fakeMe.registerOutput("getDisplayName", "3");
+    fakeMe.registerOutput("getDisplayName", "3");
+    const invitationsData = [
+      "1:2:2:group",
+      "1:2:3:service",
+      "1:2:3:group",
+      "1:2:3:service",
+    ];
     mockContext.req.registerOutput("json", {
       "userGroupInvitations": invitationsData,
     });
     const idNameMap = new IdNameMap("12", "123");
     const invitation = new Invitation(idNameMap, idNameMap, idNameMap, "group");
-    counts.forEach(() => {
+    [1, 2, 3, 4].forEach(() => {
       mockGroupRepo.registerOutput("findByDisplayName", mockGroup.this);
       mockUserRepo.registerOutput("findByDisplayName", mockUser.this);
       mockGroup.registerOutput("convertToShort", idNameMap);
@@ -130,18 +135,22 @@ Deno.test("GroupController", async (t) => {
     const returned = await groupController.acceptInvitation(mockContext.this);
     assertEquals(returned, goodReturn);
     assertEquals(mockContext.lastArgs("json"), [{
-      fulfilled: counts.map(() => invitation.toString()),
-      rejected: [],
+      fulfilled: [invitation.toString()],
+      rejected: [
+        "You are not the receiver of this invitation",
+        "1:2:3:service is not a group invitation",
+        "1:2:3:service is not a group invitation",
+      ],
     }]);
     assertEquals(
       mockGroup.stub["checkOwner"].args,
-      counts.map(() => [mockUser.this]),
+      [[mockUser.this]],
     );
     assertEquals(
       mockGroup.stub["acceptInvitation"].args,
-      counts.map(() => [invitation]),
+      [[invitation]],
     );
-    assertEquals(mockGroup.counter("checkOwner"), counts.length);
+    assertEquals(mockGroup.counter("checkOwner"), 1);
     fakeMe.reset(true);
   });
   await t.step("invite Users", async () => {
