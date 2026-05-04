@@ -112,7 +112,7 @@ export class Service extends Entity implements HasInvitations {
     if (!toPromote) {
       throw new NotFoundError("allowed User", "display name", user);
     }
-    if (!toPromote.isOwner) {
+    if (toPromote.isOwner) {
       throw new DuplicateError(user + " already Owner");
     }
     this._allowedUsers[toPromoteI] = toPromote.with({ isOwner: true });
@@ -182,6 +182,11 @@ export class Service extends Entity implements HasInvitations {
       receiver.convertToShort(),
       "service",
     );
+    if (this.sentInvitations.find((e) => e.equals(invitation))) {
+      throw new DuplicateError(
+        invitation + "already sent",
+      );
+    }
     this._sentInvitations.push(invitation);
   }
 }
