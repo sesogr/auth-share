@@ -4,6 +4,7 @@ import { ConvertedGroup } from "./ConvertedGroup.ts";
 import { ConvertedService } from "./ConvertedService.ts";
 import { ConvertedUser } from "./ConvertedUser.ts";
 import { Credentials } from "./Credentials.ts";
+
 type FilterForValues<T, Value> = Exclude<
   ({
     [F in keyof T]: T[F] extends (Value) ? F : never;
@@ -33,14 +34,15 @@ export function assertIsStringRecord(
   if (typeof obj !== "object" || obj === null) {
     throw new TypeError("Not an object");
   }
-  const objectkeys = Object.keys(obj);
-  if (!(objectkeys.length > 0)) {
+  const objectKeys = Reflect.ownKeys(obj);
+  if (!(objectKeys.length > 0)) {
     throw new TypeError("Empty object");
   }
-  if (!objectkeys.every((key) => typeof key === "string")) {
+  if (!objectKeys.every((key) => typeof key === "string")) {
     throw new TypeError("All keys must be strings");
   }
 }
+
 export function typeCheck<
   T extends JsTypeofString | "array",
 >(
@@ -69,6 +71,7 @@ export function checkForAdditionalKeys(obj: object, allKeys: string[]) {
     throw new FormlessError();
   }
 }
+
 export function indepthTypeCheck(
   assertion: string | string[],
   stringKeys: string[],
