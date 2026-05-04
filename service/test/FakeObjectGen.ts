@@ -1,11 +1,11 @@
 import { faker } from "@jackfiszr/faker";
-import { User } from "./Entities/User.ts";
-import { UserCredential } from "./Values/UserCredential.ts";
-import { Group } from "./Entities/Group.ts";
-import { Service } from "./Entities/Service.ts";
-import { ServiceCredential } from "./Values/ServiceCredential.ts";
-import { ValidatedUser } from "../../interfaceTypes/ValidatedUser.ts";
-import { UserI } from "../../interfaceTypes/UserI.ts";
+import { User } from "../src/classes/Entities/User.ts";
+import { UserCredential } from "../src/classes/Values/UserCredential.ts";
+import { Group } from "../src/classes/Entities/Group.ts";
+import { Service } from "../src/classes/Entities/Service.ts";
+import { ServiceCredential } from "../src/classes/Values/ServiceCredential.ts";
+import { ValidatedUser } from "../interfaceTypes/ValidatedUser.ts";
+import { UserI } from "../interfaceTypes/UserI.ts";
 
 export class FakeObjectGen {
   static async createFakeUser(
@@ -20,6 +20,7 @@ export class FakeObjectGen {
       id,
     );
   }
+
   static async createUnvalidatedUser(
     userName = faker.internet.userName(),
     password = faker.internet.password(7, true, /.* /, ""),
@@ -47,6 +48,7 @@ export class FakeObjectGen {
       id,
     );
   }
+
   static async createFakeService(
     futureOwner?: ValidatedUser,
   ) {
@@ -87,6 +89,7 @@ export class FakeObjectGen {
     }
     return fakeGroupList;
   }
+
   static async generateFakeServices(
     userList: ValidatedUser[] = [],
     count: number = 10,

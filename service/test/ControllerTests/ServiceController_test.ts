@@ -1,6 +1,6 @@
 import { User } from "../../src/classes/Entities/User.ts";
 import { assertEquals } from "@std/assert";
-import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { FakeObjectGen } from "../FakeObjectGen.ts";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
 import { TestContext } from "../StubbedClasses/TestContext.ts";
 import { TestServiceRepo } from "../StubbedClasses/TestServiceRepo.ts";

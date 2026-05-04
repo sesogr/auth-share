@@ -15,7 +15,7 @@ import { DbUserService } from "../../src/classes/Repositories/DenoDB/Models/DbUs
 import { setupManyToMany } from "../../src/classes/Repositories/DenoDB/Models/setupManyToMany.ts";
 import { Service } from "../../src/classes/Entities/Service.ts";
 import { User } from "../../src/classes/Entities/User.ts";
-import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { FakeObjectGen } from "../FakeObjectGen.ts";
 import { ServiceRepository } from "../../interfaceTypes/ServiceRepository.ts";
 import { UserRepository } from "../../interfaceTypes/UserRepository.ts";
 import { DbSessions } from "../../src/classes/Repositories/DenoDB/Models/DbSessions.ts";
@@ -44,9 +44,11 @@ db.link([
 ]);
 
 await db.sync({ drop: true });
+
 function sleep(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
+
 const logger = new RamOnlyLog();
 const groupsWithService = async () => {
   const fakeUser = await FakeObjectGen.createFakeUser();
@@ -101,6 +103,7 @@ async function buildUpUserRepo() {
 
   return { mockUserIdList, fakeUserList };
 }
+
 async function buildUpServRepo(userList: User[]) {
   const serviceList: Service[] = await FakeObjectGen.generateFakeServices(
     userList,
@@ -112,6 +115,7 @@ async function buildUpServRepo(userList: User[]) {
 
   return { serviceList, serviceRepository };
 }
+
 async function buildUpGroupRepo(userList: User[]) {
   const groupList: Group[] = await FakeObjectGen.generateFakeGroups(userList);
   const groupRepository = new DbGroupRepository(logger);

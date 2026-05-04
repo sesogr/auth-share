@@ -2,7 +2,7 @@ import { HeadController } from "../../src/classes/controller/HeadController.ts";
 import { Context } from "@hono/hono";
 import { RamOnlyLog } from "../RamOnlyLog.ts";
 import { TestContext } from "../StubbedClasses/TestContext.ts";
-import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { FakeObjectGen } from "../FakeObjectGen.ts";
 import { assertEquals, assertThrows } from "@std/assert";
 import { SessionError } from "../../src/classes/errors/controllerErrors/SessionError.ts";
 import { ControllerError } from "../../src/classes/errors/controllerErrors/ControllerError.ts";
@@ -14,18 +14,22 @@ class _unprotectHeadController extends HeadController {
   constructor(logging: Logger) {
     super(logging.withOwnContext("TestingHC"));
   }
+
   getLog() {
     return this.logging as RamOnlyLog;
   }
+
   unprotectGetMeFromContext(
     c: Context,
   ): ValidatedUser {
     return this.getMeFromContext(c);
   }
+
   unProtectedErrorHandle(error: unknown, c: Context) {
     return this.errorHandle(error, c);
   }
 }
+
 Deno.test("HeadController", async (t) => {
   const headController = new _unprotectHeadController(new RamOnlyLog());
   const ramLogger = headController.getLog();

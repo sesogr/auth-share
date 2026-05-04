@@ -1,7 +1,7 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { InMemUserRepository } from "../../../src/classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
-import { FakeObjectGen } from "../../../src/classes/FakeObjectGen.ts";
+import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { NotFoundError } from "../../../src/classes/errors/NotFoundError.ts";
 import { spy } from "@std/testing/mock";
 import { AllowedUserGroupMap } from "../../../src/classes/Values/AllowedUserGroupMap.ts";

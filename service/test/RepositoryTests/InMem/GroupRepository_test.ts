@@ -2,7 +2,7 @@ import { spy } from "@std/testing/mock";
 import { AllowedGroupServiceMap } from "../../../src/classes/Values/AllowedGroupServiceMap.ts";
 import { Invitation } from "../../../src/classes/Values/Invitation.ts";
 import { InMemGroupRepository } from "../../../src/classes/Repositories/InMem$Repositories/InMemGroupRepository.ts";
-import { FakeObjectGen } from "../../../src/classes/FakeObjectGen.ts";
+import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateView.ts";
 import { SpyObject } from "../../HelperTypes.ts";
 import { Group } from "../../../src/classes/Entities/Group.ts";

@@ -3,7 +3,7 @@ import { Group } from "../../src/classes/Entities/Group.ts";
 import { User } from "../../src/classes/Entities/User.ts";
 import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
 import { Invitation } from "../../src/classes/Values/Invitation.ts";
-import { FakeObjectGen } from "../../src/classes/FakeObjectGen.ts";
+import { FakeObjectGen } from "../FakeObjectGen.ts";
 import { DuplicateError } from "../../src/classes/errors/DuplicateError.ts";
 import { ConvertedGroup } from "../../src/types/types.ts";
 import { IdNameMap } from "../../src/classes/Values/IdNameMap.ts";

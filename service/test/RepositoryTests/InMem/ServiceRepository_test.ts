@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { InMemServiceRepository } from "../../../src/classes/Repositories/InMem$Repositories/InMemServiceRepository.ts";
 import { Service } from "../../../src/classes/Entities/Service.ts";
-import { FakeObjectGen } from "../../../src/classes/FakeObjectGen.ts";
+import { FakeObjectGen } from "../../FakeObjectGen.ts";
 import { ServiceRepository } from "../../../interfaceTypes/ServiceRepository.ts";
 import { User } from "../../../src/classes/Entities/User.ts";
 import { UserCredential } from "../../../src/classes/Values/UserCredential.ts";
