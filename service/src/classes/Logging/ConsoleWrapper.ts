@@ -3,7 +3,7 @@ import type { Logger, LogLevel } from "../../../interfaceTypes/Logger.ts";
 export class ConsoleWrapper implements Logger {
   constructor(
     readonly logLevel: LogLevel[],
-    private readonly context: string = "",
+    readonly context: string = "",
   ) {}
   withOwnContext(context: string): Logger {
     return new ConsoleWrapper(this.logLevel, context);
