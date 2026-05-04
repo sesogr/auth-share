@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertThrows } from "@std/assert";
 import { stub } from "@std/testing/mock";
 import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
 import { bcryptAdapter } from "../../src/adapter/bcryptAdapter.ts";
@@ -27,7 +27,11 @@ Deno.test("User Credential", async (t) => {
     "compare",
     () => Promise.resolve(true),
   );
-
+  const test: UserCredential = new UserCredential("sdf", "adf", "sdf");
+  assertThrows(() => {
+    const b: false = false;
+    test.assertsVerification(b);
+  });
   const userCred = await UserCredential.create(username, plainPassword);
   try {
     await t.step("creation", () => {

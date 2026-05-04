@@ -14,4 +14,6 @@ export type UserI = DisplayableEntity & {
   createSession(): { token: string; session: Session };
   toJson(): ConvertedUser;
   toJsonString(): string;
+  listServices(owned?: boolean): string[];
+  listJoinedGroups(): string[];
 };

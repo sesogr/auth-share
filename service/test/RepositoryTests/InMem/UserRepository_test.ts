@@ -1,7 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { InMemUserRepository } from "../../../src/classes/Repositories/InMem$Repositories/InMemUserRepository.ts";
 import { UserRepository } from "../../../interfaceTypes/UserRepository.ts";
-import { User } from "../../../src/classes/Entities/User.ts";
 import { FakeObjectGen } from "../../../src/classes/FakeObjectGen.ts";
 import { NotFoundError } from "../../../src/classes/errors/NotFoundError.ts";
 import { spy } from "@std/testing/mock";
@@ -11,6 +10,7 @@ import { ServiceAggregateView } from "../../../interfaceTypes/ServiceAggregateVi
 import { GroupAggregateView } from "../../../interfaceTypes/GroupAggregateView.ts";
 import { SpyObject } from "../../HelperTypes.ts";
 import { IdNameMap } from "../../../src/classes/Values/IdNameMap.ts";
+import { UserI } from "../../../interfaceTypes/UserI.ts";
 
 Deno.test("UserRepository", async (t) => {
   await t.step("Test for method findById()", async () => {
@@ -47,7 +47,7 @@ Deno.test("UserRepository", async (t) => {
   await t.step("Test for method findAll()", async () => {
     const { userRepository, mockUserIdList }: UserRepoTestSuit =
       await buildUp();
-    const userList: User[] = await userRepository.findAll();
+    const userList: UserI[] = await userRepository.findAll();
     const userIdList: string[] = userList.map((e) => e.getId());
     assertEquals(userIdList, mockUserIdList);
   });
@@ -64,7 +64,7 @@ Deno.test("UserRepository", async (t) => {
 });
 
 async function buildUp(): Promise<UserRepoTestSuit> {
-  const fakeUserList: User[] = await FakeObjectGen.generateFakeUsers();
+  const fakeUserList: UserI[] = await FakeObjectGen.generateFakeUsers();
   const mockUserIdList: string[] = fakeUserList.map((e) => e.getId());
   const serviceRepository: SpyObject<ServiceAggregateView> =
     createServiceRepository(mockUserIdList);
@@ -131,5 +131,5 @@ type UserRepoTestSuit = {
   userRepository: UserRepository;
   serviceRepository: SpyObject<ServiceAggregateView>;
   groupRepository: SpyObject<GroupAggregateView>;
-  fakeUserList: User[];
+  fakeUserList: UserI[];
 };

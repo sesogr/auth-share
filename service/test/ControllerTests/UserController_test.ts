@@ -8,12 +8,20 @@ import { TestUser } from "../StubbedClasses/TestUser.ts";
 import { assertEquals } from "@std/assert";
 import { ConvertedUser } from "../../src/types/ConvertedUser.ts";
 import { assertResponsesAndErrors } from "./assertResponsesAndErrors.ts";
+import { User } from "../../src/classes/Entities/User.ts";
+import { UserCredential } from "../../src/classes/Values/UserCredential.ts";
+import { Environment } from "../../src/classes/Environment.ts";
+import { CookieOptions } from "@hono/hono/utils/cookie";
+
+function clearList(listToClear: { calls: unknown[] }) {
+  while (listToClear.calls.length) listToClear.calls.pop();
+}
 
 Deno.test("UserController - Test", async (t) => {
-  const goodReturn = "returned";
+  const goodReturn = "returned" as unknown;
   const userRepo = TestUserRepo.create();
   const userController = new UserController(userRepo.this, new RamOnlyLog());
-  let errorReturned = "errorReturned";
+  let errorReturned = "errorReturned" as unknown;
   //@ts-ignore protected member
   const errorHandleStub = stub(userController, "errorHandle", () => {
     return errorReturned;
@@ -27,6 +35,7 @@ Deno.test("UserController - Test", async (t) => {
     "saveGetCookie",
     () => sessionToken,
   );
+  const deleteCookieStub = stub(HonoCookieAdapter, "deleteCookie");
   await t.step("authMiddleware", async (st) => {
     await st.step("getCookie returns a session token", async () => {
       userRepo.reset();
@@ -57,7 +66,7 @@ Deno.test("UserController - Test", async (t) => {
           nextTriggered = true;
           return Promise.resolve();
         },
-      ) as unknown as string;
+      );
       assertEquals(returned, errorReturned);
       assertEquals(nextTriggered, false);
       assertEquals(cookieStub.calls[0].args, [mockContext.this, "session"]);
@@ -73,7 +82,7 @@ Deno.test("UserController - Test", async (t) => {
     mockContext.registerOutput("json", goodReturn);
     const returned = userController.listMyServices(
       mockContext.this,
-    ) as unknown as string;
+    );
     assertEquals(returned, goodReturn);
     assertEquals(mockedUser.stub["listServices"].args[0], []);
     assertEquals(mockContext.lastArgs("json"), [listServiceReturn]);
@@ -83,7 +92,7 @@ Deno.test("UserController - Test", async (t) => {
     mockContext.reset();
     mockContext.registerOutput("json", goodReturn);
     mockedUser.registerOutput("toJson", { asd: "asd" });
-    const returned = userController.read(mockContext.this) as unknown as string;
+    const returned = userController.read(mockContext.this);
     assertEquals(returned, goodReturn);
     assertEquals(mockedUser.stub["toJson"].args[0], []);
     assertEquals(mockContext.lastArgs("json"), [{ asd: "asd" }]);
@@ -105,7 +114,7 @@ Deno.test("UserController - Test", async (t) => {
       mockContext.registerOutput("body", goodReturn);
       const returned = await userController.changePassword(
         mockContext.this,
-      ) as unknown as string;
+      );
       assertEquals(returned, goodReturn);
       assertEquals(mockedUser._credentials.stub["changePassword"].args[0], [
         password,
@@ -114,16 +123,44 @@ Deno.test("UserController - Test", async (t) => {
       assertEquals(userRepo.lastArgs("save"), [mockedUser]);
     });
   });
+  await t.step("create", async () => {
+    userRepo.reset();
+    mockedUser.reset();
+    mockContext.reset();
+    const credentials = { username: "username", password: "password" };
+    const data = {
+      displayname: "username",
+      credentials: credentials as unknown as UserCredential,
+    };
+    mockContext.req.registerOutput("json", data);
+    const createUserCredentialStub = stub(
+      UserCredential,
+      "create",
+      () => Promise.resolve(data.credentials),
+    );
+    const createUserStub = stub(User, "createUser", () => mockedUser.this);
+    mockContext.registerOutput("body", goodReturn);
+    const returned = await userController.create(mockContext.this);
+    assertEquals(returned, goodReturn);
+    assertEquals(mockContext.lastArgs("body"), [null, 201]);
+    assertEquals(createUserStub.calls[0].args, [
+      data.credentials,
+      data.displayname,
+    ]);
+    assertEquals(createUserCredentialStub.calls[0].args, [
+      data.credentials.username,
+      data.credentials.password,
+    ]);
+  });
   await t.step("log out", async () => {
     mockedUser.reset();
     mockContext.reset();
     userRepo.reset();
     sessionToken = "123";
-    const deleteCookieStub = stub(HonoCookieAdapter, "deleteCookie");
     mockContext.registerOutput("body", goodReturn);
     const returned = await userController.logOut(
       mockContext.this,
-    ) as unknown as string;
+    );
     assertEquals(returned, goodReturn);
     assertEquals(mockedUser.stub["deleteSessionByToken"].args[0], [
       sessionToken,
@@ -132,6 +169,79 @@ Deno.test("UserController - Test", async (t) => {
     assertEquals(deleteCookieStub.calls[0].args, [mockContext.this, "session"]);
     assertEquals(mockContext.lastArgs("body"), [null, 200]);
     assertEquals(userRepo.lastArgs("save"), [mockedUser]);
+  });
+  await t.step("log in", async () => {
+    mockContext.reset();
+    userRepo.reset();
+    mockedUser.reset();
+    const credentials = { username: "username", password: "password" };
+    const data = {
+      credentials: credentials,
+    };
+    mockContext.req.registerOutput("json", data);
+    userRepo.registerOutput("findByUserName", mockedUser.this);
+    const mockedSession = { expiresAt: new Date() };
+    const token = "token";
+    mockedUser.registerOutput("createSession", {
+      token: token,
+      session: mockedSession,
+    });
+    Environment.FRONT_END_URL = "http";
+    //@ts-ignore private
+    Environment.checked = true;
+    const cookieSetStub = stub(HonoCookieAdapter, "setCookie");
+    const cookieMeta: CookieOptions = {
+      domain: Environment.FRONT_END_URL,
+      path: "/",
+      secure: true,
+      httpOnly: true,
+      maxAge: 1000,
+      expires: mockedSession.expiresAt,
+      sameSite: "None" as const,
+    };
+    mockContext.registerOutput("json", goodReturn);
+    mockedUser.registerOutput("getId", "123");
+    mockedUser.registerOutput("getDisplayName", "username");
+    const returned = await userController.logIn(mockContext.this);
+    assertEquals(returned, goodReturn);
+    assertEquals(cookieSetStub.calls[0].args, [
+      mockContext.this,
+      "session",
+      token,
+      cookieMeta,
+    ]);
+    assertEquals(mockContext.lastArgs("json"), [{
+      id: "123",
+      displayname: "username",
+    }, 200]);
+    assertEquals(userRepo.stub["save"].args[0], [mockedUser.this]);
+    assertEquals(
+      mockedUser._credentials.stub["verifyPasswordHash"].args[0][0],
+      credentials.password,
+    );
+  });
+  await t.step("change display name", async () => {
+    mockedUser.reset();
+    mockContext.reset();
+    userRepo.reset();
+    mockContext.req.registerOutput("json", { displayname: "displayname" });
+    mockContext.registerOutput("body", goodReturn);
+    const returned = await userController.changeDisplayName(mockContext.this);
+    assertEquals(returned, goodReturn);
+    assertEquals(mockedUser.lastArgs("setDisplayName"), ["displayname"]);
+    assertEquals(userRepo.lastArgs("save"), [mockedUser.this]);
+    assertEquals(mockContext.lastArgs("body"), [null, 204]);
+  });
+  await t.step("delete", async () => {
+    mockedUser.reset();
+    mockContext.reset();
+    clearList(deleteCookieStub);
+    mockContext.registerOutput("body", goodReturn);
+    const returned = await userController.delete(mockContext.this);
+
+    assertEquals(returned, goodReturn);
+    assertEquals(userRepo.lastArgs("save"), [mockedUser.this]);
+    assertEquals(mockContext.lastArgs("body"), [null, 204]);
   });
   await t.step("all methods return errorHandle", async (st) => {
     sessionToken = "123";
@@ -168,7 +278,7 @@ Deno.test("UserController - Test", async (t) => {
     });
     await st.step("user not needed to be logged in", async () => {
       //login, create
-      while (errorHandleStub.calls.length) errorHandleStub.calls.pop();
+      clearList(errorHandleStub);
       mockContext.reset();
       userRepo.reset();
       const errorObject = new Error("generic");
